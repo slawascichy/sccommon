@@ -11,6 +11,7 @@ import net.sf.ehcache.CacheManager;
 
 import org.apache.commons.lang.StringUtils;
 
+import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.helpers.FileUtils;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;

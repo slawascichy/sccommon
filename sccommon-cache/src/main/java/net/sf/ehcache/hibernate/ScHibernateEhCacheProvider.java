@@ -14,12 +14,12 @@ import net.sf.ehcache.hibernate.management.impl.ProviderMBeanRegistrationHelper;
 
 import org.apache.commons.lang.StringUtils;
 
-import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.common.cache.EhCache;
 import pl.slawas.common.cache._IObjectCache;
 import pl.slawas.common.cache._IObjectCacheProvider;
 import pl.slawas.common.cache._IObjectCacheStatistics;
 import pl.slawas.common.cache.config.CacheConfig;
+import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
 

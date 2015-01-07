@@ -1,4 +1,4 @@
-package pl.slawas.common.cache;
+package pl.slawas.common.cache.config;
 
 /**
  * 
