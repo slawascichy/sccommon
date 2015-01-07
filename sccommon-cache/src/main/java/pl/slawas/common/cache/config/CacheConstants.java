@@ -16,6 +16,12 @@ public interface CacheConstants {
 	 * (pamięci podręcznej).
 	 */
 	String PROP_CONFIG_PATH = "cache.configPath";
+	/**
+	 * Parametr opisujący ścieżkę do pliku z parametrami pamięci podręcznych,
+	 * które są wykorzystywane do tworzenia dynamicznych regionów pamięci
+	 * podręcznych - plik *.properties
+	 */
+	String PROP_DYNAMIC_PARAMETERS_FILE_PATH = "cache.dynamicParametersPath";
 
 	/**
 	 * Nazwa właściwości definiująca nazwę używanego providera cache'a (pamięci

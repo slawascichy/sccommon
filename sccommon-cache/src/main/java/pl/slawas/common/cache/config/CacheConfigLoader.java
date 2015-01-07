@@ -11,6 +11,13 @@ package pl.slawas.common.cache.config;
  */
 public class CacheConfigLoader {
 
+	/**
+	 * 
+	 * @param path2fileConfiguration
+	 *            ścieżka do pliku z parametrami pamięci podręcznej
+	 *            wykorzystywanymi do tworzenia dynamicznych regionów. zobacz
+	 *            też {@link CacheConstants#PROP_DYNAMIC_PARAMETERS_FILE_PATH}
+	 */
 	public CacheConfigLoader(String path2fileConfiguration) {
 		CacheConfig.getInstance(path2fileConfiguration);
 	}
