@@ -21,6 +21,22 @@ public interface _IObjectCacheProvider {
 	 *            maksymalna liczba rekordów jaka ma być zwrócona.
 	 * @return lista statystyk regionów w postaci {@link Element}
 	 */
-	public List<_IObjectCacheStatistics> getAllStatistics(Integer maxRecords);
+	List<_IObjectCacheStatistics> getAllStatistics(Integer maxRecords);
+
+	/**
+	 * Usuwa dane z wybranego cache.
+	 * 
+	 * @param cacheName
+	 */
+	void clearCache(String cacheName);
+
+	/**
+	 * Zwraca listę wszystkich kluczy aktualnie przechowywanych obiektów
+	 * 
+	 * @param cacheName
+	 *            nazwa pamięci podręcznej/regionu
+	 * @return lista kluczy
+	 */
+	List<String> getKeysList(String cacheName);
 
 }

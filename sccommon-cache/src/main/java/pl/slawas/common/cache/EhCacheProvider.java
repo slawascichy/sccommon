@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 
 import org.apache.commons.lang.StringUtils;
@@ -129,6 +130,30 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 		}
 		return result;
 
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public void clearCache(String cacheName) {
+		if (StringUtils.isNotBlank(cacheName)) {
+			Cache ch = manager.getCache(cacheName);
+			if (ch != null) {
+				ch.removeAll();
+			}
+		}
+	}
+
+	/* Overridden (non-Javadoc) */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getKeysList(String cacheName) {
+		List<String> result = new ArrayList<String>();
+		List<Object> keys = manager.getCache(cacheName).getKeys();
+
+		for (Object key : keys) {
+			result.add(key.toString());
+		}
+		return result;
 	}
 
 }

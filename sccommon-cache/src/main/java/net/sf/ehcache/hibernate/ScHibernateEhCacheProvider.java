@@ -14,12 +14,12 @@ import net.sf.ehcache.hibernate.management.impl.ProviderMBeanRegistrationHelper;
 
 import org.apache.commons.lang.StringUtils;
 
+import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.common.cache.EhCache;
 import pl.slawas.common.cache._IObjectCache;
 import pl.slawas.common.cache._IObjectCacheProvider;
 import pl.slawas.common.cache._IObjectCacheStatistics;
 import pl.slawas.common.cache.config.CacheConfig;
-import pl.slawas.common.cache.config.CacheProperties;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
 
@@ -68,13 +68,6 @@ public class ScHibernateEhCacheProvider extends AbstractEhcacheProvider
 		}
 	}
 
-	public synchronized static _IObjectCacheProvider getInstance() {
-		if (instance == null) {
-			instance = new ScHibernateEhCacheProvider();
-		}
-		return instance;
-	}
-
 	public String[] getCacheNames() {
 		return manager.getCacheNames();
 	}
@@ -87,7 +80,7 @@ public class ScHibernateEhCacheProvider extends AbstractEhcacheProvider
 				return;
 			}
 			String customConfigPath = CacheConfig.getInstance().get(
-					CacheProperties.CACHE_CONFIG_PATH);
+					CacheConstants.PROP_CONFIG_PATH);
 			if (StringUtils.isNotBlank(customConfigPath)) {
 				logger.info("Ładuję konfigurację z pliku: {} ",
 						customConfigPath);
@@ -152,45 +145,39 @@ public class ScHibernateEhCacheProvider extends AbstractEhcacheProvider
 		return result;
 	}
 
-	public synchronized void close() {
-		manager.shutdown();
-		instance = null;
-	}
-
-	public synchronized void removeCache(String name) {
-		_IObjectCache cache = caches.get(name);
-		if (cache != null) {
-			logger.debug("Usuwam region o nazwie '{}'", name);
-			manager.removeCache(name);
-			caches.remove(name);
+	public void close() {
+		synchronized (initLock) {
+			manager.shutdown();
+			instance = null;
 		}
 	}
 
-	/**
-	 * Usuwa dane z wybranego cache.
-	 * 
-	 * @param cacheName
-	 */
-	public synchronized void clearCache(String cacheName) {
-		if (StringUtils.isNotBlank(cacheName)) {
-			Cache ch = manager.getCache(cacheName);
-			if (ch != null) {
-				ch.removeAll();
+	public void removeCache(String name) {
+		synchronized (initLock) {
+			_IObjectCache cache = caches.get(name);
+			if (cache != null) {
+				logger.debug("Usuwam region o nazwie '{}'", name);
+				manager.removeCache(name);
+				caches.remove(name);
 			}
 		}
 	}
 
-	public List<String> getCacheNamesList() {
-		List<String> result = new ArrayList<String>();
-		String[] cacheNames = manager.getCacheNames();
-		if (cacheNames != null) {
-			result = Arrays.asList(cacheNames);
+	/* Overridden (non-Javadoc) */
+	public void clearCache(String cacheName) {
+		synchronized (initLock) {
+			if (StringUtils.isNotBlank(cacheName)) {
+				Cache ch = manager.getCache(cacheName);
+				if (ch != null) {
+					ch.removeAll();
+				}
+			}
 		}
-		return result;
 	}
 
+	/* Overridden (non-Javadoc) */
 	@SuppressWarnings("unchecked")
-	public List<String> getObjectsInCache(String cacheName) {
+	public List<String> getKeysList(String cacheName) {
 		List<String> result = new ArrayList<String>();
 		List<Object> keys = manager.getCache(cacheName).getKeys();
 
