@@ -1,5 +1,6 @@
 package pl.slawas.common.cache;
 
+import java.util.List;
 import java.util.Map;
 
 import pl.slawas.common.cache.exceptions.CacheErrorException;
@@ -97,5 +98,7 @@ public interface _IObjectCache {
 	public void setTimeToLiveSeconds(long timeToLiveSeconds);
 
 	public long getTimeToLiveSeconds();
+
+	List<?> getKeys();
 
 }

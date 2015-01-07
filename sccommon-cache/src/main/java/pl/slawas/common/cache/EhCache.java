@@ -3,6 +3,7 @@ package pl.slawas.common.cache;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -197,4 +198,7 @@ public class EhCache implements Serializable, _IObjectCache {
 		config.setDiskExpiryThreadIntervalSeconds(timeToLiveSeconds);
 	}
 
+	public List<?> getKeys() {
+		return this.ehCache.getKeysWithExpiryCheck();
+	}
 }
