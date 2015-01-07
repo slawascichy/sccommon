@@ -1,6 +1,7 @@
 package pl.slawas.common.cache;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -49,8 +50,18 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 				.getProperty(CacheConstants.PROP_CONFIG_PATH) != null ? (String) props
 				.getProperty(CacheConstants.PROP_CONFIG_PATH) : null);
 		if (StringUtils.isNotBlank(customConfigPath)) {
-			logger.info("Laduje konfiguracje z pliku: {}", customConfigPath);
-			manager = new CacheManager(customConfigPath);
+
+			URL resource = EhCacheProvider.class.getResource(customConfigPath);
+			logger.info("Laduje konfiguracje z pliku {} classpath: {}",
+					new Object[] { (resource == null ? "spoza" : "z"),
+							customConfigPath });
+			if (resource == null) {
+				manager = new CacheManager(customConfigPath);
+			} else {
+				manager = new CacheManager(
+						EhCacheProvider.class
+								.getResourceAsStream(customConfigPath));
+			}
 		} else {
 			logger.info("Laduje domyslna konfiguracje.");
 			manager = new CacheManager(

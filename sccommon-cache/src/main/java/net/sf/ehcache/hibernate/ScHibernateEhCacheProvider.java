@@ -1,6 +1,7 @@
 package net.sf.ehcache.hibernate;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -82,9 +83,19 @@ public class ScHibernateEhCacheProvider extends AbstractEhcacheProvider
 			String customConfigPath = CacheConfig.getInstance().get(
 					CacheConstants.PROP_CONFIG_PATH);
 			if (StringUtils.isNotBlank(customConfigPath)) {
-				logger.info("Ładuję konfigurację z pliku: {} ",
-						customConfigPath);
-				manager = new CacheManager(customConfigPath);
+
+				URL resource = ScHibernateEhCacheProvider.class
+						.getResource(customConfigPath);
+				logger.info("Laduje konfiguracje z pliku {} classpath: {}",
+						new Object[] { (resource == null ? "spoza" : "z"),
+								customConfigPath });
+				if (resource == null) {
+					manager = new CacheManager(customConfigPath);
+				} else {
+					manager = new CacheManager(
+							ScHibernateEhCacheProvider.class
+									.getResourceAsStream(customConfigPath));
+				}
 			} else {
 				logger.info("Ładuję konfigurację domyślną. FILE_CONFIG_PATH="
 						+ pl.slawas.common.cache.EhCacheProvider.FILE_CONFIG_PATH);
