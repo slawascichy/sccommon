@@ -3,7 +3,9 @@ package pl.slawas.common.cache;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 
+import pl.slawas.common.cache.config.CacheConfig;
 import pl.slawas.common.cache.config.CacheConstants;
 
 /**
@@ -56,5 +58,37 @@ public class EhCacheProviderFactory {
 	 */
 	static void close() {
 		instance = null;
+	}
+
+	/**
+	 * Ustawianie parametru systemowego o położeniu statycznej konfiguracji
+	 * pamięci podręcznej
+	 * 
+	 * @param logger
+	 *            obiekt logger'a do którego przekazany będzie ewentualne
+	 *            ostrzeżenie o tym, że parametr lokalny został pominięty.
+	 * @param cc
+	 *            lokalna konfiguracja (parametry) pamięci podręcznej.
+	 */
+	public static void setSystemPropConfigPath(Logger logger, CacheConfig cc) {
+		/*
+		 * Pierwszy załadowany system ma pierwszeństwo - pozwoli nam to na
+		 * sterowanie jaki parametr ma być użyty.
+		 */
+		if (StringUtils.isBlank(System
+				.getProperty(CacheConstants.PROP_CONFIG_PATH))) {
+			if (StringUtils.isNotBlank(cc.get(CacheConstants.PROP_CONFIG_PATH))) {
+				System.setProperty(CacheConstants.PROP_CONFIG_PATH,
+						cc.get(CacheConstants.PROP_CONFIG_PATH));
+			}
+		} else if (StringUtils.isNotBlank(cc
+				.get(CacheConstants.PROP_CONFIG_PATH))) {
+			logger.warn(
+					"Używam parametru systemowego: {} = '{}'. Pomijam lokalne ustawienia '{}'.",
+					new Object[] {
+							CacheConstants.PROP_CONFIG_PATH,
+							System.getProperty(CacheConstants.PROP_CONFIG_PATH),
+							cc.get(CacheConstants.PROP_CONFIG_PATH) });
+		}
 	}
 }
