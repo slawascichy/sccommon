@@ -1,10 +1,22 @@
 package pl.slawas.common.cache;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.jdom.Element;
 
 public interface _IObjectCacheProvider {
+
+	/**
+	 * Inicjalizacja managera pamięci podręcznej.
+	 * 
+	 * @param props
+	 *            parametry pamięci podręcznej.
+	 * @return czy manager został zainicjalizowany podczas wywołania tej metody?
+	 *         {@code false} oznacz, że był zainicjalizowany już wcześniej,
+	 *         {@code true}, że został zainicjalizowany właśnie teraz.
+	 */
+	boolean init(Properties props);
 
 	String[] getCacheNames();
 

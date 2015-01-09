@@ -9,7 +9,7 @@ public enum CacheProviderEnum {
 	public _IObjectCacheProvider getProvider(Properties props) {
 		switch (this) {
 		case EhCache:
-			return EhCacheProvider.getInstance(props);
+			return EhCacheProviderFactory.getInstance(props);
 		case none:
 			return null;
 		default:

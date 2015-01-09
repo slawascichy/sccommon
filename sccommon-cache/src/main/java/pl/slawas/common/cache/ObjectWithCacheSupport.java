@@ -79,16 +79,14 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 					lPprovider = CacheProviderEnum.none;
 				}
 				if (lPprovider.isAllowed()) {
-					String customProviderImpl = (props
-							.getProperty(CacheConstants.PROP_PROVIDER_IMPL) != null ? (String) props
-							.getProperty(CacheConstants.PROP_PROVIDER_IMPL)
-							: null);
+
+					_IObjectCacheProvider cacheManager = lPprovider
+							.getProvider(props);
 					logger.trace(
 							"[ {} ] Zdefiniowano uzycie cache'a '{}' (impl: {}).",
 							new Object[] { getClass().getSimpleName(),
-									lPprovider.toString(), customProviderImpl });
-					_IObjectCacheProvider cacheManager = lPprovider
-							.getProvider(props);
+									lPprovider.toString(),
+									cacheManager.getClass().getName() });
 
 					/* Rozwiązywanie nazwy regionu pamięci podręcznej */
 					preparedCacheRegionName = CacheConstants.DEFAULT_REGION_NAME;

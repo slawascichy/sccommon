@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
@@ -201,5 +202,12 @@ public class EhCache implements Serializable, _IObjectCache {
 
 	public List<?> getKeys() {
 		return this.ehCache.getKeysWithExpiryCheck();
+	}
+
+	/**
+	 * @return the {@link #ehCache}
+	 */
+	public Ehcache getEhCache() {
+		return ehCache;
 	}
 }
