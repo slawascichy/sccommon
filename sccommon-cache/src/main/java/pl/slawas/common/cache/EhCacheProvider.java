@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import net.sf.ehcache.Cache;
@@ -35,65 +36,84 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 	private static final Logger logger = LoggerFactory
 			.getLogger(EhCacheProvider.class);
 
-	private static _IObjectCacheProvider instance;
+	public static final Object initLock = new Object();
 
-	private static CacheManager manager;
+	private CacheManager manager;
 
-	private final Properties props;
+	private Properties props;
 
 	private Hashtable<String, _IObjectCache> caches = new Hashtable<String, _IObjectCache>();
 
-	private EhCacheProvider(Properties props) {
+	/**
+	 * Podstawowy konstruktor - manager pamięci nie jest zainicjalizowany -
+	 * powinno się później wywołać metodę {@link #init(Properties)}
+	 */
+	public EhCacheProvider() {
 
-		this.props = props;
-		String customConfigPath = (props
-				.getProperty(CacheConstants.PROP_CONFIG_PATH) != null ? (String) props
-				.getProperty(CacheConstants.PROP_CONFIG_PATH) : null);
-		if (StringUtils.isNotBlank(customConfigPath)) {
-
-			URL resource = EhCacheProvider.class.getResource(customConfigPath);
-			logger.info("Laduje konfiguracje z pliku {} classpath: {}",
-					new Object[] { (resource == null ? "spoza" : "z"),
-							customConfigPath });
-			if (resource == null) {
-				manager = new CacheManager(customConfigPath);
-			} else {
-				manager = new CacheManager(
-						EhCacheProvider.class
-								.getResourceAsStream(customConfigPath));
-			}
-		} else {
-			logger.info("Laduje domyslna konfiguracje.");
-			manager = new CacheManager(
-					EhCacheProvider.class.getResourceAsStream(FILE_CONFIG_PATH));
-		}
-		for (String key : getCacheNames()) {
-			caches.put(key, new EhCache(manager.getCache(key), props));
-		}
 	}
 
-	public static _IObjectCacheProvider getInstance(Properties props) {
-		if (instance == null) {
-			String customProviderImpl = (props
-					.getProperty(CacheConstants.PROP_PROVIDER_IMPL) != null ? (String) props
-					.getProperty(CacheConstants.PROP_PROVIDER_IMPL) : null);
+	/**
+	 * Konstruktor, który od razu inicjalizuje managera pamięci podręcznej.
+	 * 
+	 * @param props
+	 *            lista właściwości
+	 */
+	public EhCacheProvider(Properties props) {
+		init(props);
+	}
 
-			if (StringUtils.isNotBlank(customProviderImpl)) {
-				try {
-					Class<?> impl = Class.forName(customProviderImpl);
-					instance = (_IObjectCacheProvider) impl.newInstance();
-				} catch (ClassNotFoundException e) {
-					throw new IllegalArgumentException(e);
-				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
-				} catch (InstantiationException e) {
-					throw new IllegalArgumentException(e);
+	/**
+	 * Inicjalizacja managera pamięci podręcznej.
+	 * 
+	 * @param props
+	 */
+	public boolean init(Properties props) {
+
+		if (manager != null) {
+			/**
+			 * Jeżeli manager jest już zainicjalizowany, to wystawiam tylko
+			 * ostrzeżenie
+			 */
+			logger.warn("[{}] is inicjalized!",
+					EhCacheProvider.class.getSimpleName());
+			return false;
+		}
+		synchronized (initLock) {
+			this.props = props;
+			if (logger.isDebugEnabled()) {
+				for (Entry<Object, Object> entry : this.props.entrySet()) {
+					logger.debug("[init] Laduje prperty {}: '{}'",
+							new Object[] { entry.getKey(), entry.getValue() });
+				}
+			}
+			String customConfigPath = (props
+					.getProperty(CacheConstants.PROP_CONFIG_PATH) != null ? (String) props
+					.getProperty(CacheConstants.PROP_CONFIG_PATH) : null);
+			if (StringUtils.isNotBlank(customConfigPath)) {
+
+				URL resource = EhCacheProvider.class
+						.getResource(customConfigPath);
+				logger.info("Laduje konfiguracje z pliku {} classpath: {}",
+						new Object[] { (resource == null ? "spoza" : "z"),
+								customConfigPath });
+				if (resource == null) {
+					manager = new CacheManager(customConfigPath);
+				} else {
+					manager = new CacheManager(
+							EhCacheProvider.class
+									.getResourceAsStream(customConfigPath));
 				}
 			} else {
-				instance = new EhCacheProvider(props);
+				logger.info("Laduje domyslna konfiguracje.");
+				manager = new CacheManager(
+						EhCacheProvider.class
+								.getResourceAsStream(FILE_CONFIG_PATH));
 			}
+			for (String key : getCacheNames()) {
+				caches.put(key, new EhCache(manager.getCache(key), props));
+			}
+			return true;
 		}
-		return instance;
 	}
 
 	public String[] getCacheNames() {
@@ -103,7 +123,7 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 	public _IObjectCache getCache(String name) {
 		_IObjectCache cache = caches.get(name);
 		if (cache == null) {
-			logger.debug("Tworze nowy kesz o nazwie '{}'", name);
+			logger.debug("Tworze nowy region '{}'", name);
 			manager.addCache(name);
 			cache = new EhCache(manager.getCache(name), this.props);
 			caches.put(name, cache);
@@ -113,13 +133,13 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 
 	public void close() {
 		manager.shutdown();
-		instance = null;
+		EhCacheProviderFactory.close();
 	}
 
 	public void removeCache(String name) {
 		_IObjectCache cache = caches.get(name);
 		if (cache != null) {
-			logger.debug("Usuwam kesz o nazwie '{}'", name);
+			logger.debug("Usuwam region o nazwie '{}'", name);
 			manager.removeCache(name);
 			caches.remove(name);
 		}
@@ -166,6 +186,13 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 			result.add(key.toString());
 		}
 		return result;
+	}
+
+	/**
+	 * @return the {@link #manager}
+	 */
+	public CacheManager getManager() {
+		return manager;
 	}
 
 }
