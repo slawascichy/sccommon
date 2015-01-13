@@ -67,6 +67,8 @@ public class EhCache implements Serializable, _IObjectCache {
 		if (StringUtils.isNotBlank(param)) {
 			config.setOverflowToDisk(Boolean.parseBoolean(param));
 		}
+		// TODO poprawić, by było konfigurowalne
+		config.setStatistics(true);
 	}
 
 	public Object get(Object key) throws CacheErrorException {

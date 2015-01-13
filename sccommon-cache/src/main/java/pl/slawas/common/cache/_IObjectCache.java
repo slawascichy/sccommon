@@ -95,9 +95,9 @@ public interface _IObjectCache {
 
 	_IObjectCacheStatistics getStatistics();
 
-	public void setTimeToLiveSeconds(long timeToLiveSeconds);
+	void setTimeToLiveSeconds(long timeToLiveSeconds);
 
-	public long getTimeToLiveSeconds();
+	long getTimeToLiveSeconds();
 
 	List<?> getKeys();
 

@@ -116,7 +116,10 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 								.getResourceAsStream(FILE_CONFIG_PATH));
 			}
 			for (String key : getCacheNames()) {
-				caches.put(key, new EhCache(manager.getCache(key), props));
+				Cache c = manager.getCache(key);
+				// TODO poprawić, by było konfigurowalne
+				c.setStatisticsEnabled(true);
+				caches.put(key, new EhCache(c, props));
 			}
 			return true;
 		}
