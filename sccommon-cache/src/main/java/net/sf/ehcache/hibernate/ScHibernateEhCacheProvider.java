@@ -36,6 +36,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	private static final Logger logger = LoggerFactory
 			.getLogger(ScHibernateEhCacheProvider.class);
 
+	private static final String notInicjalizedMessage = "Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)";
+
 	private ProviderMBeanRegistrationHelper mbeanRegistrationHelper;
 	private pl.slawas.common.cache.EhCacheProvider internalProvider;
 	private Object initLock = new Object();
@@ -123,8 +125,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			return this.internalProvider.getCacheNames();
 		}
-		throw new NullPointerException(
-				"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+		throw new IllegalAccessError(notInicjalizedMessage);
 	}
 
 	@Override
@@ -133,8 +134,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			return this.internalProvider.getCache(name);
 		}
-		throw new NullPointerException(
-				"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+		throw new IllegalAccessError(notInicjalizedMessage);
 	}
 
 	@Override
@@ -143,8 +143,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			this.internalProvider.removeCache(name);
 		} else {
-			throw new NullPointerException(
-					"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+			throw new IllegalAccessError(notInicjalizedMessage);
 		}
 	}
 
@@ -170,8 +169,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			return this.internalProvider.getAllStatistics(getAllStatistics);
 		}
-		throw new NullPointerException(
-				"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+		throw new IllegalAccessError(notInicjalizedMessage);
 
 	}
 
@@ -181,8 +179,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			this.internalProvider.clearCache(cacheName);
 		} else {
-			throw new NullPointerException(
-					"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+			throw new IllegalAccessError(notInicjalizedMessage);
 		}
 	}
 
@@ -192,8 +189,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			return this.internalProvider.getKeysList(cacheName);
 		}
-		throw new NullPointerException(
-				"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+		throw new IllegalAccessError(notInicjalizedMessage);
 
 	}
 
@@ -204,8 +200,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 		if (this.internalProvider != null) {
 			this.internalProvider.clearStatistics(cacheName);
 		} else {
-			throw new NullPointerException(
-					"Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)");
+			throw new IllegalAccessError(notInicjalizedMessage);
 		}
 	}
 

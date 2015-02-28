@@ -13,12 +13,12 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.helpers.Strings;
+import pl.slawas.twl4j.Logger;
+import pl.slawas.twl4j.LoggerFactory;
 
 /**
  * 
@@ -151,7 +151,10 @@ public class EhCache implements Serializable, _IObjectCache {
 	public long getSizeInMemory() {
 		try {
 			return ehCache.calculateInMemorySize();
-		} catch (Throwable t) {
+		} catch (Exception e) {
+			logger.warn(
+					"Nie udało się przeliczyć rozmiaru zajmowanej pamięci przez dany region.",
+					e);
 			return -1;
 		}
 	}
