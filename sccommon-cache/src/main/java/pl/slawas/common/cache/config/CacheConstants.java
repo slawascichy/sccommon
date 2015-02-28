@@ -30,6 +30,7 @@ public interface CacheConstants {
 	String PROP_PROVIDER = "cache.provider";
 	String PROP_PROVIDER_IMPL = "cache.provider.implementation";
 	String PROP_USE_DEFAULT_REGION = "cache.defaultRegionUsage";
+	String PROP_DISABLE_STATISTICS = "cache.statistics.disable";
 
 	/** Czas życia */
 	String PROP_timeToLive = "cache.timeToLive";

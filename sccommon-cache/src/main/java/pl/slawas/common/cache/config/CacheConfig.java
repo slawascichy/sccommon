@@ -4,6 +4,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+
 import pl.slawas.helpers.Configurations;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
@@ -148,6 +150,15 @@ public class CacheConfig {
 			generatePropertyList();
 		}
 		return this.propertyList;
+	}
+
+	public static boolean statisticsIsDisabled() {
+		String disableSatistics = CacheConfig.getInstance().get(
+				CacheConstants.PROP_DISABLE_STATISTICS);
+		if (StringUtils.isNotBlank(disableSatistics)) {
+			return Boolean.parseBoolean(disableSatistics);
+		}
+		return false;
 	}
 
 }

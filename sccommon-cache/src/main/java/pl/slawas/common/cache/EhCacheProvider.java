@@ -10,9 +10,11 @@ import java.util.Properties;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 
 import org.apache.commons.lang.StringUtils;
 
+import pl.slawas.common.cache.config.CacheConfig;
 import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.helpers.FileUtils;
 import pl.slawas.twl4j.Logger;
@@ -135,6 +137,10 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 			logger.debug("Tworze nowy region '{}'", name);
 			manager.addCache(name);
 			cache = new EhCache(manager.getCache(name), this.props);
+			Ehcache netEhcache = ((pl.slawas.common.cache.EhCache) cache)
+					.getEhCache();
+			netEhcache
+					.setStatisticsEnabled(!CacheConfig.statisticsIsDisabled());
 			caches.put(name, cache);
 		}
 		return cache;

@@ -23,6 +23,8 @@ public class EhCacheProviderFactory {
 	 */
 	private static _IObjectCacheProvider instance;
 
+	private static Object initLock = new Object();
+
 	/**
 	 * Pobieranie nowej instancji dostawcy obsługi pamięci podręcznej EhCache
 	 * 
@@ -30,24 +32,26 @@ public class EhCacheProviderFactory {
 	 * @return
 	 */
 	public static _IObjectCacheProvider getInstance(Properties props) {
-		if (instance == null) {
-			String customProviderImpl = (props
-					.getProperty(CacheConstants.PROP_PROVIDER_IMPL) != null ? (String) props
-					.getProperty(CacheConstants.PROP_PROVIDER_IMPL) : null);
-			if (StringUtils.isNotBlank(customProviderImpl)) {
-				try {
-					Class<?> impl = Class.forName(customProviderImpl);
-					instance = (_IObjectCacheProvider) impl.newInstance();
-					instance.init(props);
-				} catch (ClassNotFoundException e) {
-					throw new IllegalArgumentException(e);
-				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
-				} catch (InstantiationException e) {
-					throw new IllegalArgumentException(e);
+		synchronized (initLock) {
+			if (instance == null) {
+				String customProviderImpl = (props
+						.getProperty(CacheConstants.PROP_PROVIDER_IMPL) != null ? (String) props
+						.getProperty(CacheConstants.PROP_PROVIDER_IMPL) : null);
+				if (StringUtils.isNotBlank(customProviderImpl)) {
+					try {
+						Class<?> impl = Class.forName(customProviderImpl);
+						instance = (_IObjectCacheProvider) impl.newInstance();
+						instance.init(props);
+					} catch (ClassNotFoundException e) {
+						throw new IllegalArgumentException(e);
+					} catch (IllegalAccessException e) {
+						throw new IllegalArgumentException(e);
+					} catch (InstantiationException e) {
+						throw new IllegalArgumentException(e);
+					}
+				} else {
+					instance = new EhCacheProvider(props);
 				}
-			} else {
-				instance = new EhCacheProvider(props);
 			}
 		}
 		return instance;
