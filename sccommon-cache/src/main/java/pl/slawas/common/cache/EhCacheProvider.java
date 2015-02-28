@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -44,7 +45,7 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 
 	private Properties props;
 
-	private Hashtable<String, _IObjectCache> caches = new Hashtable<String, _IObjectCache>();
+	private Map<String, _IObjectCache> caches = new Hashtable<String, _IObjectCache>();
 
 	/**
 	 * Podstawowy konstruktor - manager pamięci nie jest zainicjalizowany -

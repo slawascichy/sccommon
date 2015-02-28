@@ -1,8 +1,9 @@
 package pl.slawas.common.cache.config;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -28,7 +29,7 @@ public final class CacheConfig {
 
 	public static final String FILE_DIRECTORY = "";
 
-	private static Hashtable<String, String> _Properties = null;
+	private static Map<String, String> _Properties = null;
 
 	static CacheConfig _Instance;
 
@@ -91,10 +92,10 @@ public final class CacheConfig {
 	private Properties generatePropertyList() {
 		synchronized (propertyListLock) {
 			this.propertyList = new Properties();
-			Enumeration<String> props = _Properties.keys();
-			while (props.hasMoreElements()) {
-				String key = props.nextElement();
-				String value = _Properties.get(key);
+			Set<Entry<String, String>> entrySet = _Properties.entrySet();
+			for (Entry<String, String> entry : entrySet) {
+				String key = entry.getKey();
+				String value = entry.getValue();
 				this.propertyList.put(key, value);
 			}
 

@@ -130,9 +130,10 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 						}
 					}
 				} else {
-					if (logger.isTraceEnabled())
+					if (logger.isTraceEnabled()) {
 						logger.warn("[ {} ] Nie zdefiniowano uzycia kesz-a.",
 								new Object[] { getClass().getSimpleName() });
+					}
 					preparedCache = null;
 				}
 			} catch (IllegalArgumentException e) {
