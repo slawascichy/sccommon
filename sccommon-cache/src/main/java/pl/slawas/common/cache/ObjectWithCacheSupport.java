@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.helpers.Strings;
+import pl.slawas.twl4j.Logger;
+import pl.slawas.twl4j.LoggerFactory;
 
 /**
  * 

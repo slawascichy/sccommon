@@ -30,7 +30,7 @@ public class CacheConfig {
 
 	private static Hashtable<String, String> _Properties = null;
 
-	private static CacheConfig _Instance;
+	static CacheConfig _Instance;
 
 	private static Object instanceLock = new Object();
 	private static Object propertyListLock = new Object();

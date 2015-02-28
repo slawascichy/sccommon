@@ -51,4 +51,11 @@ public interface _IObjectCacheProvider {
 	 */
 	List<String> getKeysList(String cacheName);
 
+	/**
+	 * Czyszczenie statystyk wybranej pamięci podręcznej cache.
+	 * 
+	 * @param cacheName
+	 */
+	void clearStatistics(String cacheName);
+
 }

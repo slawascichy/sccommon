@@ -1,12 +1,13 @@
 package pl.slawas.common.cache;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Statistics;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import pl.slawas.twl4j.Logger;
+import pl.slawas.twl4j.LoggerFactory;
 
 /**
  * 
@@ -115,8 +116,18 @@ public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics 
 	}
 
 	public double getHitsRatio() {
-		return (getCacheHits() != 0) ? ((double) (getCacheHits() - getCacheMisses()) / ((double) getCacheHits())) * 100
-				: 0;
+		if ((getCacheHits() != 0L)) {
+			BigDecimal dividend = new BigDecimal(getCacheHits()
+					- getCacheMisses());
+			logger.trace("--> getHitsRatio(): dividend={}", dividend);
+			BigDecimal divisor = new BigDecimal(getCacheHits());
+			logger.trace("--> getHitsRatio(): divisor={}", divisor);
+			BigDecimal multiplicand = new BigDecimal(100);
+			BigDecimal divide = dividend.divide(divisor, 2, RoundingMode.HALF_UP);
+			logger.trace("--> getHitsRatio(): divide={}", divide);
+			BigDecimal multi = divide.multiply(multiplicand);
+			return multi.doubleValue();
+		}
+		return 0;
 	}
-
 }

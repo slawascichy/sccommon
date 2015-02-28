@@ -3,10 +3,11 @@ package pl.slawas.common.cache;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 
 import pl.slawas.common.cache.config.CacheConfig;
 import pl.slawas.common.cache.config.CacheConstants;
+import pl.slawas.twl4j.Logger;
+import pl.slawas.twl4j.LoggerFactory;
 
 /**
  * 
@@ -17,6 +18,9 @@ import pl.slawas.common.cache.config.CacheConstants;
  * 
  */
 public class EhCacheProviderFactory {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(EhCacheProviderFactory.class);
 
 	/**
 	 * Obiekt instancji managera pamięci podręcznej.
@@ -37,7 +41,12 @@ public class EhCacheProviderFactory {
 				String customProviderImpl = (props
 						.getProperty(CacheConstants.PROP_PROVIDER_IMPL) != null ? (String) props
 						.getProperty(CacheConstants.PROP_PROVIDER_IMPL) : null);
+				logger.info(
+						"\n***************\n* Incjalizuje nowego provider'a: {}\n***************",
+						(StringUtils.isNotBlank(customProviderImpl) ? customProviderImpl
+								: EhCacheProvider.class.getName()));
 				if (StringUtils.isNotBlank(customProviderImpl)) {
+
 					try {
 						Class<?> impl = Class.forName(customProviderImpl);
 						instance = (_IObjectCacheProvider) impl.newInstance();
@@ -54,6 +63,9 @@ public class EhCacheProviderFactory {
 				}
 			}
 		}
+		logger.trace(
+				"\n***************\n* Pobrałem instancje provider'a: {}\n***************",
+				instance.getClass().getName());
 		return instance;
 	}
 

@@ -119,8 +119,7 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 			}
 			for (String key : getCacheNames()) {
 				Cache c = manager.getCache(key);
-				// TODO poprawić, by było konfigurowalne
-				c.setStatisticsEnabled(true);
+				c.setStatisticsEnabled(!CacheConfig.statisticsIsDisabled());
 				caches.put(key, new EhCache(c, props));
 			}
 			return true;
@@ -208,6 +207,16 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 	 */
 	public CacheManager getManager() {
 		return manager;
+	}
+
+	@Override
+	public void clearStatistics(String cacheName) {
+		if (StringUtils.isNotBlank(cacheName)) {
+			Cache ch = manager.getCache(cacheName);
+			if (ch != null) {
+				ch.clearStatistics();
+			}
+		}
 	}
 
 }
