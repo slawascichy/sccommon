@@ -38,9 +38,9 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 
 	private static final String notInicjalizedMessage = "Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)";
 
-	private ProviderMBeanRegistrationHelper mbeanRegistrationHelper;
-	private pl.slawas.common.cache.EhCacheProvider internalProvider;
-	private Object initLock = new Object();
+	private static ProviderMBeanRegistrationHelper mbeanRegistrationHelper;
+	private static pl.slawas.common.cache.EhCacheProvider internalProvider;
+	private static Object initLock = new Object();
 
 	public ScHibernateEhCacheProvider() {
 		super();
@@ -105,25 +105,24 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	@Override
 	public boolean init(Properties props) {
 		synchronized (initLock) {
-			if (this.internalProvider != null) {
+			if (internalProvider != null) {
 				logger.warn("{} is already initialized. ",
 						ScHibernateEhCacheProvider.class.getName());
 				return true;
 			}
-			this.internalProvider = new pl.slawas.common.cache.EhCacheProvider(
-					props);
-			this.mbeanRegistrationHelper = new ProviderMBeanRegistrationHelper();
-			this.mbeanRegistrationHelper.registerMBean(
+			internalProvider = new pl.slawas.common.cache.EhCacheProvider(props);
+			mbeanRegistrationHelper = new ProviderMBeanRegistrationHelper();
+			mbeanRegistrationHelper.registerMBean(
 					internalProvider.getManager(), props);
-			return (this.internalProvider != null);
+			return (internalProvider != null);
 		}
 	}
 
 	@Override
 	public String[] getCacheNames() {
 		logger.trace("-->getCacheNames()");
-		if (this.internalProvider != null) {
-			return this.internalProvider.getCacheNames();
+		if (internalProvider != null) {
+			return internalProvider.getCacheNames();
 		}
 		throw new IllegalAccessError(notInicjalizedMessage);
 	}
@@ -131,8 +130,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	@Override
 	public _IObjectCache getCache(String name) {
 		logger.trace("-->getCache('{}')", name);
-		if (this.internalProvider != null) {
-			return this.internalProvider.getCache(name);
+		if (internalProvider != null) {
+			return internalProvider.getCache(name);
 		}
 		throw new IllegalAccessError(notInicjalizedMessage);
 	}
@@ -140,8 +139,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	@Override
 	public void removeCache(String name) {
 		logger.trace("-->removeCache('{}')", name);
-		if (this.internalProvider != null) {
-			this.internalProvider.removeCache(name);
+		if (internalProvider != null) {
+			internalProvider.removeCache(name);
 		} else {
 			throw new IllegalAccessError(notInicjalizedMessage);
 		}
@@ -151,13 +150,13 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	public void close() {
 		logger.trace("-->close()");
 		synchronized (initLock) {
-			if (this.mbeanRegistrationHelper != null) {
-				this.mbeanRegistrationHelper.unregisterMBean();
-				this.mbeanRegistrationHelper = null;
+			if (mbeanRegistrationHelper != null) {
+				mbeanRegistrationHelper.unregisterMBean();
+				mbeanRegistrationHelper = null;
 			}
-			if (this.internalProvider != null) {
-				this.internalProvider.close();
-				this.internalProvider = null;
+			if (internalProvider != null) {
+				internalProvider.close();
+				internalProvider = null;
 			}
 		}
 	}
@@ -166,8 +165,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	public List<_IObjectCacheStatistics> getAllStatistics(
 			Integer getAllStatistics) {
 		logger.trace("-->getAllStatistics('{}')", getAllStatistics);
-		if (this.internalProvider != null) {
-			return this.internalProvider.getAllStatistics(getAllStatistics);
+		if (internalProvider != null) {
+			return internalProvider.getAllStatistics(getAllStatistics);
 		}
 		throw new IllegalAccessError(notInicjalizedMessage);
 
@@ -176,8 +175,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	@Override
 	public void clearCache(String cacheName) {
 		logger.trace("-->clearCache('{}')", cacheName);
-		if (this.internalProvider != null) {
-			this.internalProvider.clearCache(cacheName);
+		if (internalProvider != null) {
+			internalProvider.clearCache(cacheName);
 		} else {
 			throw new IllegalAccessError(notInicjalizedMessage);
 		}
@@ -186,8 +185,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	@Override
 	public List<String> getKeysList(String cacheName) {
 		logger.trace("-->getKeysList('{}')", cacheName);
-		if (this.internalProvider != null) {
-			return this.internalProvider.getKeysList(cacheName);
+		if (internalProvider != null) {
+			return internalProvider.getKeysList(cacheName);
 		}
 		throw new IllegalAccessError(notInicjalizedMessage);
 
@@ -197,8 +196,8 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 	@Override
 	public void clearStatistics(String cacheName) {
 		logger.trace("-->clearStatistics('{}')", cacheName);
-		if (this.internalProvider != null) {
-			this.internalProvider.clearStatistics(cacheName);
+		if (internalProvider != null) {
+			internalProvider.clearStatistics(cacheName);
 		} else {
 			throw new IllegalAccessError(notInicjalizedMessage);
 		}
