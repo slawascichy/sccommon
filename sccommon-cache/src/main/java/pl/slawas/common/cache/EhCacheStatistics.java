@@ -116,7 +116,7 @@ public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics 
 	}
 
 	public double getHitsRatio() {
-		if ((getCacheHits() != 0L)) {
+		if ((getCacheHits() != 0L && getCacheMisses() < getCacheHits())) {
 			BigDecimal dividend = new BigDecimal(getCacheHits()
 					- getCacheMisses());
 			logger.trace("--> getHitsRatio(): dividend={}", dividend);
