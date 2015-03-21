@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Properties;
 
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Statistics;
 import net.sf.ehcache.hibernate.management.impl.ProviderMBeanRegistrationHelper;
 import net.sf.ehcache.util.Timestamper;
 
@@ -68,8 +69,12 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 			_IObjectCache cache = getCache(name);
 			Ehcache netEhcache = ((pl.slawas.common.cache.EhCache) cache)
 					.getEhCache();
-			netEhcache
-					.setStatisticsEnabled(!CacheConfig.statisticsIsDisabled());
+			if (!CacheConfig.statisticsIsDisabled()) {
+				netEhcache.setStatisticsEnabled(!CacheConfig
+						.statisticsIsDisabled());
+				netEhcache
+						.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_GUARANTEED);
+			}
 			HibernateUtil.validateEhcache(netEhcache);
 			return new EhCache(netEhcache);
 		} catch (net.sf.ehcache.CacheException e) {
