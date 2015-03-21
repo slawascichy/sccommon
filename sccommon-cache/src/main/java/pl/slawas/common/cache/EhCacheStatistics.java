@@ -117,10 +117,10 @@ public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics 
 
 	public double getHitsRatio() {
 		if ((getCacheHits() != 0L)) {
-			BigDecimal dividend = new BigDecimal(getCacheHits()
-					+ getCacheMisses());
+			BigDecimal dividend = new BigDecimal(getCacheHits());
 			logger.trace("--> getHitsRatio(): dividend={}", dividend);
-			BigDecimal divisor = new BigDecimal(getCacheHits());
+			BigDecimal divisor = new BigDecimal(getCacheHits()
+					+ getCacheMisses());
 			logger.trace("--> getHitsRatio(): divisor={}", divisor);
 			BigDecimal multiplicand = new BigDecimal(100);
 			BigDecimal divide = dividend.divide(divisor, 2,
