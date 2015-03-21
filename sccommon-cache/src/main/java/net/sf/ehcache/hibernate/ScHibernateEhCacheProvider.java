@@ -70,8 +70,7 @@ public class ScHibernateEhCacheProvider implements CacheProvider, Serializable,
 			Ehcache netEhcache = ((pl.slawas.common.cache.EhCache) cache)
 					.getEhCache();
 			if (!CacheConfig.statisticsIsDisabled()) {
-				netEhcache.setStatisticsEnabled(!CacheConfig
-						.statisticsIsDisabled());
+				netEhcache.setStatisticsEnabled(true);
 				netEhcache
 						.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_GUARANTEED);
 			}
