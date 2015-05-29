@@ -132,18 +132,21 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 	}
 
 	public _IObjectCache getCache(String name) {
-		_IObjectCache cache = caches.get(name);
-		if (cache == null) {
-			logger.debug("Tworze nowy region '{}'", name);
-			manager.addCache(name);
-			cache = new EhCache(manager.getCache(name), this.props);
-			Ehcache netEhcache = ((pl.slawas.common.cache.EhCache) cache)
-					.getEhCache();
-			netEhcache
-					.setStatisticsEnabled(!CacheConfig.statisticsIsDisabled());
-			caches.put(name, cache);
+		String lock = ("EhCacheProvider.getCache." + name).intern();
+		synchronized (lock) {
+			_IObjectCache cache = caches.get(name);
+			if (cache == null) {
+				logger.debug("Tworze nowy region '{}'", name);
+				manager.addCache(name);
+				cache = new EhCache(manager.getCache(name), this.props);
+				Ehcache netEhcache = ((pl.slawas.common.cache.EhCache) cache)
+						.getEhCache();
+				netEhcache.setStatisticsEnabled(!CacheConfig
+						.statisticsIsDisabled());
+				caches.put(name, cache);
+			}
+			return cache;
 		}
-		return cache;
 	}
 
 	public void close() {
