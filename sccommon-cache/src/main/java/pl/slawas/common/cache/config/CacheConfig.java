@@ -20,7 +20,7 @@ import pl.slawas.twl4j.LoggerFactory;
  * @version $Revision: 1.1 $
  * 
  */
-public final class CacheConfig {
+public class CacheConfig {
 
 	final protected static Logger logger = LoggerFactory
 			.getLogger(CacheConfig.class);
