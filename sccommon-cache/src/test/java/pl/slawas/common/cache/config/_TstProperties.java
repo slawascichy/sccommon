@@ -2,10 +2,10 @@ package pl.slawas.common.cache.config;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.log4j.config.PropertyPrinter;
 
-import pl.slawas.common.cache.config.CacheConfig;
 import pl.slawas.helpers.Configurations;
 
 public class _TstProperties {
@@ -31,7 +31,7 @@ public class _TstProperties {
 		Hashtable<String, String> props = new Hashtable<String, String>();
 
 		final String propkFileName = "/test.properties";
-		Hashtable<String, String> _Properties = null;
+		Map<String, String> _Properties = null;
 		_Properties = Configurations.loadHashtable(_TstProperties.class,
 				propkFileName);
 		props.putAll(_Properties);
