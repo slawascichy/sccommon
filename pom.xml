@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.slawas</groupId>
 	<artifactId>sccommon</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>SC Common</name>
 	<description>SC Common Librares Main Project</description>
 
@@ -47,7 +47,7 @@
 	<scm>
 		<connection>scm:git:ssh://${user}@sources.ibpm.pro/opt/git/repositories/SC/Utils/${artifactId}.git</connection>
 		<developerConnection>scm:git:ssh://${user}@sources.ibpm.pro/opt/git/repositories/SC/Utils/${artifactId}.git</developerConnection>
-		<tag>sccommon-0.0.1</tag>
+		<tag>HEAD</tag>
 		<url>https://sources.ibpm.pro/?p=SC/Utils/${artifactId}.git;a=summary</url>
 	</scm>
 	<!-- -->
