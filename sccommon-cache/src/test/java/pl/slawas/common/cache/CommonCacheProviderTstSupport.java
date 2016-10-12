@@ -36,136 +36,123 @@ public class CommonCacheProviderTstSupport extends TestCase {
 	}
 
 	public void testApp() throws CacheErrorException {
+
 		EhCacheProviderFactory.close();
 		CachedObjectResult result;
 		Properties props = CacheConfig.getInstance().getPropertyList();
-		props.put(CacheConstants.PROP_PROVIDER_IMPL, provider.getName());
+		props.put(CacheConstants.PROP_PROVIDER_IMPL, this.provider.getName());
 
-		CachedElement testElement1vA = new CachedElement("e1", "vA");
-		CachedElement testElement1vA_cached = testElement1vA;
-		CachedElement testElement1vB = new CachedElement("e1", "vB");
-		CachedElement testElement2vA = new CachedElement("e2", "vA");
-		CachedElement testElement3vA = new CachedElement("e3", "vA");
-		CachedElement testElement4vA = new CachedElement("e4", "vA");
+		_IObjectCacheProvider lProvider = null;
+		try {
+			CachedElement testElement1vA = new CachedElement("e1", "vA");
+			CachedElement testElement1vA_cached = testElement1vA;
+			CachedElement testElement1vB = new CachedElement("e1", "vB");
+			CachedElement testElement2vA = new CachedElement("e2", "vA");
+			CachedElement testElement3vA = new CachedElement("e3", "vA");
+			CachedElement testElement4vA = new CachedElement("e4", "vA");
 
-		/* wstawianie do pamięci podręcznej */
-		result = CachedObjectFactory.get(testElement1vA, CacheUsage.TO_USE,
-				props);
-		assertNotNull("Wynik nie może być null", result);
-		assertEquals("Wynik powinien być nie z pamięci podręcznej (dodany).",
-				Boolean.FALSE, result.getFromCache());
-		assertEquals("Powinien być to ten sam obiekt.",
-				testElement1vA.hashCode(), result.getObj().hashCode());
+			/* wstawianie do pamięci podręcznej */
+			result = CachedObjectFactory.get(testElement1vA, CacheUsage.TO_USE,
+					props);
+			assertNotNull("Wynik nie może być null", result);
+			assertEquals(
+					"Wynik powinien być nie z pamięci podręcznej (dodany).",
+					Boolean.FALSE, result.getFromCache());
+			assertEquals("Powinien być to ten sam obiekt.",
+					testElement1vA.hashCode(), result.getObj().hashCode());
 
-		testElement1vA = new CachedElement("e1", "vA");
-		result = CachedObjectFactory.get(testElement1vA, CacheUsage.TO_USE,
-				props);
-		assertNotNull("Wynik nie może być null", result);
-		assertEquals("Wynik powinien być z pamięci podręcznej (dodany).",
-				Boolean.TRUE, result.getFromCache());
-		assertEquals("Powinien być to ten sam obiekt co do wartości.",
-				testElement1vA.hashCode(), result.getObj().hashCode());
-		assertNotSame("Powinien być to różne obiekty co do instancji.",
-				System.identityHashCode(testElement1vA_cached),
-				System.identityHashCode(testElement1vA));
+			testElement1vA = new CachedElement("e1", "vA");
+			result = CachedObjectFactory.get(testElement1vA, CacheUsage.TO_USE,
+					props);
+			assertNotNull("Wynik nie może być null", result);
+			assertEquals("Wynik powinien być z pamięci podręcznej (dodany).",
+					Boolean.TRUE, result.getFromCache());
+			assertEquals("Powinien być to ten sam obiekt co do wartości.",
+					testElement1vA.hashCode(), result.getObj().hashCode());
+			assertNotSame("Powinien być to różne obiekty co do instancji.",
+					System.identityHashCode(testElement1vA_cached),
+					System.identityHashCode(testElement1vA));
 
-		result = CachedObjectFactory.get(testElement1vB, CacheUsage.TO_USE,
-				props);
-		assertNotNull("Wynik nie może być null", result);
-		assertEquals("Wynik powinien być z pamięci podręcznej (dodany).",
-				Boolean.TRUE, result.getFromCache());
-		assertEquals("Powinien być to stary obiekt.",
-				testElement1vA.hashCode(), result.getObj().hashCode());
-		assertNotSame(
-				"Nie powinien być to być nowy obiekt, ponieważ pamięć podręczna nie została odświeżona.",
-				testElement1vB.hashCode(), result.getObj().hashCode());
-
-		result = CachedObjectFactory.get(testElement1vB, CacheUsage.REFRESH,
-				props);
-		assertNotNull("Wynik nie może być null", result);
-		assertEquals(
-				"Wynik powinien być z pamięci podręcznej (zaktualizowany).",
-				Boolean.FALSE, result.getFromCache());
-		assertEquals("Powinien być to ten sam obiekt.",
-				testElement1vB.hashCode(), result.getObj().hashCode());
-
-		/* Badanie statystyk */
-		for (int i = 0; i < 20; i++) {
 			result = CachedObjectFactory.get(testElement1vB, CacheUsage.TO_USE,
 					props);
-			result = CachedObjectFactory.get(testElement2vA, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement3vA, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement4vA, CacheUsage.TO_USE,
-					props);
-		}
+			assertNotNull("Wynik nie może być null", result);
+			assertEquals("Wynik powinien być z pamięci podręcznej (dodany).",
+					Boolean.TRUE, result.getFromCache());
+			assertEquals("Powinien być to stary obiekt.",
+					testElement1vA.hashCode(), result.getObj().hashCode());
+			assertNotSame(
+					"Nie powinien być to być nowy obiekt, ponieważ pamięć podręczna nie została odświeżona.",
+					testElement1vB.hashCode(), result.getObj().hashCode());
 
-		List<_IObjectCacheStatistics> stats;
-		_IObjectCacheProvider provider = CacheProviderEnum.EhCache
-				.getProvider(props);
-		stats = provider.getAllStatistics(100);
-		assertNotNull("Wynik nie może być null", stats);
-		printResult2Log(stats);
-		assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
-		_IObjectCacheStatistics row = stats.get(0);
-		assertEquals("Nieprawidłowa cacheHits", 80L, row.getCacheHits());
-		assertEquals("Nieprawidłowa cacheMisses", 4L, row.getCacheMisses());
-		assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
+			result = CachedObjectFactory.get(testElement1vB,
+					CacheUsage.REFRESH, props);
+			assertNotNull("Wynik nie może być null", result);
+			assertEquals(
+					"Wynik powinien być z pamięci podręcznej (zaktualizowany).",
+					Boolean.FALSE, result.getFromCache());
+			assertEquals("Powinien być to ten sam obiekt.",
+					testElement1vB.hashCode(), result.getObj().hashCode());
 
-		String[] cs = provider.getCacheNames();
-		assertNotNull("[getCacheNames] Wynik nie może być null", cs);
-		for (String name : cs) {
-			_IObjectCache cache = provider.getCache(name);
-			assertNotNull("[getCache('" + name + "')] Wynik nie może być null",
-					cache);
-			List<String> keys = provider.getKeysList(name);
-			assertNotNull("[getKeysList('" + name
-					+ "')] Wynik nie może być null", keys);
-		}
+			/* Badanie statystyk */
+			for (int i = 0; i < 20; i++) {
+				result = CachedObjectFactory.get(testElement1vB,
+						CacheUsage.TO_USE, props);
+				result = CachedObjectFactory.get(testElement2vA,
+						CacheUsage.TO_USE, props);
+				result = CachedObjectFactory.get(testElement3vA,
+						CacheUsage.TO_USE, props);
+				result = CachedObjectFactory.get(testElement4vA,
+						CacheUsage.TO_USE, props);
+			}
 
-		provider.clearCache(CachedObjectFactory.cachedObjectRegionName);
-		for (int i = 0; i < 20; i++) {
-			result = CachedObjectFactory.get(testElement1vB, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement2vA, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement3vA, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement4vA, CacheUsage.TO_USE,
-					props);
+			List<_IObjectCacheStatistics> stats;
+			lProvider = CacheProviderEnum.EhCache.getProvider(props);
+			stats = lProvider.getAllStatistics(100);
+			assertNotNull("Wynik nie może być null", stats);
+			printResult2Log(stats);
+			assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
+			_IObjectCacheStatistics row = stats.get(0);
+			assertEquals("Nieprawidłowa cacheHits", 80L, row.getCacheHits());
+			assertEquals("Nieprawidłowa cacheMisses", 4L, row.getCacheMisses());
+			assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
+
+			String[] cs = lProvider.getCacheNames();
+			assertNotNull("[getCacheNames] Wynik nie może być null", cs);
+			for (String name : cs) {
+				_IObjectCache cache = lProvider.getCache(name);
+				assertNotNull("[getCache('" + name
+						+ "')] Wynik nie może być null", cache);
+				List<String> keys = lProvider.getKeysList(name);
+				assertNotNull("[getKeysList('" + name
+						+ "')] Wynik nie może być null", keys);
+			}
+
+			lProvider.clearCache(CachedObjectFactory.cachedObjectRegionName);
+			for (int i = 0; i < 20; i++) {
+				result = CachedObjectFactory.get(testElement1vB,
+						CacheUsage.TO_USE, props);
+				result = CachedObjectFactory.get(testElement2vA,
+						CacheUsage.TO_USE, props);
+				result = CachedObjectFactory.get(testElement3vA,
+						CacheUsage.TO_USE, props);
+				result = CachedObjectFactory.get(testElement4vA,
+						CacheUsage.TO_USE, props);
+			}
+			/** statystyki po wyczyszczeniu cache */
+			stats = lProvider.getAllStatistics(100);
+			assertNotNull("Wynik nie może być null", stats);
+			printResult2Log(stats);
+			assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
+			row = stats.get(0);
+			assertEquals("Nieprawidłowa cacheHits", 156L, row.getCacheHits());
+			assertEquals("Nieprawidłowa cacheMisses", 8L, row.getCacheMisses());
+			assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
+			
+		} finally {
+			if (lProvider != null) {
+				lProvider.close();
+			}
 		}
-		/** statystyki po wyczyszczeniu cache */
-		stats = provider.getAllStatistics(100);
-		assertNotNull("Wynik nie może być null", stats);
-		printResult2Log(stats);
-		assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
-		row = stats.get(0);
-		assertEquals("Nieprawidłowa cacheHits", 156L, row.getCacheHits());
-		assertEquals("Nieprawidłowa cacheMisses", 8L, row.getCacheMisses());
-		assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
-		
-		/** statystyki po wyczyszczeniu statystyk */
-		provider.clearStatistics(CachedObjectFactory.cachedObjectRegionName);
-		for (int i = 0; i < 20; i++) {
-			result = CachedObjectFactory.get(testElement1vB, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement2vA, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement3vA, CacheUsage.TO_USE,
-					props);
-			result = CachedObjectFactory.get(testElement4vA, CacheUsage.TO_USE,
-					props);
-		}
-		/** statystyki po wyczyszczeniu cache */
-		stats = provider.getAllStatistics(100);
-		assertNotNull("Wynik nie może być null", stats);
-		printResult2Log(stats);
-		assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
-		row = stats.get(0);
-		assertEquals("Nieprawidłowa cacheHits", 80L, row.getCacheHits());
-		assertEquals("Nieprawidłowa cacheMisses", 0L, row.getCacheMisses());
-		assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
 
 	}
 

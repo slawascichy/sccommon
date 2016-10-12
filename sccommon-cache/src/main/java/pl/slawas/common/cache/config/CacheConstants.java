@@ -51,10 +51,10 @@ public interface CacheConstants {
 	 */
 	public static String DEFAULT_REGION_NAME = "scbpm.Default";
 
-	String PROP_diskPersistent = "cache.diskPersistent";
-	String PROP_eternal = "cache.eternal";
-	String PROP_maxElementsInMemory = "cache.maxElementsInMemory";
 	String PROP_memoryStoreEvictionPolicy = "cache.memoryStoreEvictionPolicy";
-	String PROP_overflowToDisk = "cache.overflowToDisk";
+	int DEFAULT_maxElementsInMemory = 10000;
+	String PROP_maxElementsInMemory = "cache.maxEntriesLocalHeap";
+	String PROP_eternal = "cache.eternal";
+	String PROP_strategy = "cache.strategy";
 
 }

@@ -1,6 +1,7 @@
 package pl.slawas.common.cache;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -9,15 +10,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.management.MBeanServer;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.PersistenceConfiguration;
+import net.sf.ehcache.config.PersistenceConfiguration.Strategy;
+import net.sf.ehcache.management.ManagementService;
 
 import org.apache.commons.lang.StringUtils;
 
 import pl.slawas.common.cache.config.CacheConfig;
 import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.helpers.FileUtils;
+import pl.slawas.helpers.Strings;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
 
@@ -63,6 +71,26 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 	 */
 	public EhCacheProvider(Properties props) {
 		init(props);
+	}
+
+	public boolean init(Configuration configuration) {
+		if (manager != null) {
+			/**
+			 * Jeżeli manager jest już zainicjalizowany, to wystawiam tylko
+			 * ostrzeżenie
+			 */
+			logger.warn("[{}] is inicjalized!",
+					EhCacheProvider.class.getSimpleName());
+			return false;
+		}
+		synchronized (initLock) {
+			manager = new CacheManager(configuration);
+			for (String key : getCacheNames()) {
+				Cache c = manager.getCache(key);
+				caches.put(key, new EhCache(c));
+			}
+			return true;
+		}
 	}
 
 	/**
@@ -118,10 +146,15 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 						EhCacheProvider.class
 								.getResourceAsStream(FILE_CONFIG_PATH));
 			}
+			if (!CacheConfig.statisticsIsDisabled()) {
+				MBeanServer mBeanServer = ManagementFactory
+						.getPlatformMBeanServer();
+				ManagementService.registerMBeans(manager, mBeanServer, false,
+						false, false, true);
+			}
 			for (String key : getCacheNames()) {
 				Cache c = manager.getCache(key);
-				c.setStatisticsEnabled(!CacheConfig.statisticsIsDisabled());
-				caches.put(key, new EhCache(c, props));
+				caches.put(key, new EhCache(c));
 			}
 			return true;
 		}
@@ -136,13 +169,44 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 		synchronized (lock) {
 			_IObjectCache cache = caches.get(name);
 			if (cache == null) {
+				/** Uzupełnienie konfiguracji */
+				CacheConfiguration config;
+				String param;
+				String originalKey = name;
+				param = (String) props.get(originalKey + Strings.DOTChar
+						+ CacheConstants.PROP_maxElementsInMemory);
+				if (StringUtils.isNotBlank(param)) {
+					config = new CacheConfiguration(name,
+							Integer.parseInt(param));
+				} else {
+					config = new CacheConfiguration(name,
+							CacheConstants.DEFAULT_maxElementsInMemory);
+				}
+				param = (String) props.get(originalKey + Strings.DOTChar
+						+ CacheConstants.PROP_eternal);
+				if (StringUtils.isNotBlank(param)) {
+					config.setEternal(Boolean.parseBoolean(param));
+				}
+				param = (String) props.get(originalKey + Strings.DOTChar
+						+ CacheConstants.PROP_memoryStoreEvictionPolicy);
+				if (StringUtils.isNotBlank(param)) {
+					config.setMemoryStoreEvictionPolicy(param);
+				}
+
+				param = (String) props.get(originalKey + Strings.DOTChar
+						+ CacheConstants.PROP_strategy);
+				PersistenceConfiguration pc;
+				if (StringUtils.isNotBlank(param)) {
+					pc = new PersistenceConfiguration();
+					pc.setStrategy(param);
+				} else {
+					pc = new PersistenceConfiguration()
+							.strategy(Strategy.LOCALTEMPSWAP);
+				}
+				config.persistence(pc);
 				logger.debug("Tworze nowy region '{}'", name);
-				manager.addCache(name);
-				cache = new EhCache(manager.getCache(name), this.props);
-				Ehcache netEhcache = ((pl.slawas.common.cache.EhCache) cache)
-						.getEhCache();
-				netEhcache.setStatisticsEnabled(!CacheConfig
-						.statisticsIsDisabled());
+				manager.addCache(new Cache(config));
+				cache = new EhCache(manager.getCache(name));
 				caches.put(name, cache);
 			}
 			return cache;
@@ -215,12 +279,8 @@ public class EhCacheProvider implements Serializable, _IObjectCacheProvider {
 
 	@Override
 	public void clearStatistics(String cacheName) {
-		if (StringUtils.isNotBlank(cacheName)) {
-			Cache ch = manager.getCache(cacheName);
-			if (ch != null) {
-				ch.clearStatistics();
-			}
-		}
+		logger.warn("--> clearStatistics('{}'): Method is deprecated",
+				cacheName);
 	}
 
 }

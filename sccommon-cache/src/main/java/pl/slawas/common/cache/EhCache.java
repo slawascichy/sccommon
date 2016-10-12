@@ -5,18 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-
-import org.apache.commons.lang.StringUtils;
-
-import pl.slawas.common.cache.config.CacheConstants;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
-import pl.slawas.helpers.Strings;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
 
@@ -36,39 +30,8 @@ public class EhCache implements Serializable, _IObjectCache {
 
 	private final Cache ehCache;
 
-	public EhCache(net.sf.ehcache.Cache ehCache, Properties props) {
+	public EhCache(Cache ehCache) {
 		this.ehCache = ehCache;
-
-		/** Uzupełnienie konfiguracji */
-		CacheConfiguration config = this.ehCache.getCacheConfiguration();
-		String originalKey = this.ehCache.getName();
-		String param = (String) props.get(originalKey + Strings.DOTChar
-				+ CacheConstants.PROP_diskPersistent);
-		if (StringUtils.isNotBlank(param)) {
-			config.setDiskPersistent(Boolean.parseBoolean(param));
-		}
-		param = (String) props.get(originalKey + Strings.DOTChar
-				+ CacheConstants.PROP_eternal);
-		if (StringUtils.isNotBlank(param)) {
-			config.setEternal(Boolean.parseBoolean(param));
-		}
-		param = (String) props.get(originalKey + Strings.DOTChar
-				+ CacheConstants.PROP_maxElementsInMemory);
-		if (StringUtils.isNotBlank(param)) {
-			config.setMaxElementsInMemory(Integer.parseInt(param));
-		}
-		param = (String) props.get(originalKey + Strings.DOTChar
-				+ CacheConstants.PROP_memoryStoreEvictionPolicy);
-		if (StringUtils.isNotBlank(param)) {
-			config.setMemoryStoreEvictionPolicy(param);
-		}
-		param = (String) props.get(originalKey + Strings.DOTChar
-				+ CacheConstants.PROP_overflowToDisk);
-		if (StringUtils.isNotBlank(param)) {
-			config.setOverflowToDisk(Boolean.parseBoolean(param));
-		}
-		// TODO poprawić, by było konfigurowalne
-		config.setStatistics(true);
 	}
 
 	public Object get(Object key) throws CacheErrorException {
@@ -150,7 +113,7 @@ public class EhCache implements Serializable, _IObjectCache {
 
 	public long getSizeInMemory() {
 		try {
-			return ehCache.calculateInMemorySize();
+			return ehCache.getStatistics().getLocalHeapSizeInBytes();
 		} catch (Exception e) {
 			logger.warn(
 					"Nie udało się przeliczyć rozmiaru zajmowanej pamięci przez dany region.",
@@ -161,14 +124,14 @@ public class EhCache implements Serializable, _IObjectCache {
 
 	public long getElementCountInMemory() throws CacheErrorException {
 		try {
-			return ehCache.getMemoryStoreSize();
+			return ehCache.getStatistics().getLocalHeapSize();
 		} catch (net.sf.ehcache.CacheException ce) {
 			throw new CacheErrorException(ce);
 		}
 	}
 
 	public long getElementCountOnDisk() {
-		return ehCache.getDiskStoreSize();
+		return ehCache.getStatistics().getLocalDiskSize();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

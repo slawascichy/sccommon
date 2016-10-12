@@ -56,6 +56,7 @@ public interface _IObjectCacheProvider {
 	 * 
 	 * @param cacheName
 	 */
+	@Deprecated
 	void clearStatistics(String cacheName);
 
 }
