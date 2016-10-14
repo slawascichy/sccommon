@@ -72,6 +72,7 @@ public class ScEhCacheRegionFactory implements RegionFactory, EhCacheInstance {
 	public CollectionRegion buildCollectionRegion(String regionName,
 			Properties properties, CacheDataDescription metadata)
 			throws CacheException {
+		logger.debug("[buildCollectionRegion] regionName: {}", regionName);
 		return new EhcacheCollectionRegion(this.accessStrategyFactory,
 				getEhCaheCache(regionName), this.settings, metadata, properties);
 	}
@@ -81,6 +82,7 @@ public class ScEhCacheRegionFactory implements RegionFactory, EhCacheInstance {
 	public EntityRegion buildEntityRegion(String regionName,
 			Properties properties, CacheDataDescription metadata)
 			throws CacheException {
+		logger.debug("[buildEntityRegion] regionName: {}", regionName);
 		return new EhcacheEntityRegion(this.accessStrategyFactory,
 				getEhCaheCache(regionName), this.settings, metadata, properties);
 	}
@@ -90,6 +92,7 @@ public class ScEhCacheRegionFactory implements RegionFactory, EhCacheInstance {
 	public NaturalIdRegion buildNaturalIdRegion(String regionName,
 			Properties properties, CacheDataDescription metadata)
 			throws CacheException {
+		logger.debug("[buildNaturalIdRegion] regionName: {}", regionName);
 		return new EhcacheNaturalIdRegion(this.accessStrategyFactory,
 				getEhCaheCache(regionName), this.settings, metadata, properties);
 	}
@@ -98,6 +101,7 @@ public class ScEhCacheRegionFactory implements RegionFactory, EhCacheInstance {
 	@Override
 	public QueryResultsRegion buildQueryResultsRegion(String regionName,
 			Properties properties) throws CacheException {
+		logger.debug("[buildQueryResultsRegion] regionName: {}", regionName);
 		return new EhcacheQueryResultsRegion(this.accessStrategyFactory,
 				getEhCaheCache(regionName), properties);
 	}
@@ -106,6 +110,7 @@ public class ScEhCacheRegionFactory implements RegionFactory, EhCacheInstance {
 	@Override
 	public TimestampsRegion buildTimestampsRegion(String regionName,
 			Properties properties) throws CacheException {
+		logger.debug("[buildTimestampsRegion] regionName: {}", regionName);
 		return new EhcacheTimestampsRegion(this.accessStrategyFactory,
 				getEhCaheCache(regionName), properties);
 	}

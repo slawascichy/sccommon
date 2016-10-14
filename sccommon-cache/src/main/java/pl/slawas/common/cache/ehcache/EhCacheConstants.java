@@ -40,6 +40,8 @@ public interface EhCacheConstants {
 	/** Czas życia */
 	String PROP_timeToLive = "cache.timeToLive";
 	int DEFAULT_timeToLive = 360000;
+	long DEFAULT_TIME_TO_LIVE_SECONDS = 300L;
+	String DEFAULT_STORE_EVICTION_POLICY = "LRU";
 
 	/**
 	 * Nazwa parametru decydującego o tym, czy podczas używania cache'a (pamięci
@@ -61,5 +63,8 @@ public interface EhCacheConstants {
 	String PROP_maxElementsInMemory = "cache.maxEntriesLocalHeap";
 	String PROP_eternal = "cache.eternal";
 	String PROP_strategy = "cache.strategy";
+	String PROP_strategy_sync = "cache.strategy.synchronousWrites";
+	String PROP_timeToIdleSeconds = "cache.timeToIdleSeconds";
+	String PROP_timeToLiveSeconds = "cache.timeToLiveSeconds";
 
 }

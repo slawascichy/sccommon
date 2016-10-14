@@ -4,9 +4,10 @@
 
 	<diskStore path="java.io.tmpdir" />
 
-	<defaultCache diskExpiryThreadIntervalSeconds="120"
-		diskPersistent="false" eternal="false" maxElementsInMemory="10000"
+	<defaultCache eternal="false" maxEntriesLocalHeap="10000"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false"
-		timeToIdleSeconds="300" timeToLiveSeconds="300" />
+		timeToIdleSeconds="300" timeToLiveSeconds="300">
+		<persistence strategy="none" />
+	</defaultCache>
 
 </ehcache>

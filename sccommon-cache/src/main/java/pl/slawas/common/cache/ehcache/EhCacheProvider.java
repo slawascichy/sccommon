@@ -184,6 +184,7 @@ public class EhCacheProvider implements EhCacheInstance {
 				CacheConfiguration config;
 				String param;
 				String originalKey = name;
+				/* PROP_maxElementsInMemory */
 				param = (String) additionalProps.get(originalKey
 						+ Strings.DOTChar
 						+ EhCacheConstants.PROP_maxElementsInMemory);
@@ -194,29 +195,71 @@ public class EhCacheProvider implements EhCacheInstance {
 					config = new CacheConfiguration(name,
 							EhCacheConstants.DEFAULT_maxElementsInMemory);
 				}
+				/* PROP_eternal */
 				param = (String) additionalProps.get(originalKey
 						+ Strings.DOTChar + EhCacheConstants.PROP_eternal);
 				if (StringUtils.isNotBlank(param)) {
 					config.setEternal(Boolean.parseBoolean(param));
+				} else {
+					config.setEternal(false);
 				}
+				/* PROP_memoryStoreEvictionPolicy */
 				param = (String) additionalProps.get(originalKey
 						+ Strings.DOTChar
 						+ EhCacheConstants.PROP_memoryStoreEvictionPolicy);
 				if (StringUtils.isNotBlank(param)) {
 					config.setMemoryStoreEvictionPolicy(param);
+				} else {
+					config.setMemoryStoreEvictionPolicy(EhCacheConstants.DEFAULT_STORE_EVICTION_POLICY);
 				}
-
+				/* PROP_strategy */
 				param = (String) additionalProps.get(originalKey
 						+ Strings.DOTChar + EhCacheConstants.PROP_strategy);
 				PersistenceConfiguration pc;
+				Strategy strategy = Strategy.NONE;
 				if (StringUtils.isNotBlank(param)) {
 					pc = new PersistenceConfiguration();
 					pc.setStrategy(param);
+					strategy = Strategy.valueOf(param.toUpperCase());
 				} else {
-					pc = new PersistenceConfiguration()
-							.strategy(Strategy.LOCALTEMPSWAP);
+					pc = new PersistenceConfiguration().strategy(strategy);
+				}
+				/* PROP_strategy_sync */
+				param = (String) additionalProps
+						.get(originalKey + Strings.DOTChar
+								+ EhCacheConstants.PROP_strategy_sync);
+				if (StringUtils.isNotBlank(param)) {
+					pc.setSynchronousWrites(Boolean.parseBoolean(param));
+				} else {
+					switch (strategy) {
+					case NONE:
+					case LOCALTEMPSWAP:
+						pc.setSynchronousWrites(false);
+						break;
+					default:
+						pc.setSynchronousWrites(true);
+					}
 				}
 				config.persistence(pc);
+				/* PROP_timeToIdleSeconds */
+				param = (String) additionalProps.get(originalKey
+						+ Strings.DOTChar
+						+ EhCacheConstants.PROP_timeToIdleSeconds);
+				if (StringUtils.isNotBlank(param)) {
+					config.setTimeToIdleSeconds(Long.parseLong(param));
+				} else {
+					config.setTimeToIdleSeconds(EhCacheConstants.DEFAULT_TIME_TO_LIVE_SECONDS);
+				}
+				/* PROP_timeToLiveSeconds */
+				param = (String) additionalProps.get(originalKey
+						+ Strings.DOTChar
+						+ EhCacheConstants.PROP_timeToLiveSeconds);
+				if (StringUtils.isNotBlank(param)) {
+					config.setTimeToLiveSeconds(Long.parseLong(param));
+				} else {
+					config.setTimeToLiveSeconds(EhCacheConstants.DEFAULT_TIME_TO_LIVE_SECONDS);
+				}
+
 				logger.debug("[{}.getCache] Tworze nowy region '{}'",
 						new Object[] { getName(), name });
 				manager.addCache(new Cache(config));
