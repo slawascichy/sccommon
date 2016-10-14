@@ -1,25 +1,25 @@
-package pl.slawas.common.cache.config;
+package pl.slawas.common.cache.ehcache;
 
 /**
  * 
- * CacheConfigLoader obiekt pomocniczy zmieniający domyślną lokalizację
+ * EhCacheConfigLoader obiekt pomocniczy zmieniający domyślną lokalizację
  * parametrów cache (pamięci podręcznej).
  * 
  * @author Sławomir Cichy &lt;slawas@slawas.pl&gt;
  * @version $Revision: 1.1 $
  * 
  */
-public class CacheConfigLoader {
+public class EhCacheConfigLoader {
 
 	/**
 	 * 
 	 * @param path2fileConfiguration
 	 *            ścieżka do pliku z parametrami pamięci podręcznej
 	 *            wykorzystywanymi do tworzenia dynamicznych regionów. zobacz
-	 *            też {@link CacheConstants#PROP_DYNAMIC_PARAMETERS_FILE_PATH}
+	 *            też {@link EhCacheConstants#PROP_DYNAMIC_PARAMETERS_FILE_PATH}
 	 */
-	public CacheConfigLoader(String path2fileConfiguration) {
-		CacheConfig.getInstance(path2fileConfiguration);
+	public EhCacheConfigLoader(String path2fileConfiguration) {
+		EhCacheConfig.getInstance(path2fileConfiguration);
 	}
 
 }

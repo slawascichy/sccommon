@@ -1,19 +1,18 @@
 package pl.slawas.common.cache;
 
-import java.util.Properties;
+import pl.slawas.common.cache.ehcache.EhCacheInstance;
 
 public enum CacheProviderEnum {
 
 	EhCache, none;
 
-	public _IObjectCacheProvider getProvider(Properties props) {
+	public Class<?> getCacheProviderInterfaceClass() {
 		switch (this) {
 		case EhCache:
-			return EhCacheProviderFactory.getInstance(props);
+			return EhCacheInstance.class;
 		case none:
-			return null;
 		default:
-			throw new UnsupportedOperationException();
+			return null;
 		}
 	}
 

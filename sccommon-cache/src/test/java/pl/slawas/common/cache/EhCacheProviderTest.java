@@ -1,5 +1,7 @@
 package pl.slawas.common.cache;
 
+import pl.slawas.common.cache.ehcache.EhCacheProvider;
+
 
 /**
  * Unit test for simple App.

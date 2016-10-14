@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
-import pl.slawas.common.cache.config.CacheConstants;
+import pl.slawas.common.cache.ehcache.EhCacheConstants;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.helpers.Strings;
 import pl.slawas.twl4j.Logger;
@@ -38,7 +38,7 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 
 	protected CacheUsage cacheUsage;
 
-	private long cacheTimeToLive = CacheConstants.DEFAULT_timeToLive;
+	private long cacheTimeToLive = EhCacheConstants.DEFAULT_timeToLive;
 
 	/**
 	 * @param cacheUsage
@@ -72,7 +72,7 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 			String pProvider = null;
 			try {
 				/* ustawienie parametrów cache'a */
-				pProvider = (String) props.get(CacheConstants.PROP_PROVIDER);
+				pProvider = (String) props.get(EhCacheConstants.PROP_PROVIDER);
 				if (StringUtils.isNotBlank(pProvider)) {
 					lPprovider = CacheProviderEnum.valueOf(pProvider);
 				} else {
@@ -80,8 +80,8 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 				}
 				if (lPprovider.isAllowed()) {
 
-					_IObjectCacheProvider cacheManager = lPprovider
-							.getProvider(props);
+					_IObjectCacheProvider<?> cacheManager = CacheProviderFactory
+							.getInstance(props);
 					logger.trace(
 							"[ {} ] Zdefiniowano uzycie cache'a '{}' (impl: {}).",
 							new Object[] { getClass().getSimpleName(),
@@ -89,12 +89,12 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 									cacheManager.getClass().getName() });
 
 					/* Rozwiązywanie nazwy regionu pamięci podręcznej */
-					preparedCacheRegionName = CacheConstants.DEFAULT_REGION_NAME;
+					preparedCacheRegionName = EhCacheConstants.DEFAULT_REGION_NAME;
 					boolean customUseDefaultRegion = true;
-					if (props.get(CacheConstants.PROP_USE_DEFAULT_REGION) != null) {
+					if (props.get(EhCacheConstants.PROP_USE_DEFAULT_REGION) != null) {
 						customUseDefaultRegion = Boolean
 								.parseBoolean((String) props
-										.get(CacheConstants.PROP_USE_DEFAULT_REGION));
+										.get(EhCacheConstants.PROP_USE_DEFAULT_REGION));
 					}
 					customUseDefaultRegion = (useDefaultRegion == null ? customUseDefaultRegion
 							: useDefaultRegion);
@@ -102,7 +102,7 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 						logger.trace(
 								"[ {} ] Zdefiniowano uzycie domyslnego regionu '{}'.",
 								new Object[] { getClass().getSimpleName(),
-										CacheConstants.DEFAULT_REGION_NAME });
+										EhCacheConstants.DEFAULT_REGION_NAME });
 					} else {
 						preparedCacheRegionName = cacheRegionName;
 						logger.trace(
@@ -121,7 +121,7 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 						String originalKey = preparedCacheRegionName;
 						String param = (String) props.get(originalKey
 								+ Strings.DOTChar
-								+ CacheConstants.PROP_timeToLive);
+								+ EhCacheConstants.PROP_timeToLive);
 						if (StringUtils.isNotBlank(param)) {
 							preparedCache.setTimeToLiveSeconds(Integer
 									.parseInt(param));

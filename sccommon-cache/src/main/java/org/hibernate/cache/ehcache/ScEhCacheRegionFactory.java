@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
+import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.hibernate.management.impl.ProviderMBeanRegistrationHelper;
@@ -32,26 +33,30 @@ import org.hibernate.cache.spi.TimestampsRegion;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.service.spi.InjectService;
 
-import pl.slawas.common.cache.EhCacheProvider;
+import pl.slawas.common.cache.CacheProviderConfiguration;
+import pl.slawas.common.cache.CacheProviderEnum;
+import pl.slawas.common.cache.CacheProviderFactory;
+import pl.slawas.common.cache.ObjectCacheStatisticsList;
 import pl.slawas.common.cache._IObjectCache;
-import pl.slawas.common.cache._IObjectCacheProvider;
 import pl.slawas.common.cache._IObjectCacheStatistics;
+import pl.slawas.common.cache.ehcache.EhCacheConstants;
+import pl.slawas.common.cache.ehcache.EhCacheInstance;
+import pl.slawas.common.cache.ehcache.EhCacheProvider;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
 
-public class ScEhCacheRegionFactory implements RegionFactory,
-		_IObjectCacheProvider {
+public class ScEhCacheRegionFactory implements RegionFactory, EhCacheInstance {
 
 	private static final long serialVersionUID = 8498725914796376618L;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ScEhCacheRegionFactory.class);
 
-	private static final String notInicjalizedMessage = "Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(Properties) albo start(Properties)";
+	private static final String notInicjalizedMessage = "Wewnętrzny provider jest nie zainicjalizowany. Wcześniej użyj metod init(CacheProviderConfiguration, Properties) albo start(SessionFactoryOptions, Properties)";
 
 	private final ProviderMBeanRegistrationHelper mbeanRegistrationHelper;
 	private final EhcacheAccessStrategyFactory accessStrategyFactory;
-	private static pl.slawas.common.cache.EhCacheProvider internalProvider;
+	private EhCacheInstance internalProvider;
 	private static Object initLock = new Object();
 	private SessionFactoryOptions settings;
 	private ClassLoaderService classLoaderService;
@@ -134,21 +139,44 @@ public class ScEhCacheRegionFactory implements RegionFactory,
 			return;
 		}
 		try {
+			EhCacheProvider tempInstance = new EhCacheProvider();
+			tempInstance.setAdditionalProps(properties);
+
 			String configurationResourceName = null;
 			if (properties != null) {
 				configurationResourceName = (String) properties
 						.get("net.sf.ehcache.configurationResourceName");
 			}
+			/* nie każemy rejestrować, to zrobimy za chwilę */
+			Properties additionalProps = new Properties();
+			additionalProps.put(EhCacheConstants.PROP_CACHE_MANAGER_REGISTER,
+					Boolean.toString(false));
+
 			if ((configurationResourceName == null)
 					|| (configurationResourceName.length() == 0)) {
-
-				internalProvider = new EhCacheProvider(new Properties());
+				URL url = tempInstance.getConfigurationFileURL();
+				CacheProviderConfiguration<Configuration> configuration = tempInstance
+						.initConfiguration(url);
+				String managerName = configuration.getManagerName();
+				internalProvider = (EhCacheInstance) CacheProviderFactory
+						.registerInstanceByManagerName(configuration,
+								tempInstance, managerName);
+				internalProvider.init(configuration, additionalProps);
 			} else {
+				/* mam inną ścieżkę do konfiguracji */
 				URL url = loadResource(configurationResourceName);
+				tempInstance.setConfigurationFileURL(url);
 				Configuration configuration = HibernateEhcacheUtils
 						.loadAndCorrectConfiguration(url);
-				internalProvider = new EhCacheProvider();
-				internalProvider.init(configuration);
+				String managerName = configuration.getName();
+				internalProvider = (EhCacheInstance) CacheProviderFactory
+						.registerInstanceByManagerName(
+								new CacheProviderConfiguration<Configuration>(
+										managerName, configuration),
+								tempInstance, managerName);
+				internalProvider.init(
+						new CacheProviderConfiguration<Configuration>(
+								managerName, configuration), additionalProps);
 			}
 			this.mbeanRegistrationHelper.registerMBean(
 					internalProvider.getManager(), properties);
@@ -162,6 +190,8 @@ public class ScEhCacheRegionFactory implements RegionFactory,
 			}
 
 			throw new org.hibernate.cache.CacheException(e);
+		} catch (Exception e) {
+			throw new org.hibernate.cache.CacheException(e);
 		}
 	}
 
@@ -171,17 +201,86 @@ public class ScEhCacheRegionFactory implements RegionFactory,
 		close();
 	}
 
+	private Ehcache getEhCaheCache(String name)
+			throws org.hibernate.cache.CacheException {
+		try {
+			logger.trace("-->getEhCaheCache('{}')", name);
+			_IObjectCache cache = getCache(name);
+			return ((pl.slawas.common.cache.ehcache.EhCache) cache)
+					.getEhCache();
+		} catch (net.sf.ehcache.CacheException e) {
+			throw new org.hibernate.cache.CacheException(e);
+		}
+	}
+
+	@InjectService
+	public void setClassLoaderService(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
+	}
+
+	protected URL loadResource(String configurationResourceName) {
+		URL url = null;
+		if (this.classLoaderService != null) {
+			url = this.classLoaderService
+					.locateResource(configurationResourceName);
+		}
+		if (url == null) {
+			ClassLoader standardClassloader = Thread.currentThread()
+					.getContextClassLoader();
+			if (standardClassloader != null) {
+				url = standardClassloader
+						.getResource(configurationResourceName);
+			}
+			if (url == null) {
+				url = AbstractEhcacheRegionFactory.class
+						.getResource(configurationResourceName);
+			}
+			if (url == null) {
+				try {
+					url = new URL(configurationResourceName);
+				} catch (MalformedURLException localMalformedURLException) {
+				}
+			}
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"Creating EhCacheRegionFactory from a specified resource: {}.  Resolved to URL: {}",
+					new Object[] { configurationResourceName, url });
+		}
+
+		if (url == null) {
+			logger.warn("{} unable to load configuration from ''{}. ",
+					new Object[] { ScEhCacheRegionFactory.class.getName(),
+							configurationResourceName });
+		}
+		return url;
+	}
+
 	@Override
-	public boolean init(Properties props) {
+	public boolean init(
+			CacheProviderConfiguration<Configuration> configuration,
+			Properties additionalProps) {
 		synchronized (initLock) {
 			if (internalProvider != null) {
 				logger.warn("{} is already initialized. ",
 						ScEhCacheRegionFactory.class.getName());
 				return true;
 			}
-			internalProvider = new pl.slawas.common.cache.EhCacheProvider(props);
+			String managerName = configuration.getManagerName();
+			/* nie każemy rejestrować, to zrobimy za chwilę */
+			additionalProps.put(EhCacheConstants.PROP_CACHE_MANAGER_REGISTER,
+					Boolean.toString(false));
+			EhCacheProvider tempInstance = new EhCacheProvider();
+			internalProvider = (EhCacheInstance) CacheProviderFactory
+					.registerInstanceByManagerName(configuration, tempInstance,
+							managerName);
+			/* UWAGA! to może być ta sama instancja !!! */
+			if (internalProvider == this) {
+				tempInstance.init(configuration, false, additionalProps);
+				internalProvider = tempInstance;
+			}
 			mbeanRegistrationHelper.registerMBean(
-					internalProvider.getManager(), props);
+					internalProvider.getManager(), additionalProps);
 			return (internalProvider != null);
 		}
 	}
@@ -229,11 +328,12 @@ public class ScEhCacheRegionFactory implements RegionFactory,
 	}
 
 	@Override
-	public List<_IObjectCacheStatistics> getAllStatistics(
-			Integer getAllStatistics) {
-		logger.trace("-->getAllStatistics('{}')", getAllStatistics);
+	public ObjectCacheStatisticsList getAllStatistics(Integer offset,
+			Integer pageSize) {
+		logger.trace("-->getAllStatistics({}, {})", new Object[] { offset,
+				pageSize });
 		if (internalProvider != null) {
-			return internalProvider.getAllStatistics(getAllStatistics);
+			return internalProvider.getAllStatistics(offset, pageSize);
 		}
 		throw new IllegalAccessError(notInicjalizedMessage);
 
@@ -256,10 +356,10 @@ public class ScEhCacheRegionFactory implements RegionFactory,
 			return internalProvider.getKeysList(cacheName);
 		}
 		throw new IllegalAccessError(notInicjalizedMessage);
-
 	}
 
 	/* Overridden (non-Javadoc) */
+	@SuppressWarnings("deprecation")
 	@Override
 	public void clearStatistics(String cacheName) {
 		logger.trace("-->clearStatistics('{}')", cacheName);
@@ -270,58 +370,63 @@ public class ScEhCacheRegionFactory implements RegionFactory,
 		}
 	}
 
-	private Ehcache getEhCaheCache(String name)
-			throws org.hibernate.cache.CacheException {
-		try {
-			logger.trace("-->getCache('{}')", name);
-			_IObjectCache cache = getCache(name);
-			return ((pl.slawas.common.cache.EhCache) cache).getEhCache();
-		} catch (net.sf.ehcache.CacheException e) {
-			throw new org.hibernate.cache.CacheException(e);
+	@Override
+	public String getName() {
+		logger.trace("-->getName()");
+		if (internalProvider != null) {
+			return internalProvider.getName();
 		}
+		throw new IllegalAccessError(notInicjalizedMessage);
 	}
 
-	@InjectService
-	public void setClassLoaderService(ClassLoaderService classLoaderService) {
-		this.classLoaderService = classLoaderService;
+	@Override
+	public CacheProviderConfiguration<Configuration> initConfiguration(URL url) {
+		EhCacheProvider tempInstance = new EhCacheProvider();
+		return tempInstance.initConfiguration(url);
 	}
 
-	protected URL loadResource(String configurationResourceName) {
-		URL url = null;
-		if (this.classLoaderService != null) {
-			url = this.classLoaderService
-					.locateResource(configurationResourceName);
+	@Override
+	public _IObjectCacheStatistics getStatistics(String regionName) {
+		logger.trace("-->getName()");
+		if (internalProvider != null) {
+			return internalProvider.getStatistics(regionName);
 		}
-		if (url == null) {
-			ClassLoader standardClassloader = Thread.currentThread()
-					.getContextClassLoader();
-			if (standardClassloader != null) {
-				url = standardClassloader
-						.getResource(configurationResourceName);
-			}
-			if (url == null) {
-				url = AbstractEhcacheRegionFactory.class
-						.getResource(configurationResourceName);
-			}
-			if (url == null) {
-				try {
-					url = new URL(configurationResourceName);
-				} catch (MalformedURLException localMalformedURLException) {
-				}
-			}
+		throw new IllegalAccessError(notInicjalizedMessage);
+	}
+
+	@Override
+	public CacheProviderEnum getAssociatedProvider() {
+		return CacheProviderEnum.EhCache;
+	}
+
+	@Override
+	public URL getConfigurationFileURL() {
+		logger.trace("-->getConfigurationFileURL()");
+		if (internalProvider != null) {
+			return internalProvider.getConfigurationFileURL();
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug(
-					"Creating EhCacheRegionFactory from a specified resource: {}.  Resolved to URL: {}",
-					new Object[] { configurationResourceName, url });
+		EhCacheProvider tempInstance = new EhCacheProvider();
+		return tempInstance.getConfigurationFileURL();
+	}
+
+	@Override
+	public void setAdditionalProps(Properties additionalProps) {
+		logger.trace("-->setAdditionalProps()");
+		if (internalProvider != null) {
+			internalProvider.setAdditionalProps(additionalProps);
+		} else {
+			throw new IllegalAccessError(notInicjalizedMessage);
 		}
 
-		if (url == null) {
-			logger.warn("{} unable to load configuration from ''{}. ",
-					new Object[] { ScEhCacheRegionFactory.class.getName(),
-							configurationResourceName });
+	}
+
+	@Override
+	public CacheManager getManager() {
+		logger.trace("-->getManager()");
+		if (internalProvider != null) {
+			return internalProvider.getManager();
 		}
-		return url;
+		throw new IllegalAccessError(notInicjalizedMessage);
 	}
 
 }

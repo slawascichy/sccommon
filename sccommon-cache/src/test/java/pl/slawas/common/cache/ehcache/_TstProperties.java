@@ -1,4 +1,4 @@
-package pl.slawas.common.cache.config;
+package pl.slawas.common.cache.ehcache;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.log4j.config.PropertyPrinter;
 
+import pl.slawas.common.cache.ehcache.EhCacheConfig;
 import pl.slawas.helpers.Configurations;
 
 public class _TstProperties {
@@ -43,8 +44,8 @@ public class _TstProperties {
 		_Properties = Configurations.loadHashtable(_TstProperties.class,
 				mockFileName);
 		props.putAll(_Properties);
-		CacheConfig._Instance = null;
-		CacheConfig.getInstance(mockFileName);
+		EhCacheConfig._Instance = null;
+		EhCacheConfig.getInstance(mockFileName);
 		return props;
 	}
 

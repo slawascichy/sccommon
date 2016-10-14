@@ -8,9 +8,9 @@ import junit.framework.TestCase;
 import pl.slawas.common.cache.beans.CachedElement;
 import pl.slawas.common.cache.beans.CachedObjectFactory;
 import pl.slawas.common.cache.beans.CachedObjectResult;
-import pl.slawas.common.cache.config.CacheConfig;
-import pl.slawas.common.cache.config.CacheConstants;
-import pl.slawas.common.cache.config._TstProperties;
+import pl.slawas.common.cache.ehcache.EhCacheConfig;
+import pl.slawas.common.cache.ehcache.EhCacheConstants;
+import pl.slawas.common.cache.ehcache._TstProperties;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.helpers.Strings;
 import pl.slawas.twl4j.Logger;
@@ -37,12 +37,12 @@ public class CommonCacheProviderTstSupport extends TestCase {
 
 	public void testApp() throws CacheErrorException {
 
-		EhCacheProviderFactory.close();
+		CacheProviderFactory.close();
 		CachedObjectResult result;
-		Properties props = CacheConfig.getInstance().getPropertyList();
-		props.put(CacheConstants.PROP_PROVIDER_IMPL, this.provider.getName());
+		Properties props = EhCacheConfig.getInstance().getPropertyList();
+		props.put(EhCacheConstants.PROP_PROVIDER_IMPL, this.provider.getName());
 
-		_IObjectCacheProvider lProvider = null;
+		_IObjectCacheProvider<?> lProvider = null;
 		try {
 			CachedElement testElement1vA = new CachedElement("e1", "vA");
 			CachedElement testElement1vA_cached = testElement1vA;
@@ -105,13 +105,13 @@ public class CommonCacheProviderTstSupport extends TestCase {
 						CacheUsage.TO_USE, props);
 			}
 
-			List<_IObjectCacheStatistics> stats;
-			lProvider = CacheProviderEnum.EhCache.getProvider(props);
-			stats = lProvider.getAllStatistics(100);
+			ObjectCacheStatisticsList stats;
+			lProvider = CacheProviderFactory.getInstance(props);
+			stats = lProvider.getAllStatistics(0, 100);
 			assertNotNull("Wynik nie może być null", stats);
-			printResult2Log(stats);
-			assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
-			_IObjectCacheStatistics row = stats.get(0);
+			printResult2Log(stats.getList());
+			assertEquals("Nieprawidłowa liczba wierszy", 1, stats.getSize());
+			_IObjectCacheStatistics row = stats.getList().get(0);
 			assertEquals("Nieprawidłowa cacheHits", 80L, row.getCacheHits());
 			assertEquals("Nieprawidłowa cacheMisses", 4L, row.getCacheMisses());
 			assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
@@ -139,15 +139,15 @@ public class CommonCacheProviderTstSupport extends TestCase {
 						CacheUsage.TO_USE, props);
 			}
 			/** statystyki po wyczyszczeniu cache */
-			stats = lProvider.getAllStatistics(100);
+			stats = lProvider.getAllStatistics(0, 100);
 			assertNotNull("Wynik nie może być null", stats);
-			printResult2Log(stats);
-			assertEquals("Nieprawidłowa liczba wierszy", 1, stats.size());
-			row = stats.get(0);
+			printResult2Log(stats.getList());
+			assertEquals("Nieprawidłowa liczba wierszy", 1, stats.getSize());
+			row = stats.getList().get(0);
 			assertEquals("Nieprawidłowa cacheHits", 156L, row.getCacheHits());
 			assertEquals("Nieprawidłowa cacheMisses", 8L, row.getCacheMisses());
 			assertEquals("Nieprawidłowa count", 4L, row.getObjectCount());
-			
+
 		} finally {
 			if (lProvider != null) {
 				lProvider.close();

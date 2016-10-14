@@ -1,16 +1,20 @@
-package pl.slawas.common.cache.config;
+package pl.slawas.common.cache.ehcache;
 
 /**
  * 
- * CacheConfigConst - klasa z nazwami właściwości czytanymi z pliku
+ * EhCacheConstants - klasa z nazwami właściwości czytanymi z pliku
  * konfiguracyjnego cache (pamięci podręcznej).
  * 
  * @author Sławomir Cichy &lt;slawas@slawas.pl&gt;
  * @version $Revision: 1.1 $
  * 
  */
-public interface CacheConstants {
+public interface EhCacheConstants {
 
+	/**
+	 * Domyślna maksymalna liczba zwracanych rekordów.
+	 */
+	int DEFAULT_MAX_RESULT_SIZE = 1000;
 	/**
 	 * Nazwa właściwości definiująca położenie pliku z konfiguracje cache'a
 	 * (pamięci podręcznej).
@@ -30,6 +34,7 @@ public interface CacheConstants {
 	String PROP_PROVIDER = "cache.provider";
 	String PROP_PROVIDER_IMPL = "cache.provider.implementation";
 	String PROP_USE_DEFAULT_REGION = "cache.defaultRegionUsage";
+	String PROP_CACHE_MANAGER_REGISTER = "cacheManager.register";
 	String PROP_DISABLE_STATISTICS = "cache.statistics.disable";
 
 	/** Czas życia */

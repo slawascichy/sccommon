@@ -1,6 +1,8 @@
 package pl.slawas.common.cache;
 
-public interface _IObjectCacheStatistics {
+import java.io.Serializable;
+
+public interface _IObjectCacheStatistics extends Serializable {
 
 	/**
 	 * Clears the statistic counters to 0 for the associated Cache.
@@ -45,18 +47,44 @@ public interface _IObjectCacheStatistics {
 	long getObjectCount();
 
 	/**
-	 * @return the name of the cache, or null is there no associated cache
-	 */
-	String getAssociatedCacheName();
-
-	/**
 	 * Zwraca przeliczoną informację o wydajności cache wyrażoną w procentach
 	 * [%]
 	 * 
 	 * @return informacja o wydajności cache wyrażona w procentach [%]
 	 */
 	double getHitsRatio();
-	
+
 	int getSize();
+
+	/**
+	 * Nazwa powiązanego regionu pamięci podręcznej
+	 * 
+	 * @return the name of the cache, or null is there no associated cache
+	 */
+	String getAssociatedCacheName();
+
+	/**
+	 * Nazwa managera pamięci podręcznej
+	 * 
+	 * @return nazwa manager'a
+	 */
+	String getAssociatedManagerName();
+
+	/**
+	 * Definicja prvider'a pamięci podręcznej
+	 * 
+	 * @return
+	 */
+	CacheProviderEnum getAssociatedProvider();
+
+	/**
+	 * Oryginalny obiekt statystyk powiązany z implementacją. Umożliwiamy
+	 * pobranie dodatkowych statystyk o ile takie są dostępne.
+	 * 
+	 * @return oryginalna implementacja statystyk
+	 */
+	Object getAssociatedStatistics();
+	
+	boolean isActive();
 
 }

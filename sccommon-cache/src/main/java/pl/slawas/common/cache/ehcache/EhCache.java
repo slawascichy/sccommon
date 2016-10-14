@@ -1,4 +1,4 @@
-package pl.slawas.common.cache;
+package pl.slawas.common.cache.ehcache;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -10,6 +10,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import pl.slawas.common.cache._IObjectCache;
+import pl.slawas.common.cache._IObjectCacheStatistics;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
@@ -29,9 +31,11 @@ public class EhCache implements Serializable, _IObjectCache {
 	private static final Logger logger = LoggerFactory.getLogger(EhCache.class);
 
 	private final Cache ehCache;
+	private final String associatedManagerName;
 
-	public EhCache(Cache ehCache) {
+	public EhCache(String associatedManagerName, Cache ehCache) {
 		this.ehCache = ehCache;
+		this.associatedManagerName = associatedManagerName;
 	}
 
 	public Object get(Object key) throws CacheErrorException {
@@ -154,7 +158,7 @@ public class EhCache implements Serializable, _IObjectCache {
 	}
 
 	public _IObjectCacheStatistics getStatistics() {
-		return new EhCacheStatistics(ehCache);
+		return new EhCacheStatistics(this.associatedManagerName, ehCache);
 	}
 
 	public long getTimeToLiveSeconds() {

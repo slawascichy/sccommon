@@ -5,5 +5,5 @@ encoding//src/main/resources/cache.properties=UTF-8
 encoding//src/test/java=UTF-8
 encoding//src/test/resources=UTF-8
 encoding//src/test/resources-filtered=UTF-8
-encoding//src/test/resources/test-scichy.properties=UTF-8
+encoding//src/test/resources-filtered/test-scichy.properties=UTF-8
 encoding/<project>=UTF-8
