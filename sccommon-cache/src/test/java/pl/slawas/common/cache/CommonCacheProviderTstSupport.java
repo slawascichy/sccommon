@@ -51,6 +51,7 @@ public class CommonCacheProviderTstSupport extends TestCase {
 		Properties props = EhCacheConfig.getInstance().getPropertyList();
 		props.put(EhCacheConstants.PROP_PROVIDER_IMPL, this.provider.getName());
 		ObjectCacheStatisticsList stats;
+		List<CachedElement> list;
 		_IObjectCacheProvider<?> lProvider = null;
 		try {
 			lProvider = CacheProviderFactory.getInstance(props);
@@ -60,8 +61,9 @@ public class CommonCacheProviderTstSupport extends TestCase {
 			stats = lProvider.getAllStatistics(0, 100);
 			printResult2Log(stats.getList());
 
-			List<CachedElement> list = readTestData();
+			list = readTestData("/test-sample-data.csv");
 			sampleClient.check(list, props);
+			list = readTestData("/test-user-data.csv");
 			userClinet.check(list, props);
 
 			stats = lProvider.getAllStatistics(0, 100);
@@ -75,9 +77,8 @@ public class CommonCacheProviderTstSupport extends TestCase {
 		}
 	}
 
-	private List<CachedElement> readTestData() {
+	private List<CachedElement> readTestData(String csvFile) {
 		List<CachedElement> list = new ArrayList<CachedElement>();
-		String csvFile = "/test-data.csv";
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ";";
