@@ -24,7 +24,7 @@ import pl.slawas.twl4j.LoggerFactory;
 public abstract class ObjectWithCacheSupport implements Serializable,
 		_IObjectWithCache {
 
-	final static private Logger logger = LoggerFactory
+	static final private Logger logger = LoggerFactory
 			.getLogger(ObjectWithCacheSupport.class);
 
 	/** nazwa regionu używanego cache */

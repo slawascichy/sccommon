@@ -20,6 +20,8 @@ import pl.slawas.twl4j.LoggerFactory;
  * 
  * EHCache - klasa kesza, wzorowana na keszu hibernate-a
  * 
+ * http://www.ehcache.org/documentation/2.7/apis/explicitlocking.html
+ * 
  * @author Sławomir Cichy &lt;slawas@slawas.pl&gt;
  * @version $Revision: 1.3 $
  * 
@@ -40,8 +42,7 @@ public class EhCache implements Serializable, _IObjectCache {
 
 	public Object get(Object key) throws CacheErrorException {
 		try {
-			logger.trace("[{}] key: {}",
-					new Object[] { ehCache.getName(), key });
+			logger.trace("[{}] key: {}", new Object[] { ehCache.getName(), key });
 			if (key == null) {
 				return null;
 			} else {
@@ -119,9 +120,7 @@ public class EhCache implements Serializable, _IObjectCache {
 		try {
 			return ehCache.getStatistics().getLocalHeapSizeInBytes();
 		} catch (Exception e) {
-			logger.warn(
-					"Nie udało się przeliczyć rozmiaru zajmowanej pamięci przez dany region.",
-					e);
+			logger.warn("Nie udało się przeliczyć rozmiaru zajmowanej pamięci przez dany region.", e);
 			return -1;
 		}
 	}
@@ -181,5 +180,53 @@ public class EhCache implements Serializable, _IObjectCache {
 	 */
 	public Ehcache getEhCache() {
 		return ehCache;
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public void acquireReadLockOnKey(Object key) {
+		this.ehCache.acquireReadLockOnKey(key);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public void acquireWriteLockOnKey(Object key) {
+		this.ehCache.acquireWriteLockOnKey(key);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public boolean tryReadLockOnKey(Object key, long timeout) throws InterruptedException {
+		return this.ehCache.tryReadLockOnKey(key, timeout);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public boolean tryWriteLockOnKey(Object key, long timeout) throws InterruptedException {
+		return this.ehCache.tryWriteLockOnKey(key, timeout);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public void releaseReadLockOnKey(Object key) {
+		this.ehCache.releaseReadLockOnKey(key);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public void releaseWriteLockOnKey(Object key) {
+		this.ehCache.releaseWriteLockOnKey(key);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public boolean isReadLockedByCurrentThread(Object key) {
+		return this.ehCache.isReadLockedByCurrentThread(key);
+	}
+
+	/* Overridden (non-Javadoc) */
+	@Override
+	public boolean isWriteLockedByCurrentThread(Object key) {
+		return this.ehCache.isWriteLockedByCurrentThread(key);
 	}
 }

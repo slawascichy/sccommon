@@ -16,7 +16,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>-Dsclogger.config.file=/sclogger.properties</argLine>
+					<argLine>-Dsclogger.config.file=/sclogger.properties -Dcom.sun.management.jmxremote.port=3334 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
