@@ -28,7 +28,7 @@ public class UserSynchronizationMultiClient {
 	public static final int TRANSFORMER_MAX_THREADS = 10;
 	/** podstawa czasu uśpienia wątku monitorującego [ms] */
 	public static final int TRANSFORMER_MT_SLEEP_MS = 15;
-	public static final long SYNC_PERIOD = 60 * 1000L;
+	public static final long SYNC_PERIOD = 1 * 1000L;
 
 	public void check(List<CachedElement> list, Properties props) throws ExecutionException {
 

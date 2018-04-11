@@ -46,31 +46,39 @@ public class UserSynchronizationCallable implements Callable<Integer> {
 				Long currTime = Long.valueOf(Calendar.getInstance().getTimeInMillis());
 				Long lastTimeUpdate = usInfo.getLastTimeUpdate();
 
-				if (cacheResult.isElementInitialized()
-						|| (currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod())) {
-
-					Object perUserNameLock = createPerUserNameLock(userKey);
-					synchronized (perUserNameLock) {
-						logger.debug(
-								"-->UserSynchronizationCallable.call: {}: synchronization: currentUserName={} [{}, {}]...",
-								new Object[] { currentThreadName, currentUserName,
-										cacheResult.isElementInitialized() ? "init" : "exists",
-										(currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod())
-												? "Expired"
-												: "Not expired" });
-						Thread.sleep(1000);
-						synced++;
-						usInfo.setLastTimeUpdate(Calendar.getInstance().getTimeInMillis());
-						getUserCache().update(usInfo, userKey);
+				try {
+					String status;
+					if (!cacheResult.isLocked() && (cacheResult.isElementInitialized()
+							|| (currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod()))) {
+						status = "SYNC";
+					} else {
+						status = "SKIP";
 					}
-				} else if (logger.isDebugEnabled()) {
-					logger.debug("-->UserSynchronizationCallable.call: {}: skip: currentUserName={} [{}, {}]...",
-							new Object[] { currentThreadName, currentUserName,
+					logger.debug("-->UserSynchronizationCallable.call: {}: {}: currentUserName={} [{}, {}, {}]...",
+							new Object[] { currentThreadName, status, currentUserName,
 									cacheResult.isElementInitialized() ? "init" : "exists",
 									(currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod()) ? "Expired"
-											: "Not expired" });
-				}
+											: "Not expired",
+									cacheResult.isLocked() ? "Locked by " + usInfo.getLockedBy() : "Not locked" });
 
+					if (!cacheResult.isLocked() && (cacheResult.isElementInitialized()
+							|| (currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod()))) {
+						Object perUserNameLock = createPerUserNameLock(userKey);
+						synchronized (perUserNameLock) {
+							Thread.sleep(1000);
+							synced++;
+							lastTimeUpdate = Calendar.getInstance().getTimeInMillis();
+						}
+					} else {
+						Thread.sleep(100);
+					}
+				} finally {
+					if (!cacheResult.isLocked() && usInfo.getLocked()) {
+						usInfo.setLocked(Boolean.FALSE);
+						usInfo.setLastTimeUpdate(lastTimeUpdate);
+						getUserCache().update(usInfo, userKey);
+					}
+				}
 			} catch (CacheErrorException e) {
 				e.printStackTrace();
 				return 0;

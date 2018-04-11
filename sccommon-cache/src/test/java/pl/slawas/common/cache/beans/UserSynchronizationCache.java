@@ -35,26 +35,46 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 	@Override
 	public UserSynchronizationCacheGetterResult get(String userName, String userKey) throws CacheErrorException {
 
-		UserSynchronizationInfo userInfo = null;
 		if (cacheIsAllowed()) {
-			userInfo = (UserSynchronizationInfo) getCache().get(userKey);
+			getCache().acquireWriteLockOnKey(userKey);
 		}
-		boolean initCache = false;
-		if (userInfo == null) {
-			initCache = true;
-			Long currTime = Long.valueOf(Calendar.getInstance().getTimeInMillis());
-			userInfo = new UserSynchronizationInfo(userName);
-			userInfo.setLastTimeUpdate(currTime);
+		try {
+			boolean isLocked;
+			UserSynchronizationInfo userInfo = null;
 			if (cacheIsAllowed()) {
-				getCache().acquireWriteLockOnKey(userKey);
-				try {
+				userInfo = (UserSynchronizationInfo) getCache().get(userKey);
+			}
+			boolean initCache = false;
+			if (userInfo == null) {
+				initCache = true;
+				isLocked = false;
+				Long currTime = Long.valueOf(Calendar.getInstance().getTimeInMillis());
+				userInfo = new UserSynchronizationInfo(userName);
+				userInfo.setLastTimeUpdate(currTime);
+				userInfo.setLocked(Boolean.TRUE);
+				userInfo.setLockedBy(Thread.currentThread().getName());
+				if (cacheIsAllowed()) {
+					getCache().acquireWriteLockOnKey(userKey);
+					try {
+						getCache().put(userKey, userInfo);
+					} finally {
+						getCache().releaseWriteLockOnKey(userKey);
+					}
+				}
+			} else {
+				isLocked = userInfo.getLocked();
+				if (!isLocked) {
+					userInfo.setLocked(Boolean.TRUE);
+					userInfo.setLockedBy(Thread.currentThread().getName());
 					getCache().put(userKey, userInfo);
-				} finally {
-					getCache().releaseWriteLockOnKey(userKey);
 				}
 			}
+			return new UserSynchronizationCacheGetterResult(userInfo, initCache, isLocked);
+		} finally {
+			if (cacheIsAllowed()) {
+				getCache().releaseWriteLockOnKey(userKey);
+			}
 		}
-		return new UserSynchronizationCacheGetterResult(userInfo, initCache);
 	}
 
 	/* Overridden (non-Javadoc) */

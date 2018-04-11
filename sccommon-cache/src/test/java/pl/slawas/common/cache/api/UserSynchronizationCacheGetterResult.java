@@ -6,10 +6,14 @@ public class UserSynchronizationCacheGetterResult {
 
 	private final boolean elementInitialized;
 
-	public UserSynchronizationCacheGetterResult(UserSynchronizationInfo userInfo, boolean elementInitialized) {
+	private final boolean locked;
+
+	public UserSynchronizationCacheGetterResult(UserSynchronizationInfo userInfo, boolean elementInitialized,
+			boolean locked) {
 		super();
 		this.userInfo = userInfo;
 		this.elementInitialized = elementInitialized;
+		this.locked = locked;
 	}
 
 	/**
@@ -24,6 +28,13 @@ public class UserSynchronizationCacheGetterResult {
 	 */
 	public boolean isElementInitialized() {
 		return elementInitialized;
+	}
+
+	/**
+	 * @return the {@link #locked}
+	 */
+	public boolean isLocked() {
+		return locked;
 	}
 
 }

@@ -29,7 +29,7 @@ import java.io.Serializable;
  */
 public class UserSynchronizationInfo implements Serializable {
 
-	private static final long serialVersionUID = 6249310504460917282L;
+	private static final long serialVersionUID = 6249310504460917292L;
 
 	/** nazwa użytkownika (login) */
 	private final String userName;
@@ -39,6 +39,12 @@ public class UserSynchronizationInfo implements Serializable {
 
 	/** DN użytkownika w LDAP */
 	private String userDn;
+
+	/** czy synchronizacja dla tego użytkownika jest zablokowana? */
+	private Boolean locked = Boolean.FALSE;
+
+	/** nazwa wątku, który założył blokadę */
+	private String lockedBy;
 
 	/**
 	 * @param userName
@@ -86,4 +92,33 @@ public class UserSynchronizationInfo implements Serializable {
 		this.userDn = userDn;
 	}
 
+	/**
+	 * @return the {@link #locked}
+	 */
+	public Boolean getLocked() {
+		return locked == null ? Boolean.FALSE : locked;
+	}
+
+	/**
+	 * @param locked
+	 *            the {@link #locked} to set
+	 */
+	public void setLocked(Boolean locked) {
+		this.locked = locked;
+	}
+
+	/**
+	 * @return the {@link #lockedBy}
+	 */
+	public String getLockedBy() {
+		return lockedBy;
+	}
+
+	/**
+	 * @param lockedBy
+	 *            the {@link #lockedBy} to set
+	 */
+	public void setLockedBy(String lockedBy) {
+		this.lockedBy = lockedBy;
+	}
 }
