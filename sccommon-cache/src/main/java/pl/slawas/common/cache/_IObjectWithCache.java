@@ -1,5 +1,7 @@
 package pl.slawas.common.cache;
 
+import java.io.Closeable;
+
 /**
  * 
  * _IObjectWithCache interfejs dla obiektów używających cache (pamięci
@@ -9,7 +11,7 @@ package pl.slawas.common.cache;
  * @version $Revision: 1.1 $
  * 
  */
-public interface _IObjectWithCache {
+public interface _IObjectWithCache extends Closeable {
 
 	/**
 	 * Pobranie cache'a
@@ -34,8 +36,8 @@ public interface _IObjectWithCache {
 	void setCacheTimeToLive(long cacheTimeToLive);
 
 	/**
-	 * Metoda sprawdzająca czy pamięć podręczna dla danego obiektu jest
-	 * zdefiniowana i dostępna
+	 * Metoda sprawdzająca czy pamięć podręczna dla danego obiektu jest zdefiniowana
+	 * i dostępna
 	 * 
 	 * @return {@code true} albo {@code false}
 	 */
@@ -47,14 +49,6 @@ public interface _IObjectWithCache {
 	 * @return nazwa regionu
 	 */
 	String getCacheRegionName();
-
-	/**
-	 * Metoda zamykająca obiekt, odpowiedzialna również za usunięcie instancji
-	 * cache'a w przypadku gdy pamięć podręczna nie jest współdzielony.
-	 * 
-	 * @see #cacheIsShared()
-	 */
-	void close();
 
 	/**
 	 * Informacja czy używany pamięć podręczna jest współdzielona pomiędzy

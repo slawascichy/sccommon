@@ -1,8 +1,6 @@
 package pl.slawas.common.cache;
 
-import pl.slawas.common.cache.CacheProviderEnum;
-import pl.slawas.common.cache._IObjectCache;
-import pl.slawas.common.cache._IObjectWithCache;
+import java.io.IOException;
 
 public abstract class ObjectWithNotAllowedCache implements _IObjectWithCache {
 
@@ -32,7 +30,7 @@ public abstract class ObjectWithNotAllowedCache implements _IObjectWithCache {
 	}
 
 	@Override
-	public void close() {
+	public void close() throws IOException {
 		/* nie implementujemy! */
 	}
 

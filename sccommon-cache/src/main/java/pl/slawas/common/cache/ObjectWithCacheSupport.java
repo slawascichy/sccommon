@@ -1,5 +1,6 @@
 package pl.slawas.common.cache;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Properties;
 
@@ -181,7 +182,7 @@ public abstract class ObjectWithCacheSupport implements Serializable,
 		return this.cacheSharing.isShared();
 	}
 
-	public void close() {
+	public void close() throws IOException {
 		if (cacheIsAllowed() && !cacheIsShared()) {
 			try {
 				this.cache.destroy();

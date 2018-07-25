@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 import pl.slawas.common.cache.beans.CachedElement;
 import pl.slawas.common.cache.beans.CachedObjectFactory;
 import pl.slawas.common.cache.beans.CachedObjectResult;
+import pl.slawas.common.cache.beans.UserSynchronizationCache;
 import pl.slawas.common.cache.ehcache.EhCacheConfig;
 import pl.slawas.common.cache.ehcache.EhCacheConstants;
 import pl.slawas.common.cache.ehcache._TstProperties;
@@ -126,6 +127,7 @@ public class CommonCacheProviderTstSupport extends TestCase {
 		return d;
 	}
 
+	@SuppressWarnings("resource")
 	public void testApp() throws CacheErrorException {
 
 		CacheProviderFactory.close();
@@ -135,6 +137,7 @@ public class CommonCacheProviderTstSupport extends TestCase {
 
 		_IObjectCacheProvider<?> lProvider = null;
 		try {
+			new UserSynchronizationCache(props);
 			CachedElement testElement1vA = new CachedElement("e1", "vA");
 			CachedElement testElement1vA_cached = testElement1vA;
 			CachedElement testElement1vB = new CachedElement("e1", "vB");
