@@ -2,7 +2,7 @@ package pl.slawas.common.cache;
 
 import java.io.IOException;
 
-public abstract class ObjectWithNotAllowedCache implements _IObjectWithCache {
+public abstract class ObjectWithNotAllowedCache implements IObjectWithCache {
 
 	@Override
 	public void setCacheTimeToLive(long arg0) {
@@ -25,7 +25,7 @@ public abstract class ObjectWithNotAllowedCache implements _IObjectWithCache {
 	}
 
 	@Override
-	public _IObjectCache getCache() {
+	public IObjectCache getCache() {
 		return null;
 	}
 

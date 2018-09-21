@@ -54,18 +54,20 @@ public class UserSynchronizationCallable implements Callable<Integer> {
 					} else {
 						status = "SKIP";
 					}
-					logger.debug("-->UserSynchronizationCallable.call: {}: {}: currentUserName={} [{}, {}, {}]...",
-							new Object[] { currentThreadName, status, currentUserName,
-									cacheResult.isElementInitialized() ? "init" : "exists",
-									(currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod()) ? "Expired"
-											: "Not expired",
-									cacheResult.isLocked() ? "Locked by " + usInfo.getLockedBy() : "Not locked" });
-
+					if (logger.isTraceEnabled()) {
+						logger.trace("-->UserSynchronizationCallable.call: {}: {}: currentUserName={} [{}, {}, {}]...",
+								new Object[] { currentThreadName, status, currentUserName,
+										cacheResult.isElementInitialized() ? "init" : "exists",
+										(currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod())
+												? "Expired"
+												: "Not expired",
+										cacheResult.isLocked() ? "Locked by " + usInfo.getLockedBy() : "Not locked" });
+					}
 					if (!cacheResult.isLocked() && (cacheResult.isElementInitialized()
 							|| (currTime.longValue() - lastTimeUpdate.longValue() > getSyncPeriod()))) {
 						Object perUserNameLock = createPerUserNameLock(userKey);
 						synchronized (perUserNameLock) {
-							Thread.sleep(1000);
+							Thread.sleep(100);
 							synced++;
 							lastTimeUpdate = Calendar.getInstance().getTimeInMillis();
 						}

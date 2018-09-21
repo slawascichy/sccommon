@@ -1,5 +1,7 @@
 package pl.slawas.common.cache.ehcache;
 
+import pl.slawas.common.cache.CacheConstants;
+
 /**
  * 
  * EhCacheConfigLoader obiekt pomocniczy zmieniający domyślną lokalizację
@@ -16,7 +18,7 @@ public class EhCacheConfigLoader {
 	 * @param path2fileConfiguration
 	 *            ścieżka do pliku z parametrami pamięci podręcznej
 	 *            wykorzystywanymi do tworzenia dynamicznych regionów. zobacz
-	 *            też {@link EhCacheConstants#PROP_DYNAMIC_PARAMETERS_FILE_PATH}
+	 *            też {@link CacheConstants#PROP_DYNAMIC_PARAMETERS_FILE_PATH}
 	 */
 	public EhCacheConfigLoader(String path2fileConfiguration) {
 		EhCacheConfig.getInstance(path2fileConfiguration);

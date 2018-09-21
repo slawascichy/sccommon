@@ -1,20 +1,36 @@
 package pl.slawas.common.cache;
 
-import java.io.Serializable;
+import java.util.Properties;
 
-public class CacheProviderConfiguration<T> implements Serializable {
+public class CacheProviderConfiguration<T> {
 
-	public CacheProviderConfiguration(String managerName, T configuration) {
-		super();
-		this.managerName = managerName;
+	private final T configuration;
+
+	private final Properties additionalProps;
+
+	private final String managerName;
+
+	public CacheProviderConfiguration(T configuration, Properties additionalProps) {
 		this.configuration = configuration;
+		this.additionalProps = new Properties();
+		if (additionalProps != null) {
+			this.managerName = additionalProps.getProperty(CacheConstants.PROP_PROVIDER_NAME,
+					CacheConstants.DEFAULT_PROVIDER_NAME);
+			this.additionalProps.putAll(additionalProps);
+		} else {
+			this.managerName = CacheConstants.DEFAULT_PROVIDER_NAME;
+		}
 	}
 
-	private static final long serialVersionUID = 4668307382015940044L;
-
-	private String managerName;
-
-	private T configuration;
+	public CacheProviderConfiguration(String managerName, T configuration, Properties additionalProps) {
+		super();
+		this.configuration = configuration;
+		this.additionalProps = new Properties();
+		if (additionalProps != null) {
+			this.additionalProps.putAll(additionalProps);
+		}
+		this.managerName = managerName;
+	}
 
 	/**
 	 * @return the {@link #managerName}
@@ -24,26 +40,28 @@ public class CacheProviderConfiguration<T> implements Serializable {
 	}
 
 	/**
-	 * @param managerName
-	 *            the {@link #managerName} to set
-	 */
-	public void setManagerName(String managerName) {
-		this.managerName = managerName;
-	}
-
-	/**
 	 * @return the {@link #configuration}
 	 */
 	public T getConfiguration() {
 		return configuration;
 	}
 
-	/**
-	 * @param configuration
-	 *            the {@link #configuration} to set
-	 */
-	public void setConfiguration(T configuration) {
-		this.configuration = configuration;
+	public CacheProviderConfiguration<T> putCustomProperty(String propertyName, Object value) {
+		this.additionalProps.put(propertyName, value);
+		return this;
+	}
+
+	public CacheProviderConfiguration<T> putAllCustomProperties(Properties customProperties) {
+		this.additionalProps.putAll(customProperties);
+		return this;
+	}
+
+	public Object getCustomProperty(String propertyName) {
+		return this.additionalProps.get(propertyName);
+	}
+
+	public Object getCustomProperty(String propertyName, Object defaultValue) {
+		return this.additionalProps.getOrDefault(propertyName, defaultValue);
 	}
 
 }

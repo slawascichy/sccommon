@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>pl.slawas</groupId>
 		<artifactId>sccommon</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>sccommon-cache</artifactId>
 	<name>sccommon-cache</name>
@@ -40,17 +40,38 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- 
 		<hibernate.version>5.2.3.Final</hibernate.version>
 		<ehcache.version>2.10.1</ehcache.version>
+		 -->
+		<hibernate.version>5.3.6.Final</hibernate.version>
+		<!-- 
+		<ehcache.version>2.10.3</ehcache.version>
+		 -->
+		<ehcache.version>3.5.2</ehcache.version>
 	</properties>
 	<dependencies>
 		<!-- EhCache -->
+		<!-- 
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
 			<version>${ehcache.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		-->
+		<!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+		<dependency>
+		    <groupId>org.ehcache</groupId>
+		    <artifactId>ehcache</artifactId>
+		    <version>${ehcache.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.ehcache</groupId>
+		    <artifactId>ehcache-clustered</artifactId>
+		    <version>${ehcache.version}</version>
+		</dependency>
+				
 		<dependency>
 			<groupId>jdom</groupId>
 			<artifactId>jdom</artifactId>
@@ -63,10 +84,6 @@
 			<version>${hibernate.version}</version>
 			<scope>provided</scope>
 			<exclusions>
-				<exclusion>
-					<groupId>net.sf.ehcache</groupId>
-					<artifactId>ehcache</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>asm</groupId>
 					<artifactId>asm</artifactId>
@@ -84,7 +101,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>net.sf.ehcache</groupId>
-					<artifactId>ehcache-core</artifactId>
+					<artifactId>ehcache</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

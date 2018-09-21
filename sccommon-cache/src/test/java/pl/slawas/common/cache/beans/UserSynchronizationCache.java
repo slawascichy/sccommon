@@ -35,9 +35,6 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 	@Override
 	public UserSynchronizationCacheGetterResult get(String userName, String userKey) throws CacheErrorException {
 
-		if (cacheIsAllowed()) {
-			getCache().acquireWriteLockOnKey(userKey);
-		}
 		try {
 			boolean isLocked;
 			UserSynchronizationInfo userInfo = null;
@@ -54,12 +51,7 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 				userInfo.setLocked(Boolean.TRUE);
 				userInfo.setLockedBy(Thread.currentThread().getName());
 				if (cacheIsAllowed()) {
-					getCache().acquireWriteLockOnKey(userKey);
-					try {
-						getCache().put(userKey, userInfo);
-					} finally {
-						getCache().releaseWriteLockOnKey(userKey);
-					}
+					getCache().put(userKey, userInfo);
 				}
 			} else {
 				isLocked = userInfo.getLocked();
@@ -71,9 +63,7 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 			}
 			return new UserSynchronizationCacheGetterResult(userInfo, initCache, isLocked);
 		} finally {
-			if (cacheIsAllowed()) {
-				getCache().releaseWriteLockOnKey(userKey);
-			}
+
 		}
 	}
 
@@ -84,9 +74,6 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 	 */
 	@Override
 	public void update(UserSynchronizationInfo userInfo, String userKey) throws CacheErrorException {
-		if (cacheIsAllowed()) {
-			getCache().acquireWriteLockOnKey(userKey);
-		}
 		try {
 			Long currTime = Long.valueOf(Calendar.getInstance().getTimeInMillis());
 			Long lastTimeUpdate = userInfo.getLastTimeUpdate();
@@ -98,9 +85,7 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 				}
 			}
 		} finally {
-			if (cacheIsAllowed()) {
-				getCache().releaseWriteLockOnKey(userKey);
-			}
+
 		}
 	}
 }

@@ -1,13 +1,12 @@
 package pl.slawas.common.cache.ehcache;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.statistics.StatisticsGateway;
+import org.ehcache.core.Ehcache;
+import org.ehcache.core.spi.service.StatisticsService;
+
 import pl.slawas.common.cache.CacheProviderEnum;
-import pl.slawas.common.cache._IObjectCacheStatistics;
+import pl.slawas.common.cache.IObjectCacheStatistics;
 
 /**
  * 
@@ -17,59 +16,80 @@ import pl.slawas.common.cache._IObjectCacheStatistics;
  * @version $Revision: 1.2 $
  * 
  */
-public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics {
+public class EhCacheStatistics implements Serializable, IObjectCacheStatistics {
 
 	private static final long serialVersionUID = 3606940454221918725L;
 
-	private final StatisticsGateway statistics;
+	private final transient EhCacheStatisticsService statisticsService;
 
 	private final String associatedCacheName;
 
-	private final String associatedManagerName;
+	private final String associatedProviderName;
 
-	EhCacheStatistics(String associatedManagerName, String associatedCacheName) {
+	EhCacheStatistics(String associatedProviderName, String associatedCacheName) {
 		super();
-		this.statistics = null;
+		this.associatedProviderName = associatedProviderName;
 		this.associatedCacheName = associatedCacheName;
-		this.associatedManagerName = associatedManagerName;
+		this.statisticsService = null;
 	}
 
 	/**
 	 * 
 	 * @param cache
 	 */
-	EhCacheStatistics(String associatedManagerName, net.sf.ehcache.Ehcache cache) {
-		this.statistics = cache.getStatistics();
-		this.associatedCacheName = cache.getName();
-		this.associatedManagerName = associatedManagerName;
+	EhCacheStatistics(String associatedProviderName, EhCache cache) {
+		super();
+		this.associatedProviderName = associatedProviderName;
+		this.associatedCacheName = cache.getRegionName();
+		StatisticsService ss = cache.getStatisticsService();
+		if (ss instanceof EhCacheStatisticsService) {
+			this.statisticsService = (EhCacheStatisticsService) ss;
+		} else {
+			this.statisticsService = null;
+		}
 	}
 
 	public void clearStatistics() {
-
+		if (statisticsService == null) {
+			return;
+		}
+		statisticsService.clearStatistics(associatedCacheName);
 	}
 
 	public long getCacheHits() {
-		return (this.statistics != null ? this.statistics.cacheHitCount() : 0L);
+		if (statisticsService == null) {
+			return 0L;
+		}
+		return statisticsService.getCacheStatistics(associatedCacheName).getCacheHits();
 	}
 
 	public long getInMemoryHits() {
-		return (this.statistics != null ? this.statistics.localHeapHitCount()
-				: 0L);
+		if (statisticsService == null) {
+			return 0L;
+		}
+		return statisticsService.getInMemoryHits(associatedCacheName);
 	}
 
 	public long getOnDiskHits() {
-		return (this.statistics != null ? this.statistics.localDiskHitCount()
-				: 0L);
+		if (statisticsService == null) {
+			return 0L;
+		}
+		return statisticsService.getOnDiskHits(associatedCacheName);
 	}
 
 	public long getCacheMisses() {
-		return (this.statistics != null ? this.statistics.cacheMissCount() : 0L);
+		if (statisticsService == null) {
+			return 0L;
+		}
+		return statisticsService.getCacheStatistics(associatedCacheName).getCacheMisses();
 
 	}
 
 	public long getObjectCount() {
-		return (this.statistics != null ? this.statistics.getSize() : 0L);
-
+		if (statisticsService == null) {
+			return 0L;
+		}
+		return statisticsService.getObjectCount(associatedCacheName);
 	}
 
 	public String getAssociatedCacheName() {
@@ -77,17 +97,14 @@ public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics 
 	}
 
 	/**
-	 * Returns a {@link String} representation of the {@link Ehcache}
-	 * statistics.
+	 * Returns a {@link String} representation of the {@link Ehcache} statistics.
 	 */
 	public final String toString() {
-		StringBuffer dump = new StringBuffer();
-		dump.append("[ ").append(" name = ").append(getAssociatedCacheName())
-				.append(" cacheHits = ").append(getCacheHits())
-				.append(" onDiskHits = ").append(getOnDiskHits())
-				.append(" inMemoryHits = ").append(getInMemoryHits())
-				.append(" misses = ").append(getCacheMisses())
-				.append(" size = ").append(getSize()).append(" ]");
+		StringBuilder dump = new StringBuilder();
+		dump.append("[ ").append(" name = ").append(getAssociatedCacheName()).append(" cacheHits = ")
+				.append(getCacheHits()).append(" onDiskHits = ").append(getOnDiskHits()).append(" inMemoryHits = ")
+				.append(getInMemoryHits()).append(" misses = ").append(getCacheMisses()).append(" size = ")
+				.append(getSize()).append(" ]");
 
 		return dump.toString();
 	}
@@ -96,26 +113,24 @@ public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics 
 	 * @return the size
 	 */
 	public int getSize() {
-		return (this.statistics != null ? (int) this.statistics.getSize() : 0);
+		if (statisticsService == null) {
+			return 0;
+		}
+		return statisticsService.getSize(associatedCacheName);
 	}
 
 	public double getHitsRatio() {
-		double result = (this.statistics != null ? this.statistics.cacheHitRatio() : 0);
-		if (Double.isNaN(result) || Double.isInfinite(result)) {
-			return result;
+		if (statisticsService == null) {
+			return 0.0;
 		}
-		BigDecimal dividend = BigDecimal.valueOf(result);
-		BigDecimal multiplicand = new BigDecimal(100);
-		BigDecimal multi = dividend.multiply(multiplicand);
-		BigDecimal divisor = new BigDecimal(1);
-		BigDecimal divide = multi.divide(divisor, 2, RoundingMode.HALF_UP);
-		return divide.doubleValue();
+		Float hits = statisticsService.getCacheStatistics(associatedCacheName).getCacheHitPercentage();
+		return round(hits.doubleValue(), 2);
 	}
 
 	/* Overridden (non-Javadoc) */
 	@Override
 	public String getAssociatedManagerName() {
-		return this.associatedManagerName;
+		return this.associatedProviderName;
 	}
 
 	/* Overridden (non-Javadoc) */
@@ -127,12 +142,22 @@ public class EhCacheStatistics implements Serializable, _IObjectCacheStatistics 
 	/* Overridden (non-Javadoc) */
 	@Override
 	public Object getAssociatedStatistics() {
-		return this.statistics;
+		return this.statisticsService;
 	}
 
 	/* Overridden (non-Javadoc) */
 	@Override
 	public boolean isActive() {
-		return this.statistics != null;
+		return this.statisticsService != null;
+	}
+
+	public static double round(double value, int places) {
+		if (places < 0)
+			throw new IllegalArgumentException();
+
+		long factor = (long) Math.pow(10, places);
+		value = value * factor;
+		long tmp = Math.round(value);
+		return (double) tmp / factor;
 	}
 }

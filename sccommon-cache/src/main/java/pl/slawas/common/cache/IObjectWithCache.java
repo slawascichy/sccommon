@@ -11,14 +11,14 @@ import java.io.Closeable;
  * @version $Revision: 1.1 $
  * 
  */
-public interface _IObjectWithCache extends Closeable {
+public interface IObjectWithCache extends Closeable {
 
 	/**
 	 * Pobranie cache'a
 	 * 
 	 * @return
 	 */
-	_IObjectCache getCache();
+	IObjectCache getCache();
 
 	/**
 	 * Czas życia elementu w cache'u

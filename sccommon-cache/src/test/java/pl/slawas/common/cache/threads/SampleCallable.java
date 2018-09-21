@@ -36,15 +36,20 @@ public class SampleCallable implements Callable<Integer> {
 			try {
 				CachedObjectResult result = CachedObjectFactory.get(el, CacheUsage.TO_USE, props);
 				NameValuePair e = result.getObj();
-				logger.debug("-->SampleCallable.call: {}: '{}' pobrałem wartość: '{}' z {}", new Object[] {
-						currentThreadName, e.getName(), e.getValue(), result.getFromCache() ? "CACHE" : "NOWY" });
+				if (logger.isTraceEnabled()) {
+					logger.trace("-->SampleCallable.call: {}: '{}' pobrałem wartość: '{}' z {}", new Object[] {
+							currentThreadName, e.getName(), e.getValue(), result.getFromCache() ? "CACHE" : "NOWY" });
+				}
 				NameValuePair o = el;
 				if (!e.getValue().equals(o.getValue())) {
 					result = CachedObjectFactory.get(el, CacheUsage.REFRESH, props);
 					NameValuePair n = result.getObj();
-					logger.debug(
-							"-->SampleCallable.call: {}: '{}' zmiana wartości: robię refresh '{}'-->'{}', pobrałem wartość: '{}' ",
-							new Object[] { currentThreadName, o.getName(), e.getValue(), o.getValue(), n.getValue() });
+					if (logger.isTraceEnabled()) {
+						logger.trace(
+								"-->SampleCallable.call: {}: '{}' zmiana wartości: robię refresh '{}'-->'{}', pobrałem wartość: '{}' ",
+								new Object[] { currentThreadName, o.getName(), e.getValue(), o.getValue(),
+										n.getValue() });
+					}
 				}
 
 			} catch (CacheErrorException e) {

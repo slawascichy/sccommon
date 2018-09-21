@@ -1,17 +1,20 @@
 package pl.slawas.common.cache.ehcache;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import pl.slawas.common.cache._IObjectCache;
-import pl.slawas.common.cache._IObjectCacheStatistics;
+import org.ehcache.Cache;
+import org.ehcache.Cache.Entry;
+import org.ehcache.CacheManager;
+import org.ehcache.config.CacheConfiguration;
+import org.ehcache.core.spi.service.StatisticsService;
+import org.ehcache.expiry.ExpiryPolicy;
+
+import pl.slawas.common.cache.IObjectCache;
+import pl.slawas.common.cache.IObjectCacheStatistics;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
@@ -26,35 +29,50 @@ import pl.slawas.twl4j.LoggerFactory;
  * @version $Revision: 1.3 $
  * 
  */
-public class EhCache implements Serializable, _IObjectCache {
+public class EhCache implements Serializable, IObjectCache {
 
 	private static final long serialVersionUID = 600977337387514385L;
 
 	private static final Logger logger = LoggerFactory.getLogger(EhCache.class);
 
-	private final Cache ehCache;
-	private final String associatedManagerName;
+	private final transient CacheManager cacheManager;
+	private final transient Cache<String, Element> localCache;
+	private final transient ExpiryPolicy<String, Element> expiryPolicy;
+	private final transient StatisticsService statisticsService;
+	private final String associatedCacheName;
+	private final String associatedProviderName;
 
-	public EhCache(String associatedManagerName, Cache ehCache) {
-		this.ehCache = ehCache;
-		this.associatedManagerName = associatedManagerName;
+	@SuppressWarnings("unchecked")
+	public EhCache(String associatedProviderName, String associatedCacheName, final CacheManager cacheManager,
+			final StatisticsService statisticsService, CacheConfiguration<String, Element> cacheConfig,
+			boolean isCreated) {
+		this.associatedProviderName = associatedProviderName;
+		this.associatedCacheName = associatedCacheName;
+		this.cacheManager = cacheManager;
+		this.statisticsService = statisticsService;
+		if (!isCreated) {
+			this.localCache = cacheManager.createCache(associatedCacheName, cacheConfig);
+		} else {
+			this.localCache = cacheManager.getCache(associatedCacheName, String.class, Element.class);
+		}
+		this.expiryPolicy = (ExpiryPolicy<String, Element>) cacheConfig.getExpiryPolicy();
 	}
 
 	public Object get(Object key) throws CacheErrorException {
 		try {
-			logger.trace("[{}] key: {}", new Object[] { ehCache.getName(), key });
 			if (key == null) {
 				return null;
 			} else {
-				Element element = ehCache.get(key);
+				final Element element = this.localCache.get(key2String(key));
 				if (element == null) {
 					return null;
 				} else {
 					return element.getObjectValue();
 				}
 			}
-		} catch (net.sf.ehcache.CacheException e) {
-			throw new CacheErrorException(e);
+		} catch (Exception e) {
+			throw new CacheErrorException(
+					String.format("-->get: Error for key type: %s and value: %s", key.getClass(), key), e);
 		}
 	}
 
@@ -68,83 +86,82 @@ public class EhCache implements Serializable, _IObjectCache {
 
 	public void put(Object key, Object value) throws CacheErrorException {
 		try {
-			Element element = new Element(key, value);
-			ehCache.put(element);
-		} catch (IllegalArgumentException e) {
-			throw new CacheErrorException(e);
-		} catch (IllegalStateException e) {
-			throw new CacheErrorException(e);
-		} catch (net.sf.ehcache.CacheException e) {
-			throw new CacheErrorException(e);
+			localCache.put(key2String(key), new Element((Serializable) value));
+		} catch (Exception e) {
+			throw new CacheErrorException(
+					String.format("-->put: Error for key type: %s and value: %s", key.getClass(), key), e);
 		}
 
 	}
 
 	public void remove(Object key) throws CacheErrorException {
 		try {
-			ehCache.remove(key);
-		} catch (ClassCastException e) {
-			throw new CacheErrorException(e);
-		} catch (IllegalStateException e) {
-			throw new CacheErrorException(e);
-		} catch (net.sf.ehcache.CacheException e) {
-			throw new CacheErrorException(e);
+			localCache.remove(key2String(key));
+		} catch (Exception e) {
+			throw new CacheErrorException(
+					String.format("-->remove: Error for key type: %s and value: %s", key.getClass(), key), e);
 		}
 	}
 
 	public void clear() throws CacheErrorException {
 		try {
-			ehCache.removeAll();
-		} catch (IllegalStateException e) {
-			throw new CacheErrorException(e);
-		} catch (net.sf.ehcache.CacheException e) {
+			localCache.clear();
+		} catch (Exception e) {
 			throw new CacheErrorException(e);
 		}
 	}
 
 	public void destroy() throws CacheErrorException {
 		try {
-			ehCache.getCacheManager().removeCache(ehCache.getName());
+			this.cacheManager.removeCache(associatedCacheName);
 		} catch (IllegalStateException e) {
+			/*
+			 * When Spring and Hibernate are both involved this will happen in normal
+			 * shutdown operation. Do not throw an exception, simply log this one.
+			 */
+			logger.debug("This can happen if multiple frameworks both try to shutdown ehcache", e);
+		} catch (Exception e) {
 			throw new CacheErrorException(e);
-		} catch (net.sf.ehcache.CacheException e) {
-			throw new CacheErrorException(e);
+
 		}
 	}
 
 	public String getRegionName() {
-		return ehCache.getName();
+		return associatedCacheName;
 	}
 
 	public long getSizeInMemory() {
-		try {
-			return ehCache.getStatistics().getLocalHeapSizeInBytes();
-		} catch (Exception e) {
-			logger.warn("Nie udało się przeliczyć rozmiaru zajmowanej pamięci przez dany region.", e);
-			return -1;
+		/* brak implementacji */
+		if (logger.isDebugEnabled()) {
+			logger.warn("-->getSizeInMemory: implementation lack.");
 		}
+		return -1L;
 	}
 
 	public long getElementCountInMemory() throws CacheErrorException {
-		try {
-			return ehCache.getStatistics().getLocalHeapSize();
-		} catch (net.sf.ehcache.CacheException ce) {
-			throw new CacheErrorException(ce);
+		/* brak implementacji */
+		if (logger.isDebugEnabled()) {
+			logger.warn("-->getElementCountInMemory: implementation lack.");
 		}
+		return -1L;
 	}
 
 	public long getElementCountOnDisk() {
-		return ehCache.getStatistics().getLocalDiskSize();
+		/* brak implementacji */
+		if (logger.isDebugEnabled()) {
+			logger.warn("-->getElementCountOnDisk: implementation lack.");
+		}
+		return -1L;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Map toMap() throws CacheErrorException {
+	public Map<String, Object> toMap() throws CacheErrorException {
 		try {
-			Map result = new HashMap();
-			Iterator iter = ehCache.getKeys().iterator();
+			Map<String, Object> result = new HashMap<>();
+			Iterator<Entry<String, Element>> iter = localCache.iterator();
 			while (iter.hasNext()) {
-				Object key = iter.next();
-				result.put(key, ehCache.get(key).getObjectValue());
+				Entry<String, Element> entry = iter.next();
+				Serializable value = entry.getValue().getObjectValue();
+				result.put(entry.getKey(), value);
 			}
 			return result;
 		} catch (Exception e) {
@@ -156,77 +173,48 @@ public class EhCache implements Serializable, _IObjectCache {
 		return "EHCache(" + getRegionName() + ')';
 	}
 
-	public _IObjectCacheStatistics getStatistics() {
-		return new EhCacheStatistics(this.associatedManagerName, ehCache);
+	public IObjectCacheStatistics getStatistics() {
+		return new EhCacheStatistics(this.associatedProviderName, this);
 	}
 
 	public long getTimeToLiveSeconds() {
-		return ehCache.getCacheConfiguration().getTimeToLiveSeconds();
+		if (this.expiryPolicy instanceof CustomExpiry) {
+			return ((CustomExpiry<String, Element>) this.expiryPolicy).getTimeToLiveExpiration().getSeconds();
+		}
+		return -1L;
 	}
 
 	public void setTimeToLiveSeconds(long timeToLiveSeconds) {
-		CacheConfiguration config = this.ehCache.getCacheConfiguration();
-		config.setTimeToLiveSeconds(timeToLiveSeconds);
-		config.setTimeToIdleSeconds(timeToLiveSeconds / 2);
-		config.setDiskExpiryThreadIntervalSeconds(timeToLiveSeconds);
-	}
-
-	public List<?> getKeys() {
-		return this.ehCache.getKeysWithExpiryCheck();
+		if (this.expiryPolicy instanceof CustomExpiry) {
+			((CustomExpiry<String, Element>) this.expiryPolicy)
+					.setTimeToLiveExpiration(Duration.ofSeconds(timeToLiveSeconds));
+		}
 	}
 
 	/**
-	 * @return the {@link #ehCache}
+	 * @return the {@link #localCache}
 	 */
-	public Ehcache getEhCache() {
-		return ehCache;
+	public Cache<String, Element> getEhCache() {
+		return localCache;
 	}
 
-	/* Overridden (non-Javadoc) */
-	@Override
-	public void acquireReadLockOnKey(Object key) {
-		this.ehCache.acquireReadLockOnKey(key);
+	/**
+	 * @return the {@link #statisticsService}
+	 */
+	public StatisticsService getStatisticsService() {
+		return statisticsService;
 	}
 
-	/* Overridden (non-Javadoc) */
 	@Override
-	public void acquireWriteLockOnKey(Object key) {
-		this.ehCache.acquireWriteLockOnKey(key);
+	public boolean contains(Object key) {
+		return localCache.containsKey(key2String(key));
 	}
 
-	/* Overridden (non-Javadoc) */
-	@Override
-	public boolean tryReadLockOnKey(Object key, long timeout) throws InterruptedException {
-		return this.ehCache.tryReadLockOnKey(key, timeout);
+	private String key2String(Object key) {
+		if (key instanceof String) {
+			return (String) key;
+		}
+		return key.toString();
 	}
 
-	/* Overridden (non-Javadoc) */
-	@Override
-	public boolean tryWriteLockOnKey(Object key, long timeout) throws InterruptedException {
-		return this.ehCache.tryWriteLockOnKey(key, timeout);
-	}
-
-	/* Overridden (non-Javadoc) */
-	@Override
-	public void releaseReadLockOnKey(Object key) {
-		this.ehCache.releaseReadLockOnKey(key);
-	}
-
-	/* Overridden (non-Javadoc) */
-	@Override
-	public void releaseWriteLockOnKey(Object key) {
-		this.ehCache.releaseWriteLockOnKey(key);
-	}
-
-	/* Overridden (non-Javadoc) */
-	@Override
-	public boolean isReadLockedByCurrentThread(Object key) {
-		return this.ehCache.isReadLockedByCurrentThread(key);
-	}
-
-	/* Overridden (non-Javadoc) */
-	@Override
-	public boolean isWriteLockedByCurrentThread(Object key) {
-		return this.ehCache.isWriteLockedByCurrentThread(key);
-	}
 }

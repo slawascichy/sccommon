@@ -8,7 +8,7 @@ package pl.slawas.common.cache;
  * @version $Revision: 1.1 $
  *
  */
-public class EmptyObjectCacheStatistics implements _IObjectCacheStatistics {
+public class EmptyObjectCacheStatistics implements IObjectCacheStatistics {
 
 	private static final long serialVersionUID = 1566889499150263806L;
 	private String managerName;

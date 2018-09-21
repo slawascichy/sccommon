@@ -16,7 +16,7 @@ public class ObjectCacheStatisticsList implements Serializable {
 	private static final long serialVersionUID = 3020671139321025065L;
 
 	/** fragment listy obiektów ze statystykami */
-	private final List<_IObjectCacheStatistics> list;
+	private final List<IObjectCacheStatistics> list;
 
 	/** liczba wszystkich obiektów ze statystykami */
 	private final int size;
@@ -27,7 +27,7 @@ public class ObjectCacheStatisticsList implements Serializable {
 	/** zadeklarowany rozmiar strony (maksymalna liczba wyników) */
 	private final int pageSize;
 
-	public ObjectCacheStatisticsList(List<_IObjectCacheStatistics> list,
+	public ObjectCacheStatisticsList(List<IObjectCacheStatistics> list,
 			int size, int offset, int pageSize) {
 		super();
 		this.list = list;
@@ -39,7 +39,7 @@ public class ObjectCacheStatisticsList implements Serializable {
 	/**
 	 * @return the {@link #list}
 	 */
-	public List<_IObjectCacheStatistics> getList() {
+	public List<IObjectCacheStatistics> getList() {
 		return list;
 	}
 

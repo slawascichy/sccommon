@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
+import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.helpers.Configurations;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
@@ -22,12 +23,22 @@ import pl.slawas.twl4j.LoggerFactory;
  */
 public class EhCacheConfig {
 
-	final protected static Logger logger = LoggerFactory
-			.getLogger(EhCacheConfig.class);
+	protected static final Logger logger = LoggerFactory.getLogger(EhCacheConfig.class);
 
 	public static final String FILE_NAME = "ehcache.properties";
-
 	public static final String FILE_DIRECTORY = "";
+
+	public static final String PROP_CACHE_HEAP = "resource.heapEntries";
+	public static final String PROP_CACHE_OFFHEAP = "resource.offheapMBytes";
+	public static final String PROP_CACHE_DISK = "resource.diskMBytes";
+	public static final String PROP_CACHE_TIME_TO_IDLE_SECONDS = "cache.timeToIdleSeconds";
+	public static final String PROP_CACHE_TIME_TO_LIVE_SECONDS = "cache.timeToLiveSeconds";
+	public static final String PROP_CACHE_CLUSTER_RESOURCE_DEDICATED_POOL = "cache.cluster.resource.dedicated";
+	public static final String PROP_CACHE_CLUSTER_RESOURCE_SHARED_POOL = "cache.cluster.resource.shared";
+	
+	
+	public static final int DEFAULT_HEAP = 1000;
+	public static final int DEFAULT_OFFHEAP = 1;
 
 	private static Map<String, String> _Properties = null;
 
@@ -51,8 +62,7 @@ public class EhCacheConfig {
 	}
 
 	/**
-	 * Konstruktor ze wskazaniem innej lokalizacji położenia pliku
-	 * konfiguracyjnego
+	 * Konstruktor ze wskazaniem innej lokalizacji położenia pliku konfiguracyjnego
 	 * 
 	 * @param configFileName
 	 *            pełna ścieżka pliku konfiguracyjnego
@@ -83,8 +93,7 @@ public class EhCacheConfig {
 			if (_Properties != null) {
 				_Properties.clear();
 			}
-			_Properties = Configurations.loadHashtable(EhCacheConfig.class,
-					configFileName);
+			_Properties = Configurations.loadHashtable(EhCacheConfig.class, configFileName);
 		}
 
 	}
@@ -156,8 +165,7 @@ public class EhCacheConfig {
 	}
 
 	public static boolean statisticsIsDisabled() {
-		String disableSatistics = EhCacheConfig.getInstance().get(
-				EhCacheConstants.PROP_DISABLE_STATISTICS);
+		String disableSatistics = EhCacheConfig.getInstance().get(CacheConstants.PROP_DISABLE_STATISTICS);
 		if (StringUtils.isNotBlank(disableSatistics)) {
 			return Boolean.parseBoolean(disableSatistics);
 		}
@@ -165,8 +173,8 @@ public class EhCacheConfig {
 	}
 
 	/**
-	 * Ustawianie parametru systemowego {@link EhCacheConstants#PROP_CONFIG_PATH}
-	 * o położeniu statycznej konfiguracji pamięci podręcznej.
+	 * Ustawianie parametru systemowego {@link CacheConstants#PROP_CONFIG_PATH} o
+	 * położeniu statycznej konfiguracji pamięci podręcznej.
 	 * 
 	 * @param logger
 	 *            obiekt logger'a do którego przekazany będzie ewentualne
@@ -176,31 +184,23 @@ public class EhCacheConfig {
 	 */
 	public static void setSystemPropConfigPath(Logger logger, EhCacheConfig cc) {
 		/*
-		 * Pierwszy załadowany system ma pierwszeństwo - pozwoli nam to na
-		 * sterowanie jaki parametr ma być użyty.
+		 * Pierwszy załadowany system ma pierwszeństwo - pozwoli nam to na sterowanie
+		 * jaki parametr ma być użyty.
 		 */
-		if (StringUtils.isBlank(System
-				.getProperty(EhCacheConstants.PROP_CONFIG_PATH))) {
+		if (StringUtils.isBlank(System.getProperty(CacheConstants.PROP_CONFIG_PATH))) {
 			/*
-			 * parametr systemowy nie jest ustawiony, próbuję przeczytać z
-			 * konfiguracji...
+			 * parametr systemowy nie jest ustawiony, próbuję przeczytać z konfiguracji...
 			 */
-			if (StringUtils.isNotBlank(cc.get(EhCacheConstants.PROP_CONFIG_PATH))) {
+			if (StringUtils.isNotBlank(cc.get(CacheConstants.PROP_CONFIG_PATH))) {
 				/*
-				 * Konfiguracja ma ustawiony parametr, zatem ustawiam go jako
-				 * parametr systemowy
+				 * Konfiguracja ma ustawiony parametr, zatem ustawiam go jako parametr systemowy
 				 */
-				System.setProperty(EhCacheConstants.PROP_CONFIG_PATH,
-						cc.get(EhCacheConstants.PROP_CONFIG_PATH));
+				System.setProperty(CacheConstants.PROP_CONFIG_PATH, cc.get(CacheConstants.PROP_CONFIG_PATH));
 			}
-		} else if (StringUtils.isNotBlank(cc
-				.get(EhCacheConstants.PROP_CONFIG_PATH))) {
-			logger.warn(
-					"Używam parametru systemowego: {} = '{}'. Pomijam lokalne ustawienia '{}'.",
-					new Object[] {
-							EhCacheConstants.PROP_CONFIG_PATH,
-							System.getProperty(EhCacheConstants.PROP_CONFIG_PATH),
-							cc.get(EhCacheConstants.PROP_CONFIG_PATH) });
+		} else if (StringUtils.isNotBlank(cc.get(CacheConstants.PROP_CONFIG_PATH))) {
+			logger.warn("Używam parametru systemowego: {} = '{}'. Pomijam lokalne ustawienia '{}'.",
+					new Object[] { CacheConstants.PROP_CONFIG_PATH, System.getProperty(CacheConstants.PROP_CONFIG_PATH),
+							cc.get(CacheConstants.PROP_CONFIG_PATH) });
 		}
 	}
 

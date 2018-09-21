@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.slawas</groupId>
 	<artifactId>sccommon</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>SC Common</name>
 	<description>SC Common Librares Main Project</description>
 
@@ -109,8 +109,8 @@
 				<version>3.5.1</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>

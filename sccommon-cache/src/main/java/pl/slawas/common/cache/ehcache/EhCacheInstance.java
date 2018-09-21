@@ -2,12 +2,12 @@ package pl.slawas.common.cache.ehcache;
 
 import java.io.Serializable;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.config.Configuration;
-import pl.slawas.common.cache._IObjectCacheProvider;
+import org.ehcache.CacheManager;
+import org.ehcache.xml.XmlConfiguration;
 
-public interface EhCacheInstance extends _IObjectCacheProvider<Configuration>,
-		Serializable {
+import pl.slawas.common.cache.IObjectCacheProvider;
+
+public interface EhCacheInstance extends IObjectCacheProvider<XmlConfiguration>, Serializable {
 
 	CacheManager getManager();
 }
