@@ -61,7 +61,7 @@ public class CacheConstants {
 	/**
 	 * Domyślna nazwa regionu cache
 	 */
-	public static final String DEFAULT_REGION_NAME = "SCI.Default";
-	public static final String DEFAULT_PROVIDER_NAME = "SCI.Single";
+	public static final String DEFAULT_REGION_NAME = "SCI_Default_Region";
+	public static final String DEFAULT_PROVIDER_NAME = "SCI_Single";
 
 }

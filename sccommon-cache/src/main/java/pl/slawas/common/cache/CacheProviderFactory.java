@@ -141,7 +141,7 @@ public class CacheProviderFactory {
 			return new ObjectCacheStatisticsList(result, 0, lOffset, lPageSize);
 		}
 		Set<Entry<String, IObjectCacheProvider<?>>> allInstances = instances.entrySet();
-		List<String> allRegions = new ArrayList<String>();
+		List<String> allRegions = new ArrayList<>();
 		for (Entry<String, IObjectCacheProvider<?>> instance : allInstances) {
 			String managerName = instance.getKey();
 			IObjectCacheProvider<?> provider = instance.getValue();
@@ -195,7 +195,7 @@ public class CacheProviderFactory {
 	}
 
 	private static String decodeRegionName(String commonRegionName) {
-		return commonRegionName.split("\\.")[1];
+		return commonRegionName.split("\\.", 2)[1];
 	}
 
 	public static String buildInstanceNameBasedOnManagerName(CacheProviderEnum cacheProvider, String manager) {
@@ -203,7 +203,7 @@ public class CacheProviderFactory {
 		if (StringUtils.isBlank(manager)) {
 			instanceName = cacheProvider.name();
 		} else {
-			instanceName = cacheProvider.name() + "." + manager;
+			instanceName = cacheProvider.name() + "_" + manager;
 		}
 		return instanceName;
 	}

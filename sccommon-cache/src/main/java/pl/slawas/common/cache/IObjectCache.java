@@ -4,7 +4,7 @@ import pl.slawas.common.cache.exceptions.CacheErrorException;
 
 /**
  * 
- * _IObjectCache ujednolicone API dla wszystkich managerów pamięci podręcznych.
+ * IObjectCache ujednolicone API dla wszystkich managerów pamięci podręcznych.
  * Wzorowany na API EhCache
  * http://www.ehcache.org/documentation/2.7/apis/explicitlocking.html
  *

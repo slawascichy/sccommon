@@ -5,6 +5,15 @@ import java.util.Properties;
 
 import org.jdom.Element;
 
+/**
+ * 
+ * IObjectCacheProvider
+ *
+ * @author Sławomir Cichy &lt;slawomir.cichy@ibpm.pro&gt;
+ * @version $Revision: 1.1 $ 
+ *
+ * @param <Conf>
+ */
 public interface IObjectCacheProvider<Conf> {
 
 	/**

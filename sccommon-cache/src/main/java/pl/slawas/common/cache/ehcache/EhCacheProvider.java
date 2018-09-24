@@ -302,14 +302,13 @@ public class EhCacheProvider implements EhCacheInstance {
 	/* Overridden (non-Javadoc) */
 	@Override
 	public void clearCache(final String cacheName) {
-		IObjectCache cache = caches.computeIfAbsent(cacheName, mappingFunction -> {
-			throw new IllegalArgumentException(String
-					.format("-->getKeysList: Cache %s not initialized! First use getCache(String) method.", cacheName));
-		});
-		try {
-			cache.clear();
-		} catch (CacheErrorException e) {
-			logger.error(String.format("-->clearCache: Cache '%s' clear error!", cacheName), e);
+		IObjectCache cache = caches.get(cacheName);
+		if (cache != null) {
+			try {
+				cache.clear();
+			} catch (CacheErrorException e) {
+				logger.error(String.format("-->clearCache: Cache '%s' clear error!", cacheName), e);
+			}
 		}
 	}
 

@@ -4,7 +4,7 @@ import java.io.Closeable;
 
 /**
  * 
- * _IObjectWithCache interfejs dla obiektów używających cache (pamięci
+ * IObjectWithCache interfejs dla obiektów używających cache (pamięci
  * podręcznej)
  * 
  * @author Sławomir Cichy &lt;slawas@slawas.pl&gt;

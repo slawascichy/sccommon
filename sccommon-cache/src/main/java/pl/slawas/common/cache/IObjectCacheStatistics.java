@@ -2,6 +2,14 @@ package pl.slawas.common.cache;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * IObjectCacheStatistics
+ *
+ * @author Sławomir Cichy &lt;slawomir.cichy@ibpm.pro&gt;
+ * @version $Revision: 1.1 $ 
+ *
+ */
 public interface IObjectCacheStatistics extends Serializable {
 
 	/**
