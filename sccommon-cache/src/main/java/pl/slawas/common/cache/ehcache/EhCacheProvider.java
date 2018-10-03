@@ -119,7 +119,18 @@ public class EhCacheProvider implements EhCacheInstance {
 			String configurationPath = additionalProperties.getProperty(CacheConstants.PROP_CONFIG_PATH);
 			URL url = null;
 			if (configurationPath != null) {
-				url = EhCacheProvider.class.getResource(configurationPath);
+				File f = new File(configurationPath);
+				logger.info("[initConfiguration] Try loading configuration from : {} (exists?: {})",
+						new Object[] { configurationPath, f.exists() });
+				if (f.exists()) {
+					try {
+						url = f.toURI().toURL();
+					} catch (MalformedURLException e) {
+						/* nie ma prawa się zdarzyć, bo URI pochodzi od File */
+					}
+				} else {
+					url = EhCacheProvider.class.getResource(configurationPath);
+				}
 			}
 			if (url == null) {
 				/* jeżeli nie jest ustawiony URL, to zostanie ustawiony domyślny */
