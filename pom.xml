@@ -44,44 +44,6 @@
 		<url>http://scisoftware.pl</url>
 	</organization>
 
-	<scm>
-		<connection>scm:git:ssh://${user}@sources.ibpm.pro/opt/git/repositories/SC/Utils/${artifactId}.git</connection>
-		<developerConnection>scm:git:ssh://${user}@sources.ibpm.pro/opt/git/repositories/SC/Utils/${artifactId}.git</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://sources.ibpm.pro/?p=SC/Utils/${artifactId}.git;a=summary</url>
-	</scm>
-	<!-- -->
-	<issueManagement>
-		<url>https://support.ibpm.pro:8443/browse/PIAS</url>
-		<system>JIRA</system>
-	</issueManagement>
-
-	<ciManagement>
-		<url>https://ci.ibpm.pro:7080</url>
-		<system>jenkins</system>
-	</ciManagement>
-
-	<distributionManagement>
-		<site>
-			<id>wwwiq.ibpm.pro</id>
-			<url>scp://${user}@sources.ibpm.pro:/opt/ibpmusers/scichy/public_html/SC/Utils/${artifactId}</url>
-		</site>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>IBPMPRO-releases</id>
-			<name>Releases</name>
-			<url>https://support.ibpm.pro:9443/nexus/content/repositories/releases</url>
-			<layout>default</layout>
-		</repository>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<id>IBPMPRO-snapshots</id>
-			<name>Snapshots</name>
-			<url>https://support.ibpm.pro:9443/nexus/content/repositories/snapshots</url>
-			<layout>default</layout>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<build>
 		<extensions>
 			<extension>
@@ -134,7 +96,7 @@
 		<dependency>
 			<groupId>pl.slawas</groupId>
 			<artifactId>schelper</artifactId>
-			<version>0.0.10</version>
+			<version>0.0.12-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
