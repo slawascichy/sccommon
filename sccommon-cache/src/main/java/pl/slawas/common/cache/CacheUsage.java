@@ -30,8 +30,8 @@ public enum CacheUsage {
 	REFRESH,
 	/**
 	 * W trakcie aktywnej transakcji, użyj pamięci podręcznej z elementem, który
-	 * właśnie zostanie dodany został‚ dodany, i którego jeszcze nie ma w bazie
-	 * danych, użyj go tylko w lokalnej pamięci podręcznej .
+	 * właśnie zostanie dodany, i którego jeszcze nie ma w bazie danych, użyj go
+	 * tylko w lokalnej pamięci podręcznej .
 	 */
 	TO_USE_IN_FIRST_LEVEL_CACHE,
 	/**
