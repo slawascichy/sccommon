@@ -3,7 +3,6 @@ package pl.slawas.common.cache.beans;
 import java.util.Calendar;
 import java.util.Properties;
 
-import pl.slawas.common.cache.CacheSharing;
 import pl.slawas.common.cache.CacheUsage;
 import pl.slawas.common.cache.ObjectWithCacheSupport;
 import pl.slawas.common.cache.api.IUserSynchronizationCache;
@@ -24,7 +23,7 @@ public class UserSynchronizationCache extends ObjectWithCacheSupport implements 
 	public static final String CACHE_REGION_NAME = "UserSynchronizationCache";
 
 	public UserSynchronizationCache(Properties providerOptions) {
-		super(CacheUsage.TO_USE, CACHE_REGION_NAME, CacheSharing.NONE, false, providerOptions);
+		super(CacheUsage.TO_USE, CACHE_REGION_NAME, false, providerOptions);
 	}
 
 	/* Overridden (non-Javadoc) */

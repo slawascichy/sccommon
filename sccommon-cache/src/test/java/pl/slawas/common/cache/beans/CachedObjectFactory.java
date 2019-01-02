@@ -3,7 +3,6 @@ package pl.slawas.common.cache.beans;
 import java.io.IOException;
 import java.util.Properties;
 
-import pl.slawas.common.cache.CacheSharing;
 import pl.slawas.common.cache.CacheUsage;
 import pl.slawas.common.cache.ObjectWithCacheSupport;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
@@ -18,7 +17,7 @@ public class CachedObjectFactory extends ObjectWithCacheSupport {
 	public static final String cachedObjectRegionName = CachedObjectFactory.class.getSimpleName();
 
 	protected CachedObjectFactory(CacheUsage cacheUsage, Properties props) {
-		super(cacheUsage, cachedObjectRegionName, CacheSharing.NONE, false, props);
+		super(cacheUsage, cachedObjectRegionName, false, props);
 	}
 
 	public static CachedObjectResult get(NameValuePair object, CacheUsage cacheUsage, Properties props)

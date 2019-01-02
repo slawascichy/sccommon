@@ -39,6 +39,29 @@ public abstract class ObjectWithCacheSupport implements Serializable, IObjectWit
 	private long cacheTimeToLive = CacheConstants.DEFAULT_TIME_TO_LIVE;
 
 	/**
+	 * Tworzenie regionu współdzielonego (domyślnie)
+	 * 
+	 * @param cacheUsage
+	 *            informacja o tym czy ma być używana pamięć podręczna. Jako, że
+	 *            jest to inicjalizacja obiektu, to parametr powinien przyjmować
+	 *            jedną z dwóch wartości: {@link CacheUsage#TO_USE} oraz
+	 *            {@link CacheUsage#NONE}
+	 * @param cacheRegionName
+	 *            nazwa regionu pamięci podręcznej
+	 * @param useDefaultRegion
+	 *            informacja o tym czy ma być użyty domyślny region. Jeżeli podamy
+	 *            ten parametr jako wartość {@code null}, to wtedy informacja ta
+	 *            zostanie pobrana z wartości
+	 *            {@link CacheProviderEnum#CACHE_USE_DEFAULT_REGION}.
+	 * @param props
+	 *            parametry pamięci podręcznej.
+	 */
+	protected ObjectWithCacheSupport(CacheUsage cacheUsage, String cacheRegionName, Boolean useDefaultRegion,
+			Properties props) {
+		this(cacheUsage, cacheRegionName, CacheSharing.SHARED, useDefaultRegion, props);
+	}
+
+	/**
 	 * @param cacheUsage
 	 *            informacja o tym czy ma być używana pamięć podręczna. Jako, że
 	 *            jest to inicjalizacja obiektu, to parametr powinien przyjmować
