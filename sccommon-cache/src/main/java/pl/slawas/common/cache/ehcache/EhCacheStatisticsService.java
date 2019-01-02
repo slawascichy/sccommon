@@ -1,6 +1,5 @@
 package pl.slawas.common.cache.ehcache;
 
-import org.ehcache.core.spi.service.StatisticsServiceConfiguration;
 import org.ehcache.impl.internal.statistics.DefaultStatisticsService;
 
 import pl.slawas.twl4j.Logger;
@@ -20,10 +19,6 @@ public class EhCacheStatisticsService extends DefaultStatisticsService {
 
 	public EhCacheStatisticsService() {
 		super();
-	}
-
-	public EhCacheStatisticsService(StatisticsServiceConfiguration configuration) {
-		super(configuration);
 	}
 
 	/**
