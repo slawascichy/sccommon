@@ -1,0 +1,230 @@
+<xs:schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="ldap-options">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element type="xs:string" name="providerUrl">
+					<xs:annotation>
+						<xs:documentation>połączenie</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="bindDN" />
+				<xs:element type="xs:string" name="bindCredential" />
+				<xs:element type="xs:string" name="baseCtxDN">
+					<xs:annotation>
+						<xs:documentation>uwierzytelnianie użytkownika</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="baseFilter" />
+				<xs:element type="xs:string" name="userGroupOptionsAreDefinded">
+					<xs:annotation>
+						<xs:documentation>Bardzo ważna flaga mówiąca o tym, czy
+							konfiguracja ról/grup użytkownika
+							została zdefiniowana
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="rolesCtxDN">
+					<xs:annotation>
+						<xs:documentation>autoryzacja użytkownika ROLE: start - użyj
+							jeżeli 'userGroupOptionsAreDefinded' != 'false'
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="roleFilter" />
+				<xs:element type="xs:string" name="roleAttributeID">
+					<xs:annotation>
+						<xs:documentation>Atrybutem identyfikatora grupy może być DN
+							('distinguishedName') albo nazwa grupy. obsługiwane tylko przez
+							AD: &lt;roleAttributeID>distinguishedName&lt;/roleAttributeID>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="roleAttributeIsDN" />
+				<xs:element type="xs:string" name="roleNameAttributeID" />
+				<xs:element type="xs:byte" name="roleRecursion" />
+				<xs:element type="xs:string" name="usersFilter">
+					<xs:annotation>
+						<xs:documentation>ROLE: koniec informacje o użytkowniku
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="usersOrganizationalUnitNames"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>DEPRECATED zastąpione przez
+							usersOrganizationalUnitNamesOptions!!!!
+							Jednostki organizacyjne
+							(entry
+							jednostek), w których znajdują się entry
+							użytkowników
+							Separatorem
+							poszczególnych jednostek jest znak
+							'|'
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="usersOrganizationalUnitNamesOptions"
+					minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Zastępuje pole usersOrganizationalUnitNames.
+							Jednostki organizacyjne (entry jednostek), w
+							których znajdują się
+							entry użytkowników - lista opcji
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element type="xs:string" name="option" maxOccurs="unbounded"
+								minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element type="xs:string" name="userNameAttribute" />
+				<xs:element type="xs:string" name="userDisplayNameAttribute" />
+				<xs:element type="xs:string" name="userEmailAttribute" />
+				<xs:element type="xs:string" name="userDNAttribute"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>obsługiwane tylko przez AD
+							&lt;userDNAttribute>distinguishedName&lt;/userDNAttribute> To
+							można duplikować w extendedAttributies rozszerzając o mapowanie
+							wartości.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="userLocaleAttr" />
+				<xs:element type="xs:string" name="userPrimaryGroupAttribute"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Atrybut definiujący/wskazujący na grupę główną -
+							domyślnie 'primaryGroup'.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="userPrimaryGroupFilter"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element type="xs:string" name="userObjectClasses"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element type="xs:string" name="groupsFilter">
+					<xs:annotation>
+						<xs:documentation>informacje o grupie GRUPY: start - użyj jeżeli
+							'userGroupOptionsAreDefinded' != 'false'
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="groupsOrganizationalUnitNames"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>DEPRECATED zastąpione przez
+							groupsOrganizationalUnitNamesOptions!!!! Jednostki organizacyjne
+							(entry jednostek), w
+							których znajdują się entry grup. Separatorem
+							poszczególnych jednostek jest znak
+							'|'
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="groupsOrganizationalUnitNamesOptions"
+					minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Jednostki organizacyjne (entry jednostek), w
+							których znajdują się entry grup - lista opcji
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element type="xs:string" name="option" maxOccurs="unbounded"
+								minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element type="xs:string" name="structureCtxDN"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>DEPRECATED zastąpione przez
+							structureCtxDNOptions!!!! Separatorem
+							poszczególnych DN jest znak
+							'|'
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="structureCtxDNOptions" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element type="xs:string" name="option" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element type="xs:string" name="groupNameAttribute" />
+				<xs:element type="xs:string" name="groupDisplayNameAttribute" />
+				<xs:element type="xs:string" name="groupDescriptionAttribute" />
+				<xs:element type="xs:string" name="groupMemberAttribute" />
+				<xs:element type="xs:string" name="group2GroupTokenAttribute">
+					<xs:annotation>
+						<xs:documentation>Atrybutem tokena grupy może być DN
+							('distinguishedName') albo nazwa grupy.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="group2GroupTokenAttributeIsDN" />
+				<xs:element type="xs:string" name="groupDNAttribute"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element type="xs:string" name="groupObjectClasses"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element type="xs:string" name="extendedAttributies"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>DEPRECATED zastąpione przez
+							extendedAttributiesOptions!!!! Dodatkowe atrybuty użytkownika.
+							Separatorem
+							poszczególnych definicji atrybutu jest znak
+							','
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="extendedAttributiesOptions" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>dodatkowe atrybuty użytkownika - lista opcji
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element type="xs:string" name="option" maxOccurs="unbounded"
+								minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element type="xs:string" name="syncPeriod">
+					<xs:annotation>
+						<xs:documentation>cykl (okres) synchronizacji danych z LDAP
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="useDefaultParams" />
+				<xs:element type="xs:string" name="defaultTaskNotification">
+					<xs:annotation>
+						<xs:documentation>Domyślna wartość flagi powiadamiania użytkownika
+							o zadaniach drogą
+							elektroniczną (na adres email użytkownika)
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:string" name="defaultAlertOnAssignAndRun">
+					<xs:annotation>
+						<xs:documentation>Domyślna wartość flagi dla ostrzegania
+							użytkownika przed podjęciem zadania kierowanego do grupy
+							("Zadanie
+							kierowane jest do grupy i zostanie przypisane do
+							Ciebie").
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element type="xs:byte" name="ldapResultPageSize" />
+				<xs:element type="xs:string" name="logLevel" />
+				<xs:element type="xs:string" name="cacheDynamicParametersPath"
+					minOccurs="0" maxOccurs="1" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -174,5 +174,6 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>sccommon-cache</module>
+		<module>sccommon-ldap</module>
 	</modules>
 </project>
