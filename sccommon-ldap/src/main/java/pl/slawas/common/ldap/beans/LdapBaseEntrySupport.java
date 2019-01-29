@@ -83,15 +83,19 @@ public abstract class LdapBaseEntrySupport implements ILdapBaseEntry {
 		return name;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
+	 * @deprecated Pole 'name' jest ustawiane tylko i wyłącznie za pośrednictwem
+	 *             konstruktora. Metoda istnieje ze względu na spełnienie wymogów
+	 *             interfejsu. Użycie metody spowoduje wyjątek
+	 *             {@link UnsupportedOperationException}.
 	 * @see org.scbpm.lib.ldap._LdapEntry#setName(java.lang.String)
 	 */
 	@Deprecated
 	public void setName(String name) {
 		throw new UnsupportedOperationException(
-				"Pole name jest ustwiane tylko i wyłacznie za pośrednictwem konstruktora.");
+				"Pole 'name' jest ustawiane tylko i wyłącznie za pośrednictwem konstruktora.");
 	}
 
 	/**

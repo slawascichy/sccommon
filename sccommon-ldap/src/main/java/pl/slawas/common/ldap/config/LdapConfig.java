@@ -10,8 +10,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.ibm.ws.security.util.WSEncoderDecoder;
+
 import pl.slawas.common.ldap.api.Constants;
-import pl.slawas.common.ldap.api.ILdapConfigOptions;
 import pl.slawas.common.ldap.provider.ProviderOptions;
 import pl.slawas.twl4j.logger.LogLevel;
 
@@ -24,7 +25,7 @@ import pl.slawas.twl4j.logger.LogLevel;
  * 
  */
 @XmlRootElement(name = "ldap-options")
-public class LdapConfig implements Serializable, ILdapConfigOptions {
+public class LdapConfig extends LdapConfigOptions implements Serializable {
 
 	private static final long serialVersionUID = 1302128333610279616L;
 
@@ -64,6 +65,10 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 * Podczas tworzenia kontekstów (otwartych połączeń do LDAP) wartość jest
 	 * split'owana, a do {@code baseCtxDN} jest doklejany prefix
 	 * {@code "OU=" + organizationalUnitName} w trakcie wyszukiwania użytkowników.
+	 * 
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	private String usersOrganizationalUnitNames;
@@ -132,6 +137,10 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 * Podczas tworzenia kontekstów (otwartych połączeń do LDAP) wartość jest
 	 * split'owana, a do {@code rolesCtxDN} jest doklejany prefix
 	 * {@code "OU=" + organizationalUnitName} w trakcie wyszukiwania grup.
+	 * 
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	private String groupsOrganizationalUnitNames;
@@ -236,6 +245,10 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 * odróżnienia jednostek organizacji od grup/ról pocztowych i innych. Przykład
 	 * wartości: '{@code OU=Struktura,DC=ibpm,DC=pro}' Parametr opcjonalnym domyślna
 	 * wartość '{@code n/a}'
+	 * 
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	private String structureCtxDN;
@@ -282,6 +295,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * Mapowana lista atrybutów dodatkowych, które można synchronizować pomiędzy
 	 * LDAP a IBM BPM).
+	 * 
+	 * @deprecated Mechanizm dodatkowego mapowania miał zastosowanie tylko i
+	 *             wyłącznie w IBM BPM
 	 */
 	@Deprecated
 	private String extendedAttributies;
@@ -319,7 +335,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 * Poziom logowania komunikatów.
 	 * 
 	 * @see LogLevel
+	 * @deprecated zmieniono mechanizmy logowania operacji.
 	 */
+	@Deprecated
 	private String logLevel;
 
 	/**
@@ -423,7 +441,7 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 */
 	private OptionsList transformString2OptinsList(String optionsListStr, String separator) {
 		OptionsList oList = new OptionsList();
-		List<String> ops = new ArrayList<String>();
+		List<String> ops = new ArrayList<>();
 		String[] elements = optionsListStr.split("\\" + separator);
 		for (String element : elements) {
 			if (StringUtils.isNotBlank(element)) {
@@ -440,7 +458,7 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 * @return mapa parametrów.
 	 */
 	public Map<String, String> toOptions() {
-		Map<String, String> out = new HashMap<String, String>();
+		Map<String, String> out = new HashMap<>();
 		out.put(option_providerUrl, providerUrl);
 		out.put(option_bindDN, bindDN);
 		out.put(option_bindCredential, bindCredential);
@@ -526,7 +544,7 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	 */
 	private String transformOptionsList2String(OptionsList oList, String separator) {
 		String oListString;
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		List<String> ops = oList.getOption();
 		if (ops != null && !ops.isEmpty()) {
 			int i = 0;
@@ -927,6 +945,7 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * @param groupObjectClasses
 	 *            the {@link #groupObjectClasses} to set
+	 * 
 	 */
 	public void setGroupObjectClasses(String groupObjectClasses) {
 		this.groupObjectClasses = groupObjectClasses;
@@ -934,6 +953,8 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #extendedAttributies}
+	 * @deprecated Mechanizm dodatkowego mapowania miał zastosowanie tylko i
+	 *             wyłącznie w IBM BPM
 	 */
 	@Deprecated
 	public String getExtendedAttributies() {
@@ -943,6 +964,8 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * @param extendedAttributies
 	 *            the {@link #extendedAttributies} to set
+	 * @deprecated Mechanizm dodatkowego mapowania miał zastosowanie tylko i
+	 *             wyłącznie w IBM BPM
 	 */
 	@Deprecated
 	public void setExtendedAttributies(String extendedAttributies) {
@@ -1026,6 +1049,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #usersOrganizationalUnitNames}
+	 * @deprecated Metoda powstała ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	public String getUsersOrganizationalUnitNames() {
@@ -1035,6 +1061,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * @param usersOrganizationalUnitNames
 	 *            the {@link #usersOrganizationalUnitNames} to set
+	 * @deprecated Metoda powstała ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	public void setUsersOrganizationalUnitNames(String usersOrganizationalUnitNames) {
@@ -1043,6 +1072,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #groupsOrganizationalUnitNames}
+	 * @deprecated Metoda powstała ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	public String getGroupsOrganizationalUnitNames() {
@@ -1052,6 +1084,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * @param groupsOrganizationalUnitNames
 	 *            the {@link #groupsOrganizationalUnitNames} to set
+	 * @deprecated Metoda powstała ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	public void setGroupsOrganizationalUnitNames(String groupsOrganizationalUnitNames) {
@@ -1060,6 +1095,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #structureCtxDN}
+	 * @deprecated Metoda powstała ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	public String getStructureCtxDN() {
@@ -1069,6 +1107,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * @param structureCtxDN
 	 *            the {@link #structureCtxDN} to set
+	 * @deprecated Metoda powstała ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
 	@Deprecated
 	public void setStructureCtxDN(String structureCtxDN) {
@@ -1137,7 +1178,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #logLevel}
+	 * @deprecated zmieniono mechanizmy logowania operacji.
 	 */
+	@Deprecated
 	public String getLogLevel() {
 		return logLevel;
 	}
@@ -1145,7 +1188,9 @@ public class LdapConfig implements Serializable, ILdapConfigOptions {
 	/**
 	 * @param logLevel
 	 *            the {@link #logLevel} to set
+	 * @deprecated zmieniono mechanizmy logowania operacji.
 	 */
+	@Deprecated
 	public void setLogLevel(String logLevel) {
 		this.logLevel = logLevel;
 	}

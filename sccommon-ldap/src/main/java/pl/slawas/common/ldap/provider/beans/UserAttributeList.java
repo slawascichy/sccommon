@@ -27,10 +27,10 @@ public class UserAttributeList implements Serializable {
 	private static final long serialVersionUID = -695077998260486783L;
 
 	/** Mapa nazw atrybutów BPM na obiekty atrybutów użytkownika */
-	private Map<String, UserAttributeDefinition> userExtendedAttributiesTW2LDAP = new Hashtable<String, UserAttributeDefinition>();
+	private Map<String, UserAttributeDefinition> userExtendedAttributiesTW2LDAP = new Hashtable<>();
 
 	/** Lista atrybutów użytkownika w LDAP */
-	private Set<String> ldapAttrNames = new HashSet<String>();
+	private Set<String> ldapAttrNames = new HashSet<>();
 
 	/**
 	 * Metoda dodająca definicję atrybutu użytkownika

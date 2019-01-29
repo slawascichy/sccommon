@@ -97,7 +97,7 @@ public class UserAttributeDefinition implements Serializable {
 	 * przechowywany jest jego avatar. Jest on przechowywany w osobnej tablicy o
 	 * nazwie BPM_USR_AVATAR.
 	 */
-	public static String TW_ATTR_IMAGE = "Image";
+	public static final String TW_ATTR_IMAGE = "Image";
 
 	/**
 	 * Nazwa atrybutu użytkownika zdefiniowana w IBM BPM
@@ -168,10 +168,10 @@ public class UserAttributeDefinition implements Serializable {
 	 */
 	public void addValueMap(String ldapValue, String twValue) {
 		if (this.valueMapLDAP2TW == null) {
-			this.valueMapLDAP2TW = new Hashtable<String, String>();
+			this.valueMapLDAP2TW = new Hashtable<>();
 		}
 		if (this.valueMapTW2LDAP == null) {
-			this.valueMapTW2LDAP = new Hashtable<String, String>();
+			this.valueMapTW2LDAP = new Hashtable<>();
 		}
 		this.valueMapLDAP2TW.put(ldapValue, twValue);
 		this.valueMapTW2LDAP.put(twValue, ldapValue);

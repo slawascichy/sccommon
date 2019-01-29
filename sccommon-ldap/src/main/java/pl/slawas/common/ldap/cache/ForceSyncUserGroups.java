@@ -19,7 +19,7 @@ public final class ForceSyncUserGroups {
 	private ForceSyncUserGroups() {
 	}
 
-	private final static ForceSyncUserGroups instance = new ForceSyncUserGroups();
+	private static final ForceSyncUserGroups instance = new ForceSyncUserGroups();
 
 	/**
 	 * Pobranie singleton'a obiektu blokującego.

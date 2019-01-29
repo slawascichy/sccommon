@@ -35,21 +35,18 @@ import pl.slawas.twl4j.LoggerFactory;
  */
 public class LdapGroupsCacheLists {
 
+	private LdapGroupsCacheLists() {
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(LdapGroupsCacheLists.class.getName());
 
-	private static final Map<Class<? extends ILdapUserGroup>, LdapGroupsCache<? extends ILdapUserGroup>> caches = new HashMap<Class<? extends ILdapUserGroup>, LdapGroupsCache<? extends ILdapUserGroup>>();
+	private static final Map<Class<? extends ILdapUserGroup>, LdapGroupsCache<? extends ILdapUserGroup>> caches = new HashMap<>();
 	private static final Object cacheLock = new Object();
 
+	@SuppressWarnings("unchecked")
 	public static <G extends ILdapUserGroup> LdapGroupsCache<G> getCache(Class<G> clazz) {
 		synchronized (cacheLock) {
-			@SuppressWarnings("unchecked")
-			LdapGroupsCache<G> instance = (LdapGroupsCache<G>) caches.get(clazz);
-			if (instance == null) {
-				LdapGroupsCache<G> newInstance = new LdapGroupsCache<G>();
-				caches.put(clazz, newInstance);
-				return newInstance;
-			}
-			return instance;
+			return (LdapGroupsCache<G>) caches.computeIfAbsent(clazz, k -> new LdapGroupsCache<>());
 		}
 
 	}
@@ -57,8 +54,8 @@ public class LdapGroupsCacheLists {
 	/** flaga obsługi synchronizacji grup */
 	private static final ForceSyncUserGroups isForceSyncUserGroups = ForceSyncUserGroups.getInstance();
 
-	private static final String lockForceSyncUserGroups = (new StringBuilder())
-			.append("lockForceSyncUserGroups.IBMBPM.8.5.x").toString().intern();
+	private static final Object lockForceSyncUserGroups = (new StringBuilder())
+			.append("lockForceSyncUserGroups.SciSoftware.8.5.x").toString().intern();
 
 	/** Pobranie nazwy użytkownika, który uruchomił synchronizację grup */
 	public static String getUserForceSyncUserGroups() {

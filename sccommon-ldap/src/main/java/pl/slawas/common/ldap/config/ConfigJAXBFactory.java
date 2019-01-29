@@ -54,8 +54,7 @@ public abstract class ConfigJAXBFactory<Obj> implements ConfigFactory<Obj> {
 	private final Class<Obj> persistentClass;
 
 	/**
-	 * Klasa pomocnicza pozwalająca na odszukanie pliku konfiguracji w pakiecie
-	 * jar
+	 * Klasa pomocnicza pozwalająca na odszukanie pliku konfiguracji w pakiecie jar
 	 */
 	private Class<?> resourceClass;
 
@@ -67,15 +66,14 @@ public abstract class ConfigJAXBFactory<Obj> implements ConfigFactory<Obj> {
 	 * 1 przykład użycia:
 	 * 
 	 * <pre>
-	 * ConfigFactory&lt;IndexerConfig&gt; factory = new IndexerConfigFactory(getClass()
-	 * 		.getResource(&quot;config.xml&quot;).getFile(), false);
+	 * ConfigFactory&lt;IndexerConfig&gt; factory = new IndexerConfigFactory(getClass().getResource(&quot;config.xml&quot;).getFile(),
+	 * 		false);
 	 * </pre>
 	 * 
 	 * 2 przykład użycia:
 	 * 
 	 * <pre>
-	 * ConfigFactory&lt;IndexerConfig&gt; factory = new IndexerConfigFactory(&quot;config.xml&quot;,
-	 * 		true);
+	 * ConfigFactory&lt;IndexerConfig&gt; factory = new IndexerConfigFactory(&quot;config.xml&quot;, true);
 	 * factory.setResourceClass(getClass());
 	 * </pre>
 	 * 
@@ -88,23 +86,23 @@ public abstract class ConfigJAXBFactory<Obj> implements ConfigFactory<Obj> {
 	@SuppressWarnings("unchecked")
 	protected ConfigJAXBFactory(String url, boolean readConfigFromJar) {
 		this.url = url;
-		this.persistentClass = (Class<Obj>) ((ParameterizedType) this
-				.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		this.persistentClass = (Class<Obj>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+				.getActualTypeArguments()[0];
 		this.readConfigFromJar = readConfigFromJar;
 		this.configString = null;
 	}
 
 	@SuppressWarnings("unchecked")
 	protected ConfigJAXBFactory(String configString) {
-		this.persistentClass = (Class<Obj>) ((ParameterizedType) this
-				.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		this.persistentClass = (Class<Obj>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+				.getActualTypeArguments()[0];
 		this.url = null;
 		this.readConfigFromJar = false;
 		this.configString = configString;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Obj makeIndexConfig() throws ConfigException {
+	public Obj makeIndexConfig() {
 		Obj config = null;
 		InputStream is = null;
 		BufferedReader br = null;
@@ -123,9 +121,7 @@ public abstract class ConfigJAXBFactory<Obj> implements ConfigFactory<Obj> {
 					config = (Obj) unmarshaller.unmarshal(br);
 				} else {
 					/* dodanie strony kodowej odczytywanej konfiguracji */
-					config = (Obj) unmarshaller
-							.unmarshal(new InputStreamReader(
-									new FileInputStream(url), "UTF-8"));
+					config = (Obj) unmarshaller.unmarshal(new InputStreamReader(new FileInputStream(url), "UTF-8"));
 				}
 			} else if (StringUtils.isNotBlank(configString)) {
 				is = new ByteArrayInputStream(configString.getBytes());

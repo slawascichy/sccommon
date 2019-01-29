@@ -70,4 +70,14 @@ public class Constants {
 	 */
 	public static final String NULL_STRING = "null";
 
+	/** Separator wykorzystywany podczas konwersji wartości do String'a */
+	public static final String VALUE_SEPARATOR = "-";
+
+	public static final String SPACE_SEPARATOR = " ";
+
+	/** Wartość reprezentująca niezdefiniowaną długość pola binarnego */
+	public static final int UNSPECIFIED_LENGTH = -1;
+
+	/** Domyślna nazwa atrybutu reprezentującego adres e-mail */
+	public static final String DEFAULT_EMAIL_ATTR_NAME = "mail";
 }

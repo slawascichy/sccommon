@@ -15,7 +15,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package pl.slawas.common.ldap.api;
+package pl.slawas.common.ldap.config;
+
+import com.ibm.ws.security.util.WSEncoderDecoder;
 
 import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.common.ldap.provider.ProviderOptions;
@@ -29,111 +31,114 @@ import pl.slawas.twl4j.logger.LogLevel;
  * @version $Revision: 1.1 $
  * 
  */
-public interface ILdapConfigOptions {
+public class LdapConfigOptions {
+
+	protected LdapConfigOptions() {
+	}
 
 	/** Otwarcie nawiasu (ze spacją na początku) */
-	final String OPEN_BRACKED = " (";
+	public static final String OPEN_BRACKED = " (";
 	/** Otwarcie nawiasu kwadratowego */
-	final String OPEN_SQUARE_BRACKED = "[";
+	public static final String OPEN_SQUARE_BRACKED = "[";
 	/** Zamknięcie nawiasu */
-	final String CLOSE_BRACKED = ")";
+	public static final String CLOSE_BRACKED = ")";
 	/** Zamknięcie nawiasu kwadratowego (ze spacją na końcu) */
-	final String CLOSE_SQUARE_BRACKED = "] ";
+	public static final String CLOSE_SQUARE_BRACKED = "] ";
 	/** Wartość reprezentująca brak dostępu do wartości */
-	final String NOT_ALLOWED_VALUE = "n/a";
+	public static final String NOT_ALLOWED_VALUE = "n/a";
 	/** Wartość reprezentująca spację */
-	final String SPACE = " ";
+	public static final String SPACE = " ";
 	/** Reprezentacja związku pomiędzy dwoma obiektami */
-	final String RELATIONSHIP = " -> ";
+	public static final String RELATIONSHIP = " -> ";
 	/** Reprezentacja znaku podkreślenia */
-	final String UNDERSCORE = "_";
+	public static final String UNDERSCORE = "_";
 	/** Reprezentacja kropki */
-	final String DOT = ".";
+	public static final String DOT = ".";
 	/** Reprezentacja dwukropka (sam) */
-	final String DOUBLE_DOT_ALONE = ":";
+	public static final String DOUBLE_DOT_ALONE = ":";
 	/** Reprezentacja dwukropka (ze spacją na końcu) */
-	final String DOUBLE_DOT = ": ";
+	public static final String DOUBLE_DOT = ": ";
 	/** Reprezentacja przecinka (ze spacją na końcu) */
-	final String COMMA = ", ";
+	public static final String COMMA = ", ";
 	/** Reprezentacja znaku równości */
-	final String EQUALS = "=";
+	public static final String EQUALS_CHR = "=";
 	/** cudzysłów pojedynczy */
-	final String SINGLE_QUOTATION_MARK = "'";
+	public static final String SINGLE_QUOTATION_MARK = "'";
 	/** cudzysłów podwójny */
-	final String DOUBLE_QUOTATION_MARK = "\"";
-	final String ZERO = "0";
-	final Long ZEROL = 0L;
+	public static final String DOUBLE_QUOTATION_MARK = "\"";
+	public static final String ZERO = "0";
+	public static final Long ZEROL = 0L;
 	/** gwiazdka */
-	final char STAR = '*';
+	public static final char STAR = '*';
 	/** znak zapytania */
-	final char QUESTION_MARK = '?';
+	public static final char QUESTION_MARK = '?';
 
 	/**
 	 * separator oddzielający poszczególne definicje atrybutów użytkownika.
 	 */
-	String ATTRIBUTE_SEPARATOR = ",";
+	public static final String ATTRIBUTE_SEPARATOR = ",";
 
 	/**
 	 * separator rozdzielający różne nazwy atrybutów gdzie pierwsza to nazwa
 	 * atrybutu w TW, druga w LDAP
 	 */
-	String ATTRIBUTE_NAME_MAP_SEPARATOR = "|";
+	public static final String ATTRIBUTE_NAME_MAP_SEPARATOR = "|";
 
 	/**
 	 * Separator używany do oddzielania par wartości do zbudowania mapy wartości,
 	 * różnic pomiędzy TW i LDAP.
 	 */
-	String ATTRIBUTE_VALUE_PAIR_MAP_SEPARATOR = ":";
+	public static final String ATTRIBUTE_VALUE_PAIR_MAP_SEPARATOR = ":";
 
 	/**
 	 * Separator używana do rozdzielenia wartości w parze.
 	 */
-	String ATTRIBUTE_VALUE_MAP_SEPARATOR = "@";
+	public static final String ATTRIBUTE_VALUE_MAP_SEPARATOR = "@";
 
-	String FILE_LOCATION_PREFIX = "file:";
+	public static final String FILE_LOCATION_PREFIX = "file:";
 
 	/** Domyślna liczba zagnieżdżenia ról */
-	String DEFAILT_ROLE_RECURSION = "10";
+	public static final String DEFAILT_ROLE_RECURSION = "10";
 
 	/**
 	 * Domyślny period synchronizacji użytkowników [ms] ustawiony na 7 dni.
 	 */
-	long DEFAULT_SYNC_PRIOD = 1000 * 60 * 60 * 24 * 7;
+	public static final long DEFAULT_SYNC_PRIOD = 1000 * 60 * 60 * 24 * 7L;
 
 	/**
 	 * Domyślna nazwa klasy obiektu użytkownika w LDAP/AD
 	 */
-	String DEFAULT_USER_OBJECT_CLASS_NAME = "user";
+	public static final String DEFAULT_USER_OBJECT_CLASS_NAME = "user";
 
 	/**
 	 * Domyślna nazwa klasy obiektu grupy w LDAP/AD
 	 */
-	String DEFAULT_GROUP_OBJECT_CLASS_NAME = "group";
+	public static final String DEFAULT_GROUP_OBJECT_CLASS_NAME = "group";
 
 	/**
 	 * Nazwa atrybutu klasy obiektu w LDAP/AD
 	 */
-	String OBJECT_CLASS = "objectClass";
+	public static final String OBJECT_CLASS = "objectClass";
 
 	/**
 	 * Domyślna lokalizacja pliku z dynamicznymi parametrami pamięci podręcznych
 	 */
-	String DEFAULT_CACHE_DYNAMIC_PARAMETERS_PATH = "/pro/ibpm/security/cache/cache.properties";
+	public static final String DEFAULT_CACHE_DYNAMIC_PARAMETERS_PATH = "/pro/ibpm/security/cache/cache.properties";
 
 	/* Niezbędne elementy do nawiązania połączenia */
 	/** Nazwa opcji dla: Provider URL */
-	String option_providerUrl = "providerUrl";
+	public static final String option_providerUrl = "providerUrl";
 	/**
 	 * Nazwa opcji dla: Adres entry wykorzystywanego podczas uwierzytelniania
 	 * nawiązywanego połączenia - z reguły jakiś użytkownik techniczny.
 	 */
-	String option_bindDN = "bindDN";
+	public static final String option_bindDN = "bindDN";
 	/**
 	 * Nazwa opcji dla: Hasło wykorzystywane podczas uwierzytelniania nawiązywanego
 	 * połączenia - z reguły hasło użytkownika technicznego. Hasło zakodowane metodą
 	 * dostępną w {@link WSEncoderDecoder}.
 	 */
-	String option_bindCredential = "bindCredential";
+	public static final String option_bindCredential = "bindCredential";
 
 	/* uwierzytelnianie użytkownika */
 	/**
@@ -147,7 +152,7 @@ public interface ILdapConfigOptions {
 	 * @see #userDNAttribute
 	 * 
 	 */
-	String option_baseCtxDN = "baseCtxDN";
+	public static final String option_baseCtxDN = "baseCtxDN";
 	/**
 	 * Nazwa opcji dla: Podstawowy filtr wyciągający informacje o użytkowniku o
 	 * podanej nazwie.
@@ -157,7 +162,7 @@ public interface ILdapConfigOptions {
 	 * </p>
 	 * gdzie {0} jest zamieniane na nazwę użytkownika.
 	 */
-	String option_baseFilter = "baseFilter";
+	public static final String option_baseFilter = "baseFilter";
 
 	/**
 	 * lista nazw jednostek organizacyjnych odseparowanych znakiem przecinka (może
@@ -168,7 +173,7 @@ public interface ILdapConfigOptions {
 	 * split'owana, a do {@code baseCtxDN} jest doklejany prefix
 	 * {@code "OU=" + organizationalUnitName} w trakcie wyszukiwania użytkowników.
 	 */
-	String option_usersOrganizationalUnitNames = "userOrganizationalUnitNames";
+	public static final String option_usersOrganizationalUnitNames = "userOrganizationalUnitNames";
 
 	/**
 	 * lista nazw jednostek organizacyjnych odseparowanych znakiem przecinka (może
@@ -179,7 +184,7 @@ public interface ILdapConfigOptions {
 	 * split'owana, a do {@code rolesCtxDN} jest doklejany prefix
 	 * {@code "OU=" + organizationalUnitName} w trakcie wyszukiwania grup.
 	 */
-	String option_groupsOrganizationalUnitNames = "groupOrganizationalUnitNames";
+	public static final String option_groupsOrganizationalUnitNames = "groupOrganizationalUnitNames";
 
 	/**
 	 * Parametr definiujący kontekst drzewa ze strukturą firmy, wsparcie dla
@@ -187,7 +192,7 @@ public interface ILdapConfigOptions {
 	 * wartości: '{@code OU=Struktura,DC=ibpm,DC=pro}' Parametr opcjonalnym domyślna
 	 * wartość '{@code n/a}'
 	 */
-	String option_structureCtxDN = "structureCtxDN";
+	public static final String option_structureCtxDN = "structureCtxDN";
 
 	/* autoryzacja użytkownika */
 	/**
@@ -201,7 +206,7 @@ public interface ILdapConfigOptions {
 	 * @see #group2GroupTokenAttribute
 	 * @see #groupDNAttribute
 	 */
-	String option_rolesCtxDN = "rolesCtxDN";
+	public static final String option_rolesCtxDN = "rolesCtxDN";
 	/**
 	 * Nazwa opcji dla: Podstawowy filtr wyciągający informacje rolach użytkowników
 	 * o podanej 'distinguishedName' użytkownika.
@@ -212,26 +217,26 @@ public interface ILdapConfigOptions {
 	 * gdzie {1} jest zamieniane na wartość atrybutu wskazującego
 	 * 'distinguishedName' użytkownika ({@link #userDNAttribute}).
 	 */
-	String option_roleFilter = "roleFilter";
+	public static final String option_roleFilter = "roleFilter";
 	/**
 	 * Nazwa opcji dla: Atrybut jednoznacznie identyfikujący entry roli.
 	 */
-	String option_roleAttributeID = "roleAttributeID";
+	public static final String option_roleAttributeID = "roleAttributeID";
 	/**
 	 * Nazwa opcji dla: Czy wartość atrybutu {@link #roleAttributeID} wskazuje na
 	 * 'distinguishedName' roli? Wartości jakie przyjmuje to pole to {@code 'true'}
 	 * albo {@code 'false'}.
 	 */
-	String option_roleAttributeIsDN = "roleAttributeIsDN";
+	public static final String option_roleAttributeIsDN = "roleAttributeIsDN";
 	/**
 	 * Nazwa opcji dla: Atrybut definiujący nazwę roli.
 	 */
-	String option_roleNameAttributeID = "roleNameAttributeID";
+	public static final String option_roleNameAttributeID = "roleNameAttributeID";
 	/**
 	 * Nazwa opcji dla: Maksymalna liczba poziomów zagnieżdżenia pomiędzy rolami
 	 * jaka ma być wykorzystana do zbudowania listy ról użytkownika.
 	 */
-	String option_roleRecursion = "roleRecursion";
+	public static final String option_roleRecursion = "roleRecursion";
 
 	/* informacje o użytkowniku */
 	/**
@@ -241,30 +246,30 @@ public interface ILdapConfigOptions {
 	 * (&amp;(objectClass=user)(isVisible=true))
 	 * </p>
 	 */
-	String option_usersFilter = "usersFilter";
+	public static final String option_usersFilter = "usersFilter";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu definiującego unikalną nazwę/login
 	 * użytkownika. Dla AD to {@code sAMAccountName}.
 	 */
-	String option_userNameAttribute = "userNameAttribute";
+	public static final String option_userNameAttribute = "userNameAttribute";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu definiującego nazwę prezentacyjną
 	 * użytkownika, najczęściej jest to 'Nazwisko i Imię'.
 	 */
-	String option_userDisplayNameAttribute = "userDisplayNameAttribute";
+	public static final String option_userDisplayNameAttribute = "userDisplayNameAttribute";
 	/** Nazwa opcji dla: Nazwa atrybutu definiującego adres email użytkownika */
-	String option_userEmailAttribute = "userEmailAttribute";
+	public static final String option_userEmailAttribute = "userEmailAttribute";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu definiującego 'distinguishedName' użytkownika
 	 * (lokalizację entry w drzewie katalogowym LDAP'a) - dla AD jest to
 	 * 'distinguishedName'.
 	 */
-	String option_userDNAttribute = "userDNAttribute";
+	public static final String option_userDNAttribute = "userDNAttribute";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu użytkownika, w którym przechowywana jest
 	 * informacja o głównej grupie użytkownika.
 	 */
-	String option_userPrimaryGroupAttribute = "userPrimaryGroupAttribute";
+	public static final String option_userPrimaryGroupAttribute = "userPrimaryGroupAttribute";
 	/**
 	 * Nazwa opcji dla: Dodatkowy filtr wyciągający wartość dodatkowego atrybutu
 	 * użytkownika zdefiniowanego w IBM BPM atrybutu o nazwie 'Primary Group'
@@ -275,14 +280,14 @@ public interface ILdapConfigOptions {
 	 * gdzie {1} jest zamieniane na wartość atrybutu wskazującego
 	 * 'distinguishedName' użytkownika ({@link #userDNAttribute}).
 	 */
-	String option_userPrimaryGroupFilter = "userPrimaryGroupFilter";
+	public static final String option_userPrimaryGroupFilter = "userPrimaryGroupFilter";
 	/**
 	 * Nazwa opcji dla: Lista klas definiujących obiekt użytkownika. Domyślnie
 	 * jednoelementowa lista zawierająca {@link #DEFAULT_USER_OBJECT_CLASS_NAME} . W
 	 * konfiguracji jest to lista elementów odseparowana przecinkami (
 	 * {@link #ATTRIBUTE_SEPARATOR}).
 	 */
-	String option_userObjectClasses = "userObjectClasses";
+	public static final String option_userObjectClasses = "userObjectClasses";
 
 	/* informacje o grupie */
 	/**
@@ -292,104 +297,104 @@ public interface ILdapConfigOptions {
 	 * (&amp;(objectClass=group)(isVisible=true))
 	 * </p>
 	 */
-	String option_groupsFilter = "groupsFilter";
+	public static final String option_groupsFilter = "groupsFilter";
 	/** Nazwa opcji dla: Nazwa atrybutu definiującego unikalną nazwę grupy */
-	String option_groupNameAttribute = "groupNameAttribute";
+	public static final String option_groupNameAttribute = "groupNameAttribute";
 	/** Nazwa opcji dla: Nazwa atrybutu definiującego nazwę prezentacyjną grupy. */
-	String option_groupDisplayNameAttribute = "groupDisplayNameAttribute";
+	public static final String option_groupDisplayNameAttribute = "groupDisplayNameAttribute";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu wskazującego na entry członka grupy
 	 * najczęściej {@code member}.
 	 */
-	String option_groupMemberAttribute = "groupMemberAttribute";
+	public static final String option_groupMemberAttribute = "groupMemberAttribute";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu wskazującego na entry grupy, której członkiem
 	 * jest dana grupa (w celu zbudowania hierarchii grup). Najczęściej
 	 * {@code memberOf}
 	 */
-	String option_group2GroupTokenAttribute = "group2GroupTokenAttribute";
+	public static final String option_group2GroupTokenAttribute = "group2GroupTokenAttribute";
 	/**
 	 * Nazwa opcji dla: Nazwa atrybutu definiującego 'distinguishedName' grupy
 	 * (lokalizację entry w drzewie katalogowym LDAP'a) - dla AD jest to
 	 * 'distinguishedName'.
 	 */
-	String option_groupDNAttribute = "groupDNAttribute";
+	public static final String option_groupDNAttribute = "groupDNAttribute";
 	/**
 	 * Nazwa opcji dla: Lista klas definiujących obiekt grupy. Domyślnie
 	 * jednoelementowa lista zawierająca {@link #DEFAULT_GROUP_OBJECT_CLASS_NAME}. W
 	 * konfiguracji jest to lista elementów odseparowana przecinkami
 	 * ({@link #ATTRIBUTE_SEPARATOR} ).
 	 */
-	String option_groupObjectClasses = "groupObjectClasses";
+	public static final String option_groupObjectClasses = "groupObjectClasses";
 
 	/* Parametry dodatkowe */
 	/**
 	 * Nazwa opcji dla: Mapowana lista atrybutów dodatkowych, które można
 	 * synchronizować pomiędzy LDAP a IBM BPM).
 	 */
-	String option_extendedAttributies = "extendedAttributies";
+	public static final String option_extendedAttributies = "extendedAttributies";
 
 	/**
 	 * Nazwa opcji dla: Rozmiar cyklu synchronizacji danych o użytkownikach i
 	 * grupach pomiędzy LDAP i IBM BPM.
 	 */
-	String option_syncPeriod = "syncPeriod";
+	public static final String option_syncPeriod = "syncPeriod";
 
 	/**
 	 * Nazwa opcji dla: Domyślna wartość flagi powiadamiania użytkownika o zadaniach
 	 * drogą elektroniczną (na adres email użytkownika).
 	 */
-	String option_defaultTaskNotification = "defaultTaskNotification";
+	public static final String option_defaultTaskNotification = "defaultTaskNotification";
 
 	/**
 	 * Nazwa opcji dla: Domyślna wartość flagi dla ostrzegania użytkownika przed
 	 * podjęciem zadania kierowanego do grupy ("Zadanie kierowane jest do grupy i
 	 * zostanie przypisane do Ciebie"). ALERT_ON_ASSIGN_AND_RUN
 	 */
-	String option_defaultAlertOnAssignAndRun = "defaultAlertOnAssignAndRun";
+	public static final String option_defaultAlertOnAssignAndRun = "defaultAlertOnAssignAndRun";
 
 	/**
 	 * Nazwa opcji dla: Bardzo ważna flaga, mówiąca o tym, czy konfiguracja ról/grup
 	 * użytkownika została zdefiniowana.
 	 */
-	String option_userGroupOptionsAreDefinded = "userGroupOptionsAreDefinded";
+	public static final String option_userGroupOptionsAreDefinded = "userGroupOptionsAreDefinded";
 
 	/**
 	 * Nazwa opcji dla: Rozmiar strony dla wyniku wyszukiwania w LDAP.
 	 */
-	String option_ldapResultPageSize = "ldapResultPageSize";
+	public static final String option_ldapResultPageSize = "ldapResultPageSize";
 
 	/**
 	 * Nazwa opcji dla: Rozmiar strony dla wyniku wyszukiwania w LDAP.
 	 */
-	String option_userLocaleAttr = "userLocaleAttr";
+	public static final String option_userLocaleAttr = "userLocaleAttr";
 
 	/**
 	 * Nazwa opcji dla: Czy nadpisać ustawienia użytkownika ustawieniami domyślnymi?
 	 * Dotyczy tylko parametru {@link ProviderOptions#getDefaultTaskNotification()}.
 	 */
-	String option_useDefaultParams = "useDefaultParams";
+	public static final String option_useDefaultParams = "useDefaultParams";
 
 	/**
 	 * Nazwa opcji dla opisy grupy.
 	 */
-	String option_groupDescriptionAttribute = "groupDescriptionAttribute";
+	public static final String option_groupDescriptionAttribute = "groupDescriptionAttribute";
 
 	/**
 	 * Nazwa opcji, w której przechowywana jest flaga informująca o tym czy atrybut
 	 * wskazujący na "rodzica" jest zdefiniowany jako DN. Jeżeli nie, to wtedy
 	 * uznamy, że przechowywana jest wartość taka jak zostało to zdefiniowane dla
-	 * {@link ILdapConfigOptions#option_roleAttributeID} oraz
-	 * {@link ILdapConfigOptions#option_roleAttributeIsDN}.
+	 * {@link LdapConfigOptions#option_roleAttributeID} oraz
+	 * {@link LdapConfigOptions#option_roleAttributeIsDN}.
 	 */
-	String option_group2GroupTokenAttributeIsDN = "group2GroupTokenAttributeIsDN";
+	public static final String option_group2GroupTokenAttributeIsDN = "group2GroupTokenAttributeIsDN";
 
 	/**
 	 * Nazwa opcji, która definiuje poziom logowania komunikatów.
 	 * 
 	 * @see LogLevel
 	 */
-	String option_logLevel = "logLevel";
+	public static final String option_logLevel = "logLevel";
 
 	/**
 	 * Nazwa opcji, która definiuje ścieżkę z plikiem zawierającym konfigurację
@@ -399,6 +404,6 @@ public interface ILdapConfigOptions {
 	 * @see CacheConstants#PROP_DYNAMIC_PARAMETERS_FILE_PATH
 	 * 
 	 */
-	String option_cacheDynamicParametersPath = "cacheDynamicParametersPath";
+	public static final String option_cacheDynamicParametersPath = "cacheDynamicParametersPath";
 
 }

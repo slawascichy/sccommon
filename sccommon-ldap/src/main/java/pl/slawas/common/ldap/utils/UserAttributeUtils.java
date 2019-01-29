@@ -22,8 +22,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
@@ -55,6 +56,9 @@ import pl.slawas.twl4j.Logger;
  */
 public class UserAttributeUtils {
 
+	private UserAttributeUtils() {
+	}
+
 	/**
 	 * Parsowanie zapisanych w konfiguracji mapowania wartości do postaci tablicy.
 	 * 
@@ -65,8 +69,8 @@ public class UserAttributeUtils {
 	 *            używana w LDAP, a druga to wartość przechowywana w TW.
 	 * @return mapa par wartości LDAP -> TW
 	 */
-	public static Hashtable<String, String> valueMapParser(String valueMap) {
-		Hashtable<String, String> result = new Hashtable<String, String>();
+	public static Map<String, String> valueMapParser(String valueMap) {
+		Map<String, String> result = new HashMap<>();
 		String[] valuesPairs = valueMap.split("\\" + ProviderOptions.ATTRIBUTE_VALUE_PAIR_MAP_SEPARATOR);
 		for (String valuesPair : valuesPairs) {
 			String[] values = valuesPair.split("\\" + ProviderOptions.ATTRIBUTE_VALUE_MAP_SEPARATOR);
@@ -89,8 +93,8 @@ public class UserAttributeUtils {
 	 * @return zmieniona do nazwy używanej w indeksie metadanych.
 	 */
 	public static String transform2ColumnName(String attrName) {
-		String columnName = attrName.toLowerCase();
-		return columnName;
+
+		return attrName.toLowerCase();
 	}
 
 	/**
@@ -134,7 +138,7 @@ public class UserAttributeUtils {
 	public static List<IUserAttribute> createAtributeList(final ProviderOptions lo, final Logger log,
 			final String[] additionalAttrs, LdapResult result, ILdapEntry single, Set<String> attrSet) {
 		// user attributes
-		List<IUserAttribute> attributes = new ArrayList<IUserAttribute>();
+		List<IUserAttribute> attributes = new ArrayList<>();
 		// other attributes
 		UserAttributeList attrList = lo.getExtendedAttributies();
 		if (attrList != null && !attrList.isEmpty()) {

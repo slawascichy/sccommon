@@ -29,9 +29,6 @@ import java.sql.Types;
  */
 public interface ILdapAttribute extends Serializable {
 
-	/** Domyślna nazwa atrybutu reprezentującego adres e-mail */
-	String DEFAULT_EMAIL_ATTR_NAME = "mail";
-
 	/**
 	 * @return nazwa atrybutu.
 	 */
@@ -67,14 +64,12 @@ public interface ILdapAttribute extends Serializable {
 	int getType();
 
 	/**
-	 * Ustawianie "identyfikatora" typu, jakim jest reprezentowana wartość
-	 * atrybutu
+	 * Ustawianie "identyfikatora" typu, jakim jest reprezentowana wartość atrybutu
 	 * 
 	 * @param type
-	 *            "identyfikator" typu, jakim jest reprezentowana wartość
-	 *            atrybutu. Słownikiem typów jest {@link Types} np.
-	 *            {@link Types#OTHER}, {@link Types#ARRAY},
-	 *            {@link Types#INTEGER} itp.
+	 *            "identyfikator" typu, jakim jest reprezentowana wartość atrybutu.
+	 *            Słownikiem typów jest {@link Types} np. {@link Types#OTHER},
+	 *            {@link Types#ARRAY}, {@link Types#INTEGER} itp.
 	 */
 	void setType(int type);
 

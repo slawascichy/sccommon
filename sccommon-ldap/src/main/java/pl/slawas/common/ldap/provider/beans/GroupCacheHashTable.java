@@ -85,8 +85,9 @@ public class GroupCacheHashTable<G extends ILdapUserGroup> extends Hashtable<Str
 	 */
 	@Override
 	public synchronized void putAll(Map<? extends String, ? extends G> map) {
-		for (String key : map.keySet()) {
-			G value = map.get(key);
+		for (Map.Entry<? extends String, ? extends G> entry : map.entrySet()) {
+			String key = entry.getKey();
+			G value = entry.getValue();
 			this.put(key, value);
 		}
 	}

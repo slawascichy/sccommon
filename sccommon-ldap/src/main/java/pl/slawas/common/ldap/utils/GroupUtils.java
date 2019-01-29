@@ -12,6 +12,9 @@ import org.apache.commons.lang.StringUtils;
  */
 public class GroupUtils {
 
+	private GroupUtils() {
+	}
+
 	private static final String OU = "OU=";
 
 	/**

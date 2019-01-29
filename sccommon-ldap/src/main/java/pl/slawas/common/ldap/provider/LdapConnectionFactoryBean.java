@@ -25,9 +25,8 @@ import org.apache.commons.lang.StringUtils;
 import pl.slawas.common.ldap.api.ILdapConnectionFactory;
 import pl.slawas.common.ldap.api.ILdapContextFactory;
 import pl.slawas.common.ldap.api.ILdapUserGroup;
+import pl.slawas.common.ldap.api.LockSerializableObject;
 import pl.slawas.common.ldap.dao.LdapAOHelper;
-import pl.slawas.common.ldap.dao.LdapUserAO;
-import pl.slawas.common.ldap.dao.LdapUserGroupAO;
 import pl.slawas.helpers.Strings;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
@@ -53,7 +52,7 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 		}
 	}
 
-	final private static Logger log = LoggerFactory.getLogger(LdapConnectionFactoryBean.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(LdapConnectionFactoryBean.class.getName());
 
 	/** obiekt połączenia (kontekstu) LDAP */
 	private transient ILdapContextFactory ldapContextFactory = null;
@@ -76,7 +75,7 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 	private final ProviderOptions ldapOptions;
 
 	/** obiekt pozwalający na ustawienie blokady podczas inicjalizacji kontekstu */
-	private Object initLock = new Object();
+	private Serializable initLock = new LockSerializableObject();
 
 	private final Class<?> parentClazz;
 
@@ -105,9 +104,10 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 		try {
 			this.ldapContextFactory = new LdapContextFactoryBean(this.ldapOptions, this.organizationalUnitName,
 					isGroupContext);
-			log.debug("Utworzylem kontekst (polaczenie) dla {}", LdapAOHelper.getContextName(organizationalUnitName));
+			logger.debug("Utworzylem kontekst (polaczenie) dla {}",
+					LdapAOHelper.getContextName(organizationalUnitName));
 		} catch (Exception e) {
-			throw new RuntimeException("Blad inicjalizacji kontekstu LDAP'a", e);
+			throw new IllegalArgumentException("Blad inicjalizacji kontekstu LDAP'a", e);
 		}
 		this.isNotInicjalized = false;
 	}
@@ -147,7 +147,7 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 					this.ldapContextFactory.close();
 				} catch (Exception ignore) {
 					// ignore
-					log.warn("Blad zamkniecia kontekstu LDAP'a mozna zignorowac...", ignore);
+					logger.warn("Blad zamkniecia kontekstu LDAP'a mozna zignorowac...", ignore);
 				}
 			}
 			this.ldapContextFactory = null;
@@ -180,7 +180,7 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 		if (args != null) {
 			int i = 0;
 			for (String arg : args) {
-				log.debug("local Filter arg{}: {}", new Object[] { i, arg });
+				logger.debug("local Filter arg{}: {}", new Object[] { i, arg });
 				localFilter = Strings.replaceAll(localFilter, "{" + i++ + "}", arg);
 			}
 		}
@@ -198,10 +198,10 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 	 */
 	public static String readValue(LdapResult result, String attrName) {
 		if (result.get(attrName) != null) {
-			log.trace("readValue: {}={}", new Object[] { attrName, result.get(attrName).get(0).getValue() });
+			logger.trace("readValue: {}={}", new Object[] { attrName, result.get(attrName).get(0).getValue() });
 			return (String) result.get(attrName).get(0).getValue();
 		}
-		log.trace("readValue: {}={}", new Object[] { attrName, result.get(attrName) });
+		logger.trace("readValue: {}={}", new Object[] { attrName, result.get(attrName) });
 		return null;
 
 	}
@@ -232,10 +232,10 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 	}
 
 	/**
-	 * @return the {@link #log}
+	 * @return the {@link #logger}
 	 */
 	public static Logger getLog() {
-		return log;
+		return logger;
 	}
 
 	/**
@@ -250,34 +250,6 @@ public class LdapConnectionFactoryBean implements Serializable, ILdapConnectionF
 	 */
 	public ProviderOptions getLdapOptions() {
 		return ldapOptions;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.scbpm.lib.ldap.dao._LdapAOFactory#getGroupLao()
-	 */
-	@Deprecated
-	public LdapUserGroupAO getGroupLao() {
-		if (isNotInicjalized) {
-			init();
-		}
-		// return new LdapUserGroupAO(this.ldapContextFactory);
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.scbpm.lib.ldap.dao._LdapAOFactory#getUserLao()
-	 */
-	@Deprecated
-	public LdapUserAO getUserLao() {
-		if (isNotInicjalized) {
-			init();
-		}
-		// return new LdapUserAO(this.ldapContextFactory, getGroupLao());
-		return null;
 	}
 
 }

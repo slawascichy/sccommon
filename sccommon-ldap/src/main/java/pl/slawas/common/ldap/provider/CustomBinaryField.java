@@ -2,6 +2,7 @@ package pl.slawas.common.ldap.provider;
 
 import org.apache.commons.lang.StringUtils;
 
+import pl.slawas.common.ldap.api.Constants;
 import pl.slawas.common.ldap.api.ICustomBinaryField;
 
 /**
@@ -26,7 +27,8 @@ import pl.slawas.common.ldap.api.ICustomBinaryField;
  * attributes are considered to have non-string syntax:</dt>
  * </dl>
  * 
- * <table summary="attributes with non-string syntax" border="1" cellpadding="3" width="70%">
+ * <table summary="attributes with non-string syntax" border="1" cellpadding="3"
+ * width="70%">
  * <tbody>
  * <tr>
  * <th>Attribute ID</th>
@@ -136,8 +138,8 @@ import pl.slawas.common.ldap.api.ICustomBinaryField;
  * </dd>
  * </dl>
  * informs the provider to return values of the <tt>mpegVideo</tt> and
- * <tt>myspecialkey</tt> attributes as <tt>byte[]</tt>. <a name="connect"
- * id="connect"></a></dd>
+ * <tt>myspecialkey</tt> attributes as <tt>byte[]</tt>.
+ * <a name="connect" id="connect"></a></dd>
  * </dl>
  * </dd>
  * 
@@ -147,16 +149,16 @@ import pl.slawas.common.ldap.api.ICustomBinaryField;
  */
 public enum CustomBinaryField implements ICustomBinaryField {
 
-	objectGUID(16), objectSid(UNSPECIFIED_LENGTH);
+	objectGUID(16), objectSid(Constants.UNSPECIFIED_LENGTH);
 
-	public final static String CUSTOM_BINARY_FIELDS;
+	public static final String CUSTOM_BINARY_FIELDS;
 
 	static {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int i = 0;
 		for (CustomBinaryField bfName : CustomBinaryField.values()) {
 			if (i != 0) {
-				sb.append(SPACE_SEPARATOR);
+				sb.append(Constants.SPACE_SEPARATOR);
 			}
 			sb.append(bfName.name());
 			i++;
@@ -184,9 +186,8 @@ public enum CustomBinaryField implements ICustomBinaryField {
 	 */
 	public String value2String(byte[] binaryObject) {
 		if (binaryObject == null
-				|| (this.lenght != UNSPECIFIED_LENGTH && binaryObject.length != this.lenght)) {
-			throw new IllegalArgumentException(this.name()
-					+ ": Nieprawidłowa wartość pola binarnego.");
+				|| (this.lenght != Constants.UNSPECIFIED_LENGTH && binaryObject.length != this.lenght)) {
+			throw new IllegalArgumentException(this.name() + ": Nieprawidłowa wartość pola binarnego.");
 		}
 		StringBuilder displayStr = new StringBuilder();
 		switch (this) {
@@ -195,16 +196,16 @@ public enum CustomBinaryField implements ICustomBinaryField {
 			displayStr.append(prefixZeros((int) binaryObject[2] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[1] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[0] & 0xFF));
-			displayStr.append(VALUE_SEPARATOR);
+			displayStr.append(Constants.VALUE_SEPARATOR);
 			displayStr.append(prefixZeros((int) binaryObject[5] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[4] & 0xFF));
-			displayStr.append(VALUE_SEPARATOR);
+			displayStr.append(Constants.VALUE_SEPARATOR);
 			displayStr.append(prefixZeros((int) binaryObject[7] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[6] & 0xFF));
-			displayStr.append(VALUE_SEPARATOR);
+			displayStr.append(Constants.VALUE_SEPARATOR);
 			displayStr.append(prefixZeros((int) binaryObject[8] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[9] & 0xFF));
-			displayStr.append(VALUE_SEPARATOR);
+			displayStr.append(Constants.VALUE_SEPARATOR);
 			displayStr.append(prefixZeros((int) binaryObject[10] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[11] & 0xFF));
 			displayStr.append(prefixZeros((int) binaryObject[12] & 0xFF));
@@ -215,10 +216,10 @@ public enum CustomBinaryField implements ICustomBinaryField {
 		case objectSid:
 			displayStr.append("S-");
 			/*
-			 * bytes[0] : in the array is the version (must be 1 but might
-			 * change in the future)
+			 * bytes[0] : in the array is the version (must be 1 but might change in the
+			 * future)
 			 */
-			displayStr.append(binaryObject[0]).append(VALUE_SEPARATOR);
+			displayStr.append(binaryObject[0]).append(Constants.VALUE_SEPARATOR);
 
 			/* bytes[2..7] : the Authority */
 			StringBuilder tmpBuff = new StringBuilder();
@@ -232,20 +233,16 @@ public enum CustomBinaryField implements ICustomBinaryField {
 			int count = binaryObject[1];
 
 			/*
-			 * bytes[8..end] : the sub authorities (these are Integers - notice
-			 * the endian)
+			 * bytes[8..end] : the sub authorities (these are Integers - notice the endian)
 			 */
 			for (int i = 0; i < count; i++) {
 				int currSubAuthOffset = i * 4;
 				tmpBuff.setLength(0);
-				tmpBuff.append(String.format("%02X%02X%02X%02X",
-						(binaryObject[11 + currSubAuthOffset] & 0xFF),
-						(binaryObject[10 + currSubAuthOffset] & 0xFF),
-						(binaryObject[9 + currSubAuthOffset] & 0xFF),
+				tmpBuff.append(String.format("%02X%02X%02X%02X", (binaryObject[11 + currSubAuthOffset] & 0xFF),
+						(binaryObject[10 + currSubAuthOffset] & 0xFF), (binaryObject[9 + currSubAuthOffset] & 0xFF),
 						(binaryObject[8 + currSubAuthOffset] & 0xFF)));
 
-				displayStr.append(VALUE_SEPARATOR).append(
-						Long.parseLong(tmpBuff.toString(), 16));
+				displayStr.append(Constants.VALUE_SEPARATOR).append(Long.parseLong(tmpBuff.toString(), 16));
 			}
 			break;
 		default:
@@ -270,9 +267,9 @@ public enum CustomBinaryField implements ICustomBinaryField {
 	}
 
 	/**
-	 * Weryfikacja czy atrybut LDAP jest dodatkowym polem binarnym np.
-	 * objectGUID. Taki atrybut podlega dodatkowej obróbce podczas
-	 * przekształcania do postaci String'a.
+	 * Weryfikacja czy atrybut LDAP jest dodatkowym polem binarnym np. objectGUID.
+	 * Taki atrybut podlega dodatkowej obróbce podczas przekształcania do postaci
+	 * String'a.
 	 * 
 	 * 
 	 * @param ldapAttrName

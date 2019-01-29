@@ -112,7 +112,7 @@ public abstract class LdapAOSupport<T extends ILdapEntry> {
 		delete(getFactory(), entryDN);
 	}
 
-	abstract public List<T> loadByFilter(String searchFilter) throws NamingException;
+	public abstract List<T> loadByFilter(String searchFilter) throws NamingException;
 
 	public List<T> loadByWildcard(String wildcardCredentials) throws NamingException {
 		String searchFilter = getFactory().getLdapOptions().getBaseFilter(new String[] { wildcardCredentials });
@@ -120,16 +120,16 @@ public abstract class LdapAOSupport<T extends ILdapEntry> {
 
 	}
 
-	abstract protected Map<String, T> prepareAllAsMap(String searchFilter, Map<String, T> target,
+	protected abstract Map<String, T> prepareAllAsMap(String searchFilter, Map<String, T> target,
 			boolean checkOldElement) throws NamingException;
 
 	public Map<String, T> loadByWildcardAsMap(String wildcardCredentials) throws NamingException {
-		Map<String, T> map = new HashMap<String, T>();
+		Map<String, T> map = new HashMap<>();
 		String searchFilter = getFactory().getLdapOptions().getBaseFilter(new String[] { wildcardCredentials });
 		getLog().debug("--> loadByWildcardAsMap: Sarch Filter: {}", searchFilter);
 		return prepareAllAsMap(searchFilter, map, false);
 	}
 
-	abstract protected String getEntryNameAttribute();
+	protected abstract String getEntryNameAttribute();
 
 }

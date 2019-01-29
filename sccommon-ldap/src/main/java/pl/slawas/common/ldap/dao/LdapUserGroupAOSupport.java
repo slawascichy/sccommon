@@ -13,7 +13,6 @@ import javax.naming.NamingException;
 import org.apache.commons.lang.StringUtils;
 
 import pl.slawas.common.ldap.api.Constants;
-import pl.slawas.common.ldap.api.ILdapAttribute;
 import pl.slawas.common.ldap.api.ILdapConnectionFactory;
 import pl.slawas.common.ldap.api.ILdapContextFactory;
 import pl.slawas.common.ldap.api.ILdapUserGroup;
@@ -41,7 +40,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 
 	private static final long serialVersionUID = 715770566979293240L;
 
-	private static final Logger log = LoggerFactory.getLogger(LdapUserGroupAOSupport.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(LdapUserGroupAOSupport.class.getName());
 
 	private final transient ILdapConnectionFactory factory;
 
@@ -96,8 +95,8 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		lo = factory.getLdapOptions();
 
 		// get list of groups attributes
-		Set<String> vAttr = new HashSet<String>();
-		vAttr.add(ILdapAttribute.DEFAULT_EMAIL_ATTR_NAME);
+		Set<String> vAttr = new HashSet<>();
+		vAttr.add(Constants.DEFAULT_EMAIL_ATTR_NAME);
 		vAttr.add(lo.getGroupNameAttribute());
 		vAttr.add(lo.getGroupDisplayNameAttribute());
 		vAttr.add(lo.getGroupMemberAttribute());
@@ -112,28 +111,42 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		// copy the list into final array of attributes
 		int attrSize = vAttr.size() + (additionalAttrs != null ? additionalAttrs.length : 0);
 		attrs = new String[attrSize];
-		attrSet = new HashSet<String>(attrSize);
+		attrSet = new HashSet<>(attrSize);
 		/*
 		 * wpierw przepisuję podstawowe informacje o atrybutach wynikające z
 		 * konfiguracji
 		 */
 		Iterator<String> it = vAttr.iterator();
 		int i = 0;
+		StringBuilder traceOut = new StringBuilder();
+		if (logger.isTraceEnabled()) {
+			traceOut.append("\n---------- base attributes: ----------");
+		}
 		while (it.hasNext()) {
 			attrs[i] = it.next();
 			attrSet.add(attrs[i]);
-			log.trace("Atrybut {}: {}", new Object[] { i, attrs[i] });
+			if (logger.isTraceEnabled()) {
+				traceOut.append("\n\t").append(i).append(": ").append(attrs[i]);
+			}
 			i++;
 		}
 		/* teraz dopiszę dodatkowe */
 		this.additionalAttrs = additionalAttrs;
 		if (additionalAttrs != null && additionalAttrs.length != 0) {
+			if (logger.isTraceEnabled()) {
+				traceOut.append("\n---------- additional attributes: ----------");
+			}
 			for (String addAttr : additionalAttrs) {
 				attrs[i] = addAttr;
 				attrSet.add(attrs[i]);
-				log.trace("Atrybut dodatkowy {}: {}", new Object[] { i, attrs[i] });
+				if (logger.isTraceEnabled()) {
+					traceOut.append("\n\t").append(i).append(": ").append(attrs[i]);
+				}
 				i++;
 			}
+		}
+		if (logger.isTraceEnabled()) {
+			logger.trace("LdapUserGroupAOSupport: {}", traceOut.toString());
 		}
 	}
 
@@ -161,15 +174,15 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		if (StringUtils.isNotBlank(description) && !Constants.NULL_STRING.equals(description)) {
 			single.setDescription(description);
 		}
-		String email = LdapAOHelper.readValue(result, ILdapAttribute.DEFAULT_EMAIL_ATTR_NAME);
+		String email = LdapAOHelper.readValue(result, Constants.DEFAULT_EMAIL_ATTR_NAME);
 		if (StringUtils.isNotBlank(email) && !Constants.NULL_STRING.equals(email)) {
 			single.setEmail(email);
 		}
 
 		/* ustawiamy dodatkowe atrybuty grupy */
 		if (this.additionalAttrs != null && this.additionalAttrs.length != 0) {
-			List<IUserAttribute> attributes = UserAttributeUtils.createAtributeList(this.lo, log, this.additionalAttrs,
-					result, single, this.attrSet);
+			List<IUserAttribute> attributes = UserAttributeUtils.createAtributeList(this.lo, logger,
+					this.additionalAttrs, result, single, this.attrSet);
 			single.setAttributes(attributes);
 		}
 
@@ -187,7 +200,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 				throw new NamingException("Can't follow referal for authentication: " + name);
 			}
 		}
-		log.trace("groupDN={}", groupDN);
+		logger.trace("groupDN={}", groupDN);
 		single.setDn(groupDN);
 		single.setStructureUnit(lo.checkStructureUnit(single.getDn()));
 
@@ -196,7 +209,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		String mainMemberOf = null;
 		if (memberOfListResult != null) {
 			/** Jest jakiś wynik dla atrybutu 'memberOf' - start */
-			Set<String> otherMembersOf = new HashSet<String>();
+			Set<String> otherMembersOf = new HashSet<>();
 
 			if (lo.getGroup2GroupTokenAttributeIsDN()) {
 				/** powiązania pomiędzy grupami są zdefiniowane jako DN - start */
@@ -220,7 +233,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 				 * rodziców.
 				 */
 				otherMembersOf.remove(mainMemberOf);
-			} else if (log.isWarnEnabled()) {
+			} else if (logger.isWarnEnabled()) {
 				StringBuilder sb = new StringBuilder();
 				if (!otherMembersOf.isEmpty()) {
 					int i = 0;
@@ -233,7 +246,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 					}
 				}
 				String extMsg = sb.toString();
-				log.warn("Nie udało się ustalić rodzica głównego dla grupy {}{}", new Object[] { single.getName(),
+				logger.warn("Nie udało się ustalić rodzica głównego dla grupy {}{}", new Object[] { single.getName(),
 						(StringUtils.isNotBlank(extMsg) ? " pośród znanych rodziców: " + extMsg : StringUtils.EMPTY) });
 			}
 			single.setMainMemberOf(mainMemberOf);
@@ -241,7 +254,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 			/** Jest jakiś wynik dla atrybutu 'memberOf' - koniec */
 		}
 
-		Set<String> members = new HashSet<String>();
+		Set<String> members = new HashSet<>();
 		List<LdapValue> membersListResult = result.get(lo.getGroupMemberAttribute());
 
 		for (LdapValue memberResult : membersListResult) {
@@ -277,7 +290,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		 */
 		String mainMemberOf = null;
 		if (memberOfListResult.size() > 1) {
-			log.warn(
+			logger.warn(
 					"Może być problem, gdy grupa {} jest członkiem wielu grup. Aby rozwiązać ten problem bierzemy pierwszą z brzegu aby ustawić mainMemberOf.",
 					single.getName());
 		}
@@ -287,7 +300,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 			if (!Constants.NULL_STRING.equalsIgnoreCase(currMember) && StringUtils.isNotBlank(currMember)) {
 				otherMembersOf.add(currMember);
 				if (ii == 0) {
-					log.trace("Mam kandydata na rodzica głównego! group currMember = {}", currMember);
+					logger.trace("Mam kandydata na rodzica głównego! group currMember = {}", currMember);
 					mainMemberOf = currMember;
 				}
 				ii++;
@@ -318,7 +331,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 			for (LdapValue memberResult : memberOfListResult) {
 				/** pętla po rodzicach - start */
 				String currMemberOfDN = (String) memberResult.getValue();
-				log.trace("group currMemberOfDN = {}", currMemberOfDN);
+				logger.trace("group currMemberOfDN = {}", currMemberOfDN);
 				String[] currMemberOfDNElements = currMemberOfDN.split("\\,");
 				if (currMemberOfDNElements.length > 1) {
 					/** właściwa długość obu DN - start */
@@ -350,12 +363,15 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 						for (int ii = 0; ii < singleDNElements.length - 1; ii++) {
 							isInSubTree = singleDNElements[singleDNElements.length - 1 - ii]
 									.equalsIgnoreCase(currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii]);
-							log.trace("check[{}] isMainMemberOfInSubTree = {} ('{}'=='{}'",
-									new Object[] { ii, isInSubTree, singleDNElements[singleDNElements.length - 1 - ii],
-											currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii] });
+							if (logger.isTraceEnabled()) {
+								logger.trace("check[{}] isMainMemberOfInSubTree = {} ('{}'=='{}'",
+										new Object[] { ii, isInSubTree,
+												singleDNElements[singleDNElements.length - 1 - ii],
+												currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii] });
+							}
 						}
-						if (log.isWarnEnabled() && isInSubTree) {
-							log.warn(
+						if (logger.isWarnEnabled() && isInSubTree) {
+							logger.warn(
 									"Grupa nadrzędna, rodzic, jest zdefiniowany w poddrzewie grupy {} (DN grupy: {}, DN rodzica: {}). "
 											+ "Sugeruje to nieprawidłową organizację danych w repozytorium LDAP.",
 									new Object[] { single.getName(), single.getDn(), currMemberOfDN });
@@ -379,23 +395,28 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 						for (int ii = 0; ii < currMemberOfDNElements.length - 1; ii++) {
 							isInSameTree = singleDNElements[singleDNElements.length - 1 - ii]
 									.equalsIgnoreCase(currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii]);
-							log.trace("check[{}] isMainMemberOf = {} ('{}'=='{}'",
-									new Object[] { ii, isInSameTree, singleDNElements[singleDNElements.length - 1 - ii],
-											currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii] });
+							if (logger.isTraceEnabled()) {
+								logger.trace("check[{}] isMainMemberOf = {} ('{}'=='{}'",
+										new Object[] { ii, isInSameTree,
+												singleDNElements[singleDNElements.length - 1 - ii],
+												currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii] });
+							}
 							depth++;
 						}
-						if (isInSameTree) {
-							if (weight < depth) {
-								weight = depth;
-								mainMemberOf = currMemberOfDN;
-								log.debug("Znalazłem kandydata na rodzica głównego! group mainMemberOf = {}; waga = {}",
+						if (isInSameTree && weight < depth) {
+							weight = depth;
+							mainMemberOf = currMemberOfDN;
+							if (logger.isDebugEnabled()) {
+								logger.debug(
+										"Znalazłem kandydata na rodzica głównego! group mainMemberOf = {}; waga = {}",
 										new Object[] { currMemberOfDN, weight });
 							}
+
 						}
 					}
 					/** właściwa długość obu DN - koniec */
 				} else {
-					log.warn("Niewłaściwa długość DN rodzica {}. "
+					logger.warn("Niewłaściwa długość DN rodzica {}. "
 							+ "Sugeruje to nieprawidłową organizację danych w repozytorium LDAP lub złą konfigurację mechanizmu synchronizacji danych.",
 							new Object[] { currMemberOfDN });
 				}
@@ -403,7 +424,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 			}
 			/** właściwa DN grupy - koniec */
 		} else {
-			log.warn("Niewłaściwa długość DN grupy {} (DN = {}). "
+			logger.warn("Niewłaściwa długość DN grupy {} (DN = {}). "
 					+ "Sugeruje to nieprawidłową organizację danych w repozytorium LDAP lub złą konfigurację mechanizmu synchronizacji danych.",
 					new Object[] { single.getName(), single.getDn() });
 		}
@@ -416,7 +437,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 	public G load(Object id) throws NamingException {
 
 		String searchFilter = "(" + lo.getRoleAttributeID() + "=" + (String) id + ")";
-		log.debug("--> load: Sarch Filter: {}", searchFilter);
+		logger.debug("--> load: Sarch Filter: {}", searchFilter);
 		LdapResult result = getFactory().uniqueEntrySearch(attrs, searchFilter);
 		if (result != null) {
 			return transform2UserGroup(result);
@@ -425,12 +446,12 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 	}
 
 	public G loadBySearchFilter(String searchFilter) throws NamingException {
-		log.debug("--> loadBySearchFilter: Sarch Filter: {}", searchFilter);
+		logger.debug("--> loadBySearchFilter: Sarch Filter: {}", searchFilter);
 		LdapResult result = getFactory().uniqueEntrySearch(attrs, searchFilter);
 		if (result != null) {
 			G user = transform2UserGroup(result);
-			if (user != null && log.isDebugEnabled()) {
-				log.debug("Pobralem z LDAP: {}", user.toString());
+			if (user != null && logger.isDebugEnabled()) {
+				logger.debug("Pobralem z LDAP: {}", user.toString());
 			}
 			return user;
 		}
@@ -439,13 +460,13 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 
 	public List<G> loadAll() throws NamingException {
 		String searchFilter = lo.getGroupsFilter();
-		log.debug("--> loadAll: Sarch Filter: {}", searchFilter);
+		logger.debug("--> loadAll: Sarch Filter: {}", searchFilter);
 		return loadByFilter(searchFilter);
 	}
 
 	public G loadPrimaryUserGroup(String[] userArgs) throws NamingException {
 		String searchFilter = lo.getUserPrimaryGroupFilter(userArgs);
-		log.debug("--> loadPrimaryUserGroup: Sarch Filter: {}", searchFilter);
+		logger.debug("--> loadPrimaryUserGroup: Sarch Filter: {}", searchFilter);
 		LdapResult result = getFactory().uniqueEntrySearch(attrs, searchFilter);
 		if (result != null) {
 			return transform2UserGroup(result);
@@ -455,13 +476,13 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 
 	public List<G> loadUserGroups(String[] userArgs) throws NamingException {
 		String searchFilter = lo.getRoleFilter(userArgs);
-		log.debug("--> loadUserGroups: Sarch Filter: {}", searchFilter);
+		logger.debug("--> loadUserGroups: Sarch Filter: {}", searchFilter);
 		return loadByFilter(searchFilter);
 
 	}
 
 	public Map<String, G> loadAllAsMap() throws NamingException {
-		Map<String, G> map = new HashMap<String, G>();
+		Map<String, G> map = new HashMap<>();
 		return prepareAllAsMap(lo.getGroupsFilter(), map, false);
 	}
 
@@ -473,7 +494,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 	protected Map<String, G> prepareAllAsMap(String searchFilter, Map<String, G> target, boolean checkOldElement)
 			throws NamingException {
 
-		log.debug("--> prepareAllAsMap: Sarch Filter: {}", searchFilter);
+		logger.debug("--> prepareAllAsMap: Sarch Filter: {}", searchFilter);
 		List<LdapResult> resultsList = getFactory().manyEntrySearch(attrs, searchFilter);
 		if (!checkOldElement) {
 			for (LdapResult result : resultsList) {
@@ -590,8 +611,8 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 	/* Overridden (non-Javadoc) */
 	@Override
 	public List<G> loadByFilter(String searchFilter) throws NamingException {
-		List<G> list = new ArrayList<G>();
-		log.debug("loadByFilter -> Sarch Filter: {}", searchFilter);
+		List<G> list = new ArrayList<>();
+		logger.debug("loadByFilter -> Sarch Filter: {}", searchFilter);
 		List<LdapResult> resultsList = super.loadByFilter(getFactory(), attrs, searchFilter);
 		for (LdapResult result : resultsList) {
 			G group = transform2UserGroup(result);
@@ -603,11 +624,11 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 	}
 
 	/**
-	 * @return the {@link #log}
+	 * @return the {@link #logger}
 	 */
 	@Override
 	protected Logger getLog() {
-		return log;
+		return logger;
 	}
 
 }

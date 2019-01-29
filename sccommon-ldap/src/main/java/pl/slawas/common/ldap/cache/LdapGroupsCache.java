@@ -18,6 +18,7 @@ package pl.slawas.common.ldap.cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.naming.NamingException;
 
@@ -52,17 +53,17 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 	/**
 	 * Mapa grup z nazwą grupy jako kluczem.
 	 */
-	private final Map<String, GroupCacheHashTable<G>> groupsCacheByName = new HashMap<String, GroupCacheHashTable<G>>();
+	private final Map<String, GroupCacheHashTable<G>> groupsCacheByName = new HashMap<>();
 
 	/**
 	 * Mapa grup z DN'em jako kluczem.
 	 */
-	private final Map<String, GroupCacheHashTable<G>> groupsCacheByDN = new HashMap<String, GroupCacheHashTable<G>>();
+	private final Map<String, GroupCacheHashTable<G>> groupsCacheByDN = new HashMap<>();
 
 	/**
 	 * Ostatni czas synchronizacji listy z nazwą jednostki jako kluczem.
 	 */
-	private final Map<String, LastTimeGroupSynchronization> lastTimeGroupSynchronizationMap = new HashMap<String, LastTimeGroupSynchronization>();
+	private final Map<String, LastTimeGroupSynchronization> lastTimeGroupSynchronizationMap = new HashMap<>();
 
 	/**
 	 * Metoda czyszcząca wszystkie obiekty z pamięci podręcznych.
@@ -105,11 +106,11 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 		synchronized (groupsCacheByName) {
 			regionOfgroupsCacheByName = groupsCacheByName.get(organizationalUnitName.toUpperCase());
 			if (regionOfgroupsCacheByName == null) {
-				regionOfgroupsCacheByName = new GroupCacheHashTable<G>();
+				regionOfgroupsCacheByName = new GroupCacheHashTable<>();
 				groupsCacheByName.put(organizationalUnitName.toUpperCase(), regionOfgroupsCacheByName);
 			}
 		}
-		String lockaName = (getClass().getSimpleName() + ".putIntoCacheByName." + ldapUserGroup.getName().toUpperCase())
+		Object lockaName = (getClass().getSimpleName() + ".putIntoCacheByName." + ldapUserGroup.getName().toUpperCase())
 				.intern();
 		synchronized (lockaName) {
 			regionOfgroupsCacheByName.put(ldapUserGroup.getName(), ldapUserGroup);
@@ -146,11 +147,11 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 		synchronized (groupsCacheByDN) {
 			regionOfgroupsCacheByDN = groupsCacheByDN.get(organizationalUnitName.toUpperCase());
 			if (regionOfgroupsCacheByDN == null) {
-				regionOfgroupsCacheByDN = new GroupCacheHashTable<G>();
+				regionOfgroupsCacheByDN = new GroupCacheHashTable<>();
 				groupsCacheByDN.put(organizationalUnitName.toUpperCase(), regionOfgroupsCacheByDN);
 			}
 		}
-		String lockaName = (getClass().getSimpleName() + ".putIntoCacheByDN." + ldapUserGroup.getDn().toUpperCase())
+		Object lockaName = (getClass().getSimpleName() + ".putIntoCacheByDN." + ldapUserGroup.getDn().toUpperCase())
 				.intern();
 		synchronized (lockaName) {
 			regionOfgroupsCacheByDN.put(ldapUserGroup.getDn(), ldapUserGroup);
@@ -200,7 +201,7 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 
 			GroupCacheHashTable<G> oCacheByName = groupsCacheByName.get(organizationalUnitName);
 			if (oCacheByName == null) {
-				oCacheByName = new GroupCacheHashTable<G>();
+				oCacheByName = new GroupCacheHashTable<>();
 			}
 			if (oCacheByName.isEmpty() || rebuild) {
 				// przebudowuję obiekty pamięci podręcznej.
@@ -215,7 +216,7 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 				groupsCacheByName.put(organizationalUnitName, oCacheByName);
 
 				/* teraz z DN grupy jako klucz */
-				GroupCacheHashTable<G> oCacheByDN = new GroupCacheHashTable<G>();
+				GroupCacheHashTable<G> oCacheByDN = new GroupCacheHashTable<>();
 				for (G g : oCacheByName.values()) {
 					if (g.getDn() != null) {
 						oCacheByDN.put(g.getDn(), g);
@@ -226,17 +227,19 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 
 				if (logger.isTraceEnabled()) {
 					StringBuilder sb = new StringBuilder();
-					for (String key : oCacheByName.keySet()) {
+					for (Entry<String, G> entry : oCacheByName.entrySet()) {
+						String key = entry.getKey();
+						ILdapUserGroup value = entry.getValue();
 						sb.append("\n\tkey: ").append(key);
-						ILdapUserGroup value = oCacheByName.get(key);
 						sb.append("\nvalue: ").append(value.toString(true));
 					}
 					logger.trace("-->loadRegionUserGroupCacheList: created groupCacheByName for {} with {} entries: {}",
 							new Object[] { organizationalUnitName, oCacheByName.size(), sb.toString() });
 					sb = new StringBuilder();
-					for (String key : oCacheByDN.keySet()) {
+					for (Entry<String, G> entry : oCacheByDN.entrySet()) {
+						String key = entry.getKey();
+						ILdapUserGroup value = entry.getValue();
 						sb.append("\n\tkey: ").append(key);
-						ILdapUserGroup value = oCacheByDN.get(key);
 						sb.append("\nvalue: ").append(value.toString(true));
 					}
 					logger.trace("-->loadRegionUserGroupCacheList: created groupCacheByDN for {} with {} entries: {}",
@@ -262,11 +265,12 @@ public class LdapGroupsCache<G extends ILdapUserGroup> {
 	 *            czy mają być przebudowane lokalne tablice (pamięć podręczna)
 	 * @return mapa nazwa grupy - obiekt grupy
 	 */
+	@SuppressWarnings("deprecation")
 	public <L extends ILdapUser<G>> GroupCacheHashTable<G> loadUserGroupCacheList(
 			LdapObjectFactorySupport<L, G> objectFactory, ProviderOptions ldapOptions, boolean rebuild) {
 		String[] organizationalUnitArray = ldapOptions.getGroupsOrganizationalUnitNames();
 
-		GroupCacheHashTable<G> result = new GroupCacheHashTable<G>();
+		GroupCacheHashTable<G> result = new GroupCacheHashTable<>();
 
 		for (String organizationalUnit : organizationalUnitArray) {
 			/** modyfikacja/aktualizacja/pobieranie regionu groupsCacheByName */

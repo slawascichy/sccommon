@@ -51,15 +51,15 @@ public class LdapUserSupport<G extends ILdapUserGroup> extends LdapEntrySupport
 	private G primaryGroup;
 
 	/**
-	 * DN domyślnej grupy użytkownika. . Pole pomocnicze dla wyznaczenia
-	 * wartości pola {@link #primaryGroup}.
+	 * DN domyślnej grupy użytkownika. . Pole pomocnicze dla wyznaczenia wartości
+	 * pola {@link #primaryGroup}.
 	 */
 	private String primaryGroupDN;
 
 	/**
 	 * Lista grup, do których użytkownik jest bezpośrednio zapisany np. za
-	 * pośrednictwem atrybutu {@code member} albo {@code uniqueMember} w LDAP.
-	 * Lista zawiera również grupę domyślną reprezentowaną przez pole
+	 * pośrednictwem atrybutu {@code member} albo {@code uniqueMember} w LDAP. Lista
+	 * zawiera również grupę domyślną reprezentowaną przez pole
 	 * {@link #primaryGroup}.
 	 */
 	private List<G> baseGroups;
@@ -78,15 +78,15 @@ public class LdapUserSupport<G extends ILdapUserGroup> extends LdapEntrySupport
 	/**
 	 * Mapa zmienionych atrybutów. Zasady ustawiania:
 	 * <ul>
-	 * <li>dodawanie atrybutu: nowa wartość
-	 * {@link ILdapAttribute#setValue(Object)}, stara wartość ustawiona na
-	 * {@code null} za pomocą {@link ILdapAttribute#setOldValue(Object)}</li>
-	 * <li>zmiana atrybutu: nowa wartość {@link ILdapAttribute#setValue(Object)}
-	 * , stara wartość ustawiona za pomocą
+	 * <li>dodawanie atrybutu: nowa wartość {@link ILdapAttribute#setValue(Object)},
+	 * stara wartość ustawiona na {@code null} za pomocą
+	 * {@link ILdapAttribute#setOldValue(Object)}</li>
+	 * <li>zmiana atrybutu: nowa wartość {@link ILdapAttribute#setValue(Object)} ,
+	 * stara wartość ustawiona za pomocą
 	 * {@link ILdapAttribute#setOldValue(Object)}</li>
 	 * <li>usunięcie atrybutu: nowa wartość ustawiona na {@code null}
-	 * {@link ILdapAttribute#setValue(Object)} , stara wartość ustawiona za
-	 * pomocą {@link ILdapAttribute#setOldValue(Object)}</li>
+	 * {@link ILdapAttribute#setValue(Object)} , stara wartość ustawiona za pomocą
+	 * {@link ILdapAttribute#setOldValue(Object)}</li>
 	 * </ul>
 	 */
 	private Map<String, List<ILdapAttribute>> changesMap;
@@ -105,8 +105,8 @@ public class LdapUserSupport<G extends ILdapUserGroup> extends LdapEntrySupport
 		while (!(tmpClass.getGenericSuperclass() instanceof ParameterizedType)) {
 			tmpClass = tmpClass.getSuperclass();
 		}
-		this.persistentClass = (Class<G>) ((ParameterizedType) tmpClass
-				.getGenericSuperclass()).getActualTypeArguments()[0];
+		this.persistentClass = (Class<G>) ((ParameterizedType) tmpClass.getGenericSuperclass())
+				.getActualTypeArguments()[0];
 	}
 
 	/* Overridden (non-Javadoc) */
@@ -169,33 +169,23 @@ public class LdapUserSupport<G extends ILdapUserGroup> extends LdapEntrySupport
 	@Override
 	public String toString(boolean showLists) {
 		StringBuilder userDescription = new StringBuilder()
-				.append("\n  LdapUser:\n --------------------------------------")
-				.append("\n DN : ")
-				.append(this.getDn())
-				.append("\n Name : ")
-				.append(this.getName())
-				.append("\n Display Name : ")
-				.append(this.getDisplayName())
-				.append("\n E-mail : ")
-				.append(this.getEmail())
+				.append("\n  LdapUser:\n --------------------------------------").append("\n DN : ")
+				.append(this.getDn()).append("\n Name : ").append(this.getName()).append("\n Display Name : ")
+				.append(this.getDisplayName()).append("\n E-mail : ").append(this.getEmail())
 				.append("\n Primary Group : ")
-				.append((this.primaryGroup == null ? "unknown"
-						: this.primaryGroup.getName()));
+				.append((this.primaryGroup == null ? "unknown" : this.primaryGroup.getName()));
 		if (showLists) {
 			List<IUserAttribute> attributes = this.getAttributes();
 			if (attributes != null && !attributes.isEmpty()) {
 				userDescription.append("\n Attributes:");
 				for (IUserAttribute attr : attributes) {
-					userDescription.append("\n\t").append(attr.getName())
-							.append(" : ").append(attr.getValue());
+					userDescription.append("\n\t").append(attr.getName()).append(" : ").append(attr.getValue());
 				}
 			}
-			List<G> baseGroups = this.baseGroups;
 			if (baseGroups != null && !baseGroups.isEmpty()) {
 				userDescription.append("\n Base Groups:");
 				for (ILdapUserGroup attr : baseGroups) {
-					userDescription.append("\n\t").append(attr.getName())
-							.append(" (").append(attr.getDisplayName())
+					userDescription.append("\n\t").append(attr.getName()).append(" (").append(attr.getDisplayName())
 							.append(")");
 				}
 			}
@@ -252,15 +242,11 @@ public class LdapUserSupport<G extends ILdapUserGroup> extends LdapEntrySupport
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + Arrays.hashCode(avatar);
-		result = prime * result
-				+ ((avatarBase64 == null) ? 0 : avatarBase64.hashCode());
-		result = prime * result
-				+ ((baseGroups == null) ? 0 : baseGroups.hashCode());
+		result = prime * result + ((avatarBase64 == null) ? 0 : avatarBase64.hashCode());
+		result = prime * result + ((baseGroups == null) ? 0 : baseGroups.hashCode());
 		result = prime * result + ((locale == null) ? 0 : locale.hashCode());
-		result = prime * result
-				+ ((primaryGroup == null) ? 0 : primaryGroup.hashCode());
-		result = prime * result
-				+ ((primaryGroupDN == null) ? 0 : primaryGroupDN.hashCode());
+		result = prime * result + ((primaryGroup == null) ? 0 : primaryGroup.hashCode());
+		result = prime * result + ((primaryGroupDN == null) ? 0 : primaryGroupDN.hashCode());
 		return result;
 	}
 
@@ -281,33 +267,44 @@ public class LdapUserSupport<G extends ILdapUserGroup> extends LdapEntrySupport
 		if (!persistentClass.equals(other.persistentClass)) {
 			return false;
 		}
-		if (!Arrays.equals(avatar, other.avatar))
+		if (!Arrays.equals(avatar, other.avatar)) {
 			return false;
+		}
 		if (avatarBase64 == null) {
-			if (other.avatarBase64 != null)
+			if (other.avatarBase64 != null) {
 				return false;
-		} else if (!avatarBase64.equals(other.avatarBase64))
+			}
+		} else if (!avatarBase64.equals(other.avatarBase64)) {
 			return false;
+		}
 		if (baseGroups == null) {
-			if (other.baseGroups != null)
+			if (other.baseGroups != null) {
 				return false;
-		} else if (!baseGroups.equals(other.baseGroups))
+			}
+		} else if (!baseGroups.equals(other.baseGroups)) {
 			return false;
+		}
 		if (StringUtils.isBlank(locale)) {
-			if (StringUtils.isNotBlank(other.locale))
+			if (StringUtils.isNotBlank(other.locale)) {
 				return false;
-		} else if (!locale.equals(other.locale))
+			}
+		} else if (!locale.equals(other.locale)) {
 			return false;
+		}
 		if (primaryGroup == null) {
-			if (other.primaryGroup != null)
+			if (other.primaryGroup != null) {
 				return false;
-		} else if (!primaryGroup.equals(other.primaryGroup))
+			}
+		} else if (!primaryGroup.equals(other.primaryGroup)) {
 			return false;
+		}
 		if (StringUtils.isBlank(primaryGroupDN)) {
-			if (StringUtils.isNotBlank(other.primaryGroupDN))
+			if (StringUtils.isNotBlank(other.primaryGroupDN)) {
 				return false;
-		} else if (!primaryGroupDN.equals(other.primaryGroupDN))
+			}
+		} else if (!primaryGroupDN.equals(other.primaryGroupDN)) {
 			return false;
+		}
 		return true;
 	}
 

@@ -40,7 +40,7 @@ public class LdapAOHelper implements Serializable {
 
 	private static final long serialVersionUID = 6652495401454679123L;
 
-	final private static Logger log = LoggerFactory.getLogger(LdapAOHelper.class.getName());
+	private final  static Logger log = LoggerFactory.getLogger(LdapAOHelper.class.getName());
 
 	public static final String DEFAULT_LDAP_CONTEXT_NAME = "DEFAULT";
 

@@ -64,9 +64,9 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 	 * Nazwa grupy dla której podczas analizy kroków jest prezentowany szczegółowy
 	 * raport.
 	 * 
-	 * TODO Trzeb to przenieść do konfiguracji
+	 * TODO Trzeba to przenieść do konfiguracji
 	 */
-	private String DEBUG_FOR_GROUP = "DAAiWOGZW-Manager";
+	private static final String DEBUG_FOR_GROUP = "DAAiWOGZW-Manager";
 
 	private final Class<L> userClass;
 	private final Class<G> groupClass;
@@ -119,6 +119,7 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 	 * @param name
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public L findUserByName(ProviderOptions ldapOptions, String name) {
 		String organizationalUnitArray[] = ldapOptions.getUsersOrganizationalUnitNames();
 
@@ -131,14 +132,10 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 					return user;
 				}
 			} catch (NamingException e) {
-				logger.error(
-						"Błąd poszukiwania użtytkownika o nazwie " + name + " w jednostce " + organizationalUnitName,
-						e);
-				e.printStackTrace();
+				logger.error(String.format("Błąd poszukiwania użtytkownika o nazwie %s w jednostce %s", name,
+						organizationalUnitName), e);
 			} finally {
-				if (laoObject != null) {
-					laoObject.close();
-				}
+				laoObject.close();
 			}
 		}
 		return user;
@@ -153,10 +150,11 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 	 *            parametry konfiguracyjne
 	 * @return lista obiektów <b>PAMIĘTAJ! później je musisz pozamykać!!!</b>
 	 */
+	@SuppressWarnings("deprecation")
 	public List<ILdapUserGroupAO<G>> loadAllUserGroupAOs(ProviderOptions ldapOptions) {
 		String organizationalUnitArray[] = ldapOptions.getGroupsOrganizationalUnitNames();
 
-		List<ILdapUserGroupAO<G>> groupLdapAOs = new ArrayList<ILdapUserGroupAO<G>>();
+		List<ILdapUserGroupAO<G>> groupLdapAOs = new ArrayList<>();
 		for (int i = 0; i < organizationalUnitArray.length; i++) {
 			groupLdapAOs.add(getNewInstanceUserGroupAO(ldapOptions, organizationalUnitArray[i]));
 		}
@@ -282,8 +280,8 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 	 *            obiekt obecnej grupy
 	 * @return obiekt grupy nadrzędnej.
 	 */
-	public G loadMainMemberOf(ProviderOptions ldapOptions, String organizationalUnitName, ILdapUserGroup uGroup)
-			throws LdapObjectFactoryException {
+	@SuppressWarnings("deprecation")
+	public G loadMainMemberOf(ProviderOptions ldapOptions, String organizationalUnitName, ILdapUserGroup uGroup) {
 		G mainMemberOf = null;
 		/*
 		 * ustawienie powiązania 'wiele-do-wiele' pomiędzy grupami - start
@@ -353,9 +351,9 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 	 *            obiekt obecnej grupy
 	 * @return obiekt grupy nadrzędnej.
 	 */
-	public Set<G> loadOtherMembersOf(ProviderOptions ldapOptions, ILdapUserGroup uGroup)
-			throws LdapObjectFactoryException {
-		Set<G> membersOf = new HashSet<G>();
+	@SuppressWarnings("deprecation")
+	public Set<G> loadOtherMembersOf(ProviderOptions ldapOptions, ILdapUserGroup uGroup) {
+		Set<G> membersOf = new HashSet<>();
 		/*
 		 * ustawienie powiązania 'wiele-do-wiele' pomiędzy grupami - start
 		 */
@@ -365,7 +363,7 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 				/* Musimy poszukać grup nadrzędnych */
 				String[] organizationalUnitArray = ldapOptions.getGroupsOrganizationalUnitNames();
 				for (String gUnit : organizationalUnitArray) {
-					// FIXME czy na pewno muszę szukać we wszystkich OU? mam
+					// TODO czy na pewno muszę szukać we wszystkich OU? mam
 					// przecież DN'y na podstawie których mogę zidentyfikować
 					// odpowiednią jednostkę organizacyjną.
 					//
@@ -407,7 +405,7 @@ public abstract class LdapObjectFactorySupport<L extends ILdapUser<G>, G extends
 		return membersOf;
 	}
 
-	public String getRoleRecursion(ProviderOptions ldapOptions) throws LdapObjectFactoryException {
+	public String getRoleRecursion(ProviderOptions ldapOptions) {
 		if (!ProviderOptions.offLine && ldapOptions != null && ldapOptions.getRoleRecursion() != null) {
 			return ldapOptions.getRoleRecursion();
 		}

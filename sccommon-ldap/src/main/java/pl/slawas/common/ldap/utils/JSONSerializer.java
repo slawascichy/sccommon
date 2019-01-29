@@ -30,14 +30,12 @@ import pl.slawas.twl4j.LoggerFactory;
  */
 public class JSONSerializer {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(JSONSerializer.class);
+	private static final Logger log = LoggerFactory.getLogger(JSONSerializer.class);
 
 	private Writer writer;
 
 	/**
-	 * flaga informująca serializator czy wynik ma być formatowany (ładnie
-	 * wyglądać)
+	 * flaga informująca serializator czy wynik ma być formatowany (ładnie wyglądać)
 	 */
 	private boolean format = false;
 
@@ -69,22 +67,12 @@ public class JSONSerializer {
 		if (null == paramNumber)
 			return writeNull();
 
-		if (paramNumber instanceof Float) {
-			if (((Float) paramNumber).isNaN())
-				return writeNull();
-			if ((1.0F / -1.0F) == paramNumber.floatValue())
-				return writeNull();
-			if ((1.0F / 1.0F) == paramNumber.floatValue())
-				return writeNull();
+		if (paramNumber instanceof Float && ((Float) paramNumber).isNaN()) {
+			return writeNull();
 		}
 
-		if (paramNumber instanceof Double) {
-			if (((Double) paramNumber).isNaN())
-				return writeNull();
-			if ((-1.0D / 0.0D) == paramNumber.doubleValue())
-				return writeNull();
-			if ((1.0D / 0.0D) == paramNumber.doubleValue())
-				return writeNull();
+		if (paramNumber instanceof Double && ((Double) paramNumber).isNaN()) {
+			return writeNull();
 		}
 
 		writeRawString(paramNumber.toString());
@@ -102,16 +90,14 @@ public class JSONSerializer {
 	}
 
 	private String rightAlignedZero(String paramString, int paramInt) {
-		if (paramInt == paramString.length())
+		if (paramInt == paramString.length()) {
 			return paramString;
-
-		StringBuffer localStringBuffer = new StringBuffer(paramString);
-
-		while (localStringBuffer.length() < paramInt) {
-			localStringBuffer.insert(0, '0');
 		}
-
-		return localStringBuffer.toString();
+		StringBuilder localStringBuilder = new StringBuilder(paramString);
+		while (localStringBuilder.length() < paramInt) {
+			localStringBuilder.insert(0, '0');
+		}
+		return localStringBuilder.toString();
 	}
 
 	public JSONSerializer writeString(String paramString) throws IOException {
@@ -157,8 +143,7 @@ public class JSONSerializer {
 					this.writer.write(j);
 				} else {
 					this.writer.write("\\u");
-					this.writer.write(rightAlignedZero(Integer.toHexString(j),
-							4));
+					this.writer.write(rightAlignedZero(Integer.toHexString(j), 4));
 				}
 			}
 		}
@@ -216,57 +201,49 @@ public class JSONSerializer {
 				case INT:
 					objectArray = new Object[((int[]) paramObject).length];
 					for (int indx = 0; indx < ((int[]) paramObject).length; indx++) {
-						objectArray[indx] = Integer
-								.valueOf(((int[]) paramObject)[indx]);
+						objectArray[indx] = Integer.valueOf(((int[]) paramObject)[indx]);
 					}
 					break;
 				case BOOLEAN:
 					objectArray = new Object[((boolean[]) paramObject).length];
 					for (int indx = 0; indx < ((boolean[]) paramObject).length; indx++) {
-						objectArray[indx] = Boolean
-								.valueOf(((boolean[]) paramObject)[indx]);
+						objectArray[indx] = Boolean.valueOf(((boolean[]) paramObject)[indx]);
 					}
 					break;
 				case BYTE:
 					objectArray = new Object[((byte[]) paramObject).length];
 					for (int indx = 0; indx < ((byte[]) paramObject).length; indx++) {
-						objectArray[indx] = Integer
-								.valueOf(((byte[]) paramObject)[indx]);
+						objectArray[indx] = Integer.valueOf(((byte[]) paramObject)[indx]);
 					}
 					break;
 				case CHAR:
 					objectArray = new Object[((char[]) paramObject).length];
 					for (int indx = 0; indx < ((char[]) paramObject).length; indx++) {
-						objectArray[indx] = Integer
-								.valueOf(((char[]) paramObject)[indx]);
+						objectArray[indx] = Integer.valueOf(((char[]) paramObject)[indx]);
 					}
 					break;
 				case DOUBLE:
 					objectArray = new Object[((double[]) paramObject).length];
 					for (int indx = 0; indx < ((double[]) paramObject).length; indx++) {
-						objectArray[indx] = Double
-								.valueOf(((double[]) paramObject)[indx]);
+						objectArray[indx] = Double.valueOf(((double[]) paramObject)[indx]);
 					}
 					break;
 				case FLOAT:
 					objectArray = new Object[((float[]) paramObject).length];
 					for (int indx = 0; indx < ((float[]) paramObject).length; indx++) {
-						objectArray[indx] = Float
-								.valueOf(((float[]) paramObject)[indx]);
+						objectArray[indx] = Float.valueOf(((float[]) paramObject)[indx]);
 					}
 					break;
 				case LONG:
 					objectArray = new Object[((long[]) paramObject).length];
 					for (int indx = 0; indx < ((long[]) paramObject).length; indx++) {
-						objectArray[indx] = Long
-								.valueOf(((long[]) paramObject)[indx]);
+						objectArray[indx] = Long.valueOf(((long[]) paramObject)[indx]);
 					}
 					break;
 				case SHORT:
 					objectArray = new Object[((short[]) paramObject).length];
 					for (int indx = 0; indx < ((short[]) paramObject).length; indx++) {
-						objectArray[indx] = Integer
-								.valueOf(((short[]) paramObject)[indx]);
+						objectArray[indx] = Integer.valueOf(((short[]) paramObject)[indx]);
 					}
 					break;
 				default:
@@ -297,7 +274,7 @@ public class JSONSerializer {
 		final Class<?>[] methodParams = new Class<?>[0];
 
 		List<Field> fields = getAnnotatedFields(clazz);
-		if (fields != null && !fields.isEmpty()) {
+		if (!fields.isEmpty()) {
 			/* buduję JSON'a, bo mam z czego - start */
 			indentPush();
 			int i = 0;
@@ -310,23 +287,15 @@ public class JSONSerializer {
 				if (StringUtils.isBlank(propertyName)) {
 					propertyName = field.getName();
 				}
-				String methodName = "get"
-						+ field.getName().substring(0, 1).toUpperCase()
+				String methodName = "get" + field.getName().substring(0, 1).toUpperCase()
 						+ field.getName().substring(1);
 				Method method = null;
 				Object propertyValue = null;
 				try {
 					method = clazz.getMethod(methodName, methodParams);
-					propertyValue = method.invoke(singleObject, new Object[0]);
-				} catch (SecurityException e) {
-					throw new IOException(e);
-				} catch (NoSuchMethodException e) {
-					throw new IOException(e);
-				} catch (IllegalArgumentException e) {
-					throw new IOException(e);
-				} catch (IllegalAccessException e) {
-					throw new IOException(e);
-				} catch (InvocationTargetException e) {
+					propertyValue = method.invoke(singleObject);
+				} catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException
+						| InvocationTargetException e) {
 					throw new IOException(e);
 				}
 				newLine();
@@ -342,9 +311,7 @@ public class JSONSerializer {
 			indent();
 			/* buduję JSON'a, bo mam z czego - koniec */
 		} else if (log.isWarnEnabled()) {
-			log.warn(
-					"Obiekt klasy {} nie posiada pól oznaczonych annotacją JSONProperty.",
-					new Object[] { clazz });
+			log.warn("Obiekt klasy {} nie posiada pól oznaczonych annotacją JSONProperty.", new Object[] { clazz });
 		}
 		writeRawString("}");
 
@@ -426,8 +393,8 @@ public class JSONSerializer {
 	}
 
 	/**
-	 * Serializacja set'a obiektów - prosta sprawa: set zamieniany jest do
-	 * macierzy obiektów i wywoływana jest metoda {@link #writeArray(Object[])}.
+	 * Serializacja set'a obiektów - prosta sprawa: set zamieniany jest do macierzy
+	 * obiektów i wywoływana jest metoda {@link #writeArray(Object[])}.
 	 * 
 	 * @param objectSet
 	 * @return
@@ -492,23 +459,23 @@ public class JSONSerializer {
 	}
 
 	public void indent() throws IOException {
-		// FIXME - metoda do implementacji
+		// TODO - metoda do implementacji
 	}
 
 	public void indentPush() {
-		// FIXME - metoda do implementacji
+		// TODO - metoda do implementacji
 	}
 
 	public void indentPop() {
-		// FIXME - metoda do implementacji
+		// TODO - metoda do implementacji
 	}
 
-	private static final Map<Class<?>, List<Field>> classFields = new HashMap<Class<?>, List<Field>>();
+	private static final Map<Class<?>, List<Field>> classFields = new HashMap<>();
 
 	/**
 	 * Metoda wyciągająca pola danego obiektu z adnotacją {@link JSONProperty}.
-	 * Implementacja zawiera możliwość sięgnięcia do pól "superklasy", ale tylko
-	 * i wyłącznie do "superklasy", która jest bezpośrednio związana z badanym
+	 * Implementacja zawiera możliwość sięgnięcia do pól "superklasy", ale tylko i
+	 * wyłącznie do "superklasy", która jest bezpośrednio związana z badanym
 	 * obiektem.
 	 * 
 	 * @param obj
@@ -528,8 +495,7 @@ public class JSONSerializer {
 		Field[] fields;
 		Field[] localfields = clazz.getDeclaredFields();
 		Class<?> superclass = clazz.getSuperclass();
-		if (superclass != null
-				&& !superclass.getCanonicalName().startsWith("java")
+		if (superclass != null && !superclass.getCanonicalName().startsWith("java")
 				&& !superclass.getCanonicalName().startsWith("com.sun")) {
 
 			Field[] superfields = superclass.getDeclaredFields();
@@ -555,7 +521,7 @@ public class JSONSerializer {
 		/* zbieram informacje o wszystkich polach - koniec */
 
 		/* do wyniku zbieram tylko pola opatrzone odpowiednią adnotacją */
-		fList = new ArrayList<Field>();
+		fList = new ArrayList<>();
 		if (fields != null && fields.length != 0) {
 			for (Field f : fields) {
 				if (f.isAnnotationPresent(JSONProperty.class)) {

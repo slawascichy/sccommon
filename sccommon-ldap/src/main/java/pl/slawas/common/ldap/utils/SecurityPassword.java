@@ -18,8 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class SecurityPassword {
 
-	private static Logger logger = Logger.getLogger(SecurityPassword.class
-			.getName());
+	private static Logger logger = Logger.getLogger(SecurityPassword.class.getName());
 
 	private static SecurityPassword instance;
 	private final String messageDigest;
@@ -55,8 +54,7 @@ public class SecurityPassword {
 		// Convert it to hexadecimal format
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < bytes.length; i++) {
-			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16)
-					.substring(1));
+			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
 		}
 		// Get complete hashed password in hex format
 		generatedPassword = sb.toString();
@@ -74,18 +72,14 @@ public class SecurityPassword {
 		byte[] bytes = getSecurePasswordAsByte(passwordToHash);
 		// Convert it to LDAP format
 		String encodedNewPasswdWithPrefix;
-		if (this.messageDigest.equals("SHA1")
-				|| this.messageDigest.equals("SHA-1")) {
-			encodedNewPasswdWithPrefix = "{SHA}"
-					+ DatatypeConverter.printBase64Binary(bytes);
+		if (this.messageDigest.equals("SHA1") || this.messageDigest.equals("SHA-1")) {
+			encodedNewPasswdWithPrefix = "{SHA}" + DatatypeConverter.printBase64Binary(bytes);
 		} else {
-			encodedNewPasswdWithPrefix = "{SSHA}"
-					+ DatatypeConverter.printBase64Binary(bytes);
+			encodedNewPasswdWithPrefix = "{SSHA}" + DatatypeConverter.printBase64Binary(bytes);
 		}
 		String encodedNewPasswdWithPrefixBase64 = DatatypeConverter
 				.printBase64Binary(encodedNewPasswdWithPrefix.getBytes());
-		return DatatypeConverter
-				.parseBase64Binary(encodedNewPasswdWithPrefixBase64);
+		return DatatypeConverter.parseBase64Binary(encodedNewPasswdWithPrefixBase64);
 	}
 
 	/**
@@ -98,23 +92,18 @@ public class SecurityPassword {
 	public byte[] getSecurePasswordAsByte(String passwordToHash) {
 		try {
 			return securePassword(passwordToHash);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error("getSecurePassword", e);
-		} catch (UnsupportedEncodingException e) {
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			logger.error("getSecurePassword", e);
 		}
 		logger.warn("getSecurePassword: returned not secured password");
 		return passwordToHash.getBytes();
 	}
 
-	private byte[] securePassword(String passwordToHash)
-			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	private byte[] securePassword(String passwordToHash) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		// Create MessageDigest instance for MD5
 		MessageDigest md = MessageDigest.getInstance(this.messageDigest);
 		// Get the hash's bytes
-		byte[] bytes = md.digest(passwordToHash.getBytes("UTF-8"));
-		// This bytes[] has bytes in decimal format;
-		return bytes;
+		return md.digest(passwordToHash.getBytes("UTF-8"));
 	}
 
 }

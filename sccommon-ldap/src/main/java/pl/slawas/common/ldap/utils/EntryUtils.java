@@ -7,6 +7,9 @@ import pl.slawas.common.ldap.dao.LdapUserAO;
 
 public class EntryUtils {
 
+	private EntryUtils() {
+	}
+
 	/**
 	 * Domyślna transformacja do instancji będącej podstawą do realizacji zmian. Aby
 	 * przygotować instancję do zmian wystarczy mi, że będzie ona spełniała

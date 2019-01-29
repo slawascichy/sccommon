@@ -2,10 +2,9 @@ package pl.slawas.common.ldap.provider;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -20,8 +19,8 @@ import com.ibm.ws.security.util.WSEncoderDecoder;
 
 import pl.slawas.common.cache.ehcache.EhCacheConfig;
 import pl.slawas.common.ldap.api.Constants;
-import pl.slawas.common.ldap.api.ILdapConfigOptions;
 import pl.slawas.common.ldap.config.LdapConfig;
+import pl.slawas.common.ldap.config.LdapConfigOptions;
 import pl.slawas.common.ldap.config.LoadLdapConfiguration;
 import pl.slawas.common.ldap.provider.beans.UserAttributeDefinition;
 import pl.slawas.common.ldap.provider.beans.UserAttributeList;
@@ -54,7 +53,12 @@ import pl.slawas.twl4j.logger.LogLevel;
  * @version $Revision: 1.1 $
  * 
  */
-public class ProviderOptions implements ILdapConfigOptions {
+public class ProviderOptions extends LdapConfigOptions implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3804155547293539009L;
 
 	private static final Logger log = LoggerFactory.getLogger(ProviderOptions.class.getName());
 
@@ -78,10 +82,10 @@ public class ProviderOptions implements ILdapConfigOptions {
 		offLine = StringUtils.isBlank(configFilePath);
 		System.out.println(
 				"External LDAP Login Module 'LdapSecurityCore' is loaded and is " + (offLine ? "OFFLINE" : "ONLINE"));
-	};
+	}
 
 	private static Object providerOptionsFromURLLock = new Object();
-	private static Map<String, ProviderOptions> providerOptionsFromURL = new HashMap<String, ProviderOptions>();
+	private static Map<String, ProviderOptions> providerOptionsFromURL = new HashMap<>();
 
 	/**
 	 * Mapa opcji (parametrów).
@@ -134,7 +138,12 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 * Podczas tworzenia kontekstów (otwartych połączeń do LDAP) wartość jest
 	 * split'owana, a do {@code baseCtxDN} jest doklejany prefix
 	 * {@code "OU=" + organizationalUnitName} w trakcie wyszukiwania użytkowników.
+	 * 
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
+	@Deprecated
 	private String[] usersOrganizationalUnitNames = null;
 
 	/**
@@ -145,7 +154,12 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 * Podczas tworzenia kontekstów (otwartych połączeń do LDAP) wartość jest
 	 * split'owana, a do {@code rolesCtxDN} jest doklejany prefix
 	 * {@code "OU=" + organizationalUnitName} w trakcie wyszukiwania grup.
+	 * 
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
+	@Deprecated
 	private String[] groupsOrganizationalUnitNames = null;
 
 	/**
@@ -153,7 +167,12 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 * odróżnienia jednostek organizacji od grup/ról pocztowych i innych. Przykład
 	 * wartości: '{@code OU=Struktura,DC=ibpm,DC=pro}' Parametr opcjonalnym domyślna
 	 * wartość '{@code n/a}'
+	 * 
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
+	@Deprecated
 	private String structureCtxDN = "n/a";
 
 	/* autoryzacja użytkownika */
@@ -321,7 +340,7 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 * elektroniczną (na adres email użytkownika). Domyślna wartość
 	 * {@link Constants.DEFAULT_TASK_NOTIFICATION}.
 	 */
-	private Boolean defaultTaskNotification = Boolean.parseBoolean(Constants.DEFAULT_TASK_NOTIFICATION);;
+	private Boolean defaultTaskNotification = Boolean.parseBoolean(Constants.DEFAULT_TASK_NOTIFICATION);
 	/**
 	 * Domyślna wartość flagi dla ostrzegania użytkownika przed podjęciem zadania
 	 * kierowanego do grupy ("Zadanie kierowane jest do grupy i zostanie przypisane
@@ -347,7 +366,9 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 * Poziom logowania komunikatów. Domyslnie INFO.
 	 * 
 	 * @see LogLevel
+	 * @deprecated zmieniono mechanizmy logowania operacji.
 	 */
+	@Deprecated
 	private LogLevel logLevel = LogLevel.INFO;
 
 	/**
@@ -359,7 +380,7 @@ public class ProviderOptions implements ILdapConfigOptions {
 	private LdapConfig config;
 
 	/** Konfiguracja pamięci podręcznych */
-	private EhCacheConfig cc;
+	private transient EhCacheConfig cc;
 
 	private ProviderOptions() {
 	}
@@ -411,7 +432,7 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 * @throws IOException
 	 */
 	public static ProviderOptions init(Map<String, String> options) throws IOException {
-		String lock = (new StringBuilder(ProviderOptions.class.getName())).toString().intern();
+		Object lock = (new StringBuilder(ProviderOptions.class.getName())).toString().intern();
 		synchronized (lock) {
 			if (instance == null) {
 				log.debug("Create new instance");
@@ -431,7 +452,7 @@ public class ProviderOptions implements ILdapConfigOptions {
 			 * Parametry z osobnego pliku konfiguracyjnego - nadpisują parametry z pliku
 			 * głównego
 			 */
-			String cachePropertiesFileName = options.get(ILdapConfigOptions.option_cacheDynamicParametersPath);
+			String cachePropertiesFileName = options.get(LdapConfigOptions.option_cacheDynamicParametersPath);
 			if (StringUtils.isNotBlank(cachePropertiesFileName)) {
 				Map<String, String> cacheProps = null;
 				cacheProps = Configurations.loadHashtable(ProviderOptions.class, cachePropertiesFileName);
@@ -488,7 +509,7 @@ public class ProviderOptions implements ILdapConfigOptions {
 	 *         {@link #init(String, boolean)}
 	 */
 	public static boolean isInicjalized() {
-		return !(instance == null);
+		return instance != null;
 	}
 
 	/**
@@ -590,8 +611,8 @@ public class ProviderOptions implements ILdapConfigOptions {
 		if (optionalOption(option_structureCtxDN) != null) {
 			this.structureCtxDN = optionalOption(option_structureCtxDN);
 		}
-		String userGroupOptionsAreDefinded = requiredOption(option_userGroupOptionsAreDefinded);
-		this.userGroupOptionsAreDefinded = Boolean.parseBoolean(userGroupOptionsAreDefinded);
+		String lUserGroupOptionsAreDefinded = requiredOption(option_userGroupOptionsAreDefinded);
+		this.userGroupOptionsAreDefinded = Boolean.parseBoolean(lUserGroupOptionsAreDefinded);
 
 		/* autoryzacja użytkownika */
 		if (this.userGroupOptionsAreDefinded) {
@@ -699,11 +720,10 @@ public class ProviderOptions implements ILdapConfigOptions {
 					uad.setLdapAttrName(mapRow[0]);
 					uad.setTwAttrName(mapRow[1]);
 					if (mapRow.length > 2) {
-						Hashtable<String, String> parsedValues = UserAttributeUtils.valueMapParser(mapRow[2]);
-						Enumeration<String> ldapValues = parsedValues.keys();
-						while (ldapValues.hasMoreElements()) {
-							String ldapValue = ldapValues.nextElement();
-							String twValue = parsedValues.get(ldapValue);
+						Map<String, String> parsedValues = UserAttributeUtils.valueMapParser(mapRow[2]);
+						for (Entry<String, String> entry : parsedValues.entrySet()) {
+							String ldapValue = entry.getKey();
+							String twValue = entry.getValue();
 							uad.addValueMap(ldapValue, twValue);
 						}
 					}
@@ -734,26 +754,26 @@ public class ProviderOptions implements ILdapConfigOptions {
 				this.syncPeriod = Long.parseLong(Strings.lrtrim(periodSync));
 			}
 		}
-		String logLevel = optionalOption(option_logLevel);
-		if (StringUtils.isNotBlank(logLevel)) {
-			this.logLevel = LogLevel.valueOf(logLevel.toUpperCase());
+		String lLogLevel = optionalOption(option_logLevel);
+		if (StringUtils.isNotBlank(lLogLevel)) {
+			this.logLevel = LogLevel.valueOf(lLogLevel.toUpperCase());
 		}
 
-		String defaultTaskNotification = optionalOption(option_defaultTaskNotification);
-		if (StringUtils.isNotBlank(defaultTaskNotification)) {
-			this.defaultTaskNotification = Boolean.parseBoolean(defaultTaskNotification);
+		String lDefaultTaskNotification = optionalOption(option_defaultTaskNotification);
+		if (StringUtils.isNotBlank(lDefaultTaskNotification)) {
+			this.defaultTaskNotification = Boolean.parseBoolean(lDefaultTaskNotification);
 		}
-		String defaultAlertOnAssignAndRun = optionalOption(option_defaultAlertOnAssignAndRun);
-		if (StringUtils.isNotBlank(defaultAlertOnAssignAndRun)) {
-			this.defaultAlertOnAssignAndRun = Boolean.parseBoolean(defaultAlertOnAssignAndRun);
+		String lDefaultAlertOnAssignAndRun = optionalOption(option_defaultAlertOnAssignAndRun);
+		if (StringUtils.isNotBlank(lDefaultAlertOnAssignAndRun)) {
+			this.defaultAlertOnAssignAndRun = Boolean.parseBoolean(lDefaultAlertOnAssignAndRun);
 		}
-		String ldapResultPageSize = optionalOption(option_ldapResultPageSize);
-		if (StringUtils.isNotBlank(ldapResultPageSize)) {
-			this.ldapResultPageSize = Integer.parseInt(ldapResultPageSize);
+		String lLdapResultPageSize = optionalOption(option_ldapResultPageSize);
+		if (StringUtils.isNotBlank(lLdapResultPageSize)) {
+			this.ldapResultPageSize = Integer.parseInt(lLdapResultPageSize);
 		}
-		String useDefaultParams = optionalOption(option_useDefaultParams);
-		if (StringUtils.isNotBlank(useDefaultParams)) {
-			this.useDefaultParams = Boolean.parseBoolean(useDefaultParams);
+		String lUseDefaultParams = optionalOption(option_useDefaultParams);
+		if (StringUtils.isNotBlank(lUseDefaultParams)) {
+			this.useDefaultParams = Boolean.parseBoolean(lUseDefaultParams);
 		}
 
 		this.config = new LdapConfig(options);
@@ -794,15 +814,15 @@ public class ProviderOptions implements ILdapConfigOptions {
 	private static String escape(final String input) {
 
 		String s = input;
-		if (s.indexOf("(") >= 0) {
+		if (s.indexOf('(') >= 0) {
 			// escape left parenthesis
 			s = Strings.replaceAll(s, "(", "\\(");
 		}
-		if (s.indexOf(")") >= 0) {
+		if (s.indexOf(')') >= 0) {
 			// escape right parenthesis
 			s = Strings.replaceAll(s, "(", "\\)");
 		}
-		if (s.indexOf("\\") >= 0) {
+		if (s.indexOf('\\') >= 0) {
 			// escape backslash
 			s = Strings.replaceAll(s, "(", "\\\\");
 		}
@@ -960,8 +980,8 @@ public class ProviderOptions implements ILdapConfigOptions {
 	public String getUserPrimaryGroupFilter(String[] args) {
 		if (StringUtils.isNotBlank(this.userPrimaryGroupFilter)) {
 			return bindFilterVariables(args, this.userPrimaryGroupFilter);
-		} else
-			return null;
+		}
+		return null;
 	}
 
 	/**
@@ -1222,14 +1242,22 @@ public class ProviderOptions implements ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #usersOrganizationalUnitNames}
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
+	@Deprecated
 	public String[] getUsersOrganizationalUnitNames() {
 		return usersOrganizationalUnitNames;
 	}
 
 	/**
 	 * @return the {@link #groupsOrganizationalUnitNames}
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
+	@Deprecated
 	public String[] getGroupsOrganizationalUnitNames() {
 		return groupsOrganizationalUnitNames;
 	}
@@ -1276,7 +1304,7 @@ public class ProviderOptions implements ILdapConfigOptions {
 			return false;
 		}
 		String[] structures = convert2Array(this.structureCtxDN.toUpperCase());
-		if (structures != null && structures.length > 0) {
+		if (structures.length > 0) {
 			for (String str : structures) {
 				if (StringUtils.isNotBlank(str) && groupDN.toUpperCase().endsWith(str)) {
 					return true;
@@ -1290,7 +1318,11 @@ public class ProviderOptions implements ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #structureCtxDN}
+	 * @deprecated parametr powstał ze względu na możliwość obsługi wielu
+	 *             repozytoriów LDAP w IBM BPM. W obecnej implementacji jest zbędna.
+	 *             Trzeba pomyśleć o zmianie w konfiguracji.
 	 */
+	@Deprecated
 	public String getStructureCtxDN() {
 		return structureCtxDN;
 	}
@@ -1325,7 +1357,9 @@ public class ProviderOptions implements ILdapConfigOptions {
 
 	/**
 	 * @return the {@link #logLevel}
+	 * @deprecated zmieniono mechanizmy logowania operacji.
 	 */
+	@Deprecated
 	public LogLevel getLogLevel() {
 		return logLevel;
 	}

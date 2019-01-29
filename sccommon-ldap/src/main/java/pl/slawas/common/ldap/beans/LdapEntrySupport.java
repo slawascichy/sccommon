@@ -19,8 +19,9 @@ package pl.slawas.common.ldap.beans;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -35,8 +36,7 @@ import pl.slawas.common.ldap.api.IUserAttribute;
  * 
  */
 @SuppressWarnings("serial")
-public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
-		ILdapEntry {
+public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements ILdapEntry {
 
 	/**
 	 * Np. adres poczty elektronicznej użytkownika
@@ -57,7 +57,7 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 	 * Mapa atrybutów użytkownika, pomocniczo, by szybko można było pobrać
 	 * odpowiednie wartości atrybutu po jego nazwie.
 	 */
-	private Hashtable<String, IUserAttribute> attrMap;
+	private Map<String, IUserAttribute> attrMap;
 
 	/**
 	 * 
@@ -121,8 +121,8 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 	}
 
 	/**
-	 * <font color="#dd0000">Uwaga! użycie metody nadpisze dodane przy użyciu
-	 * tej metody {@link #addAttribute(IUserAttribute)} wartości.</font>
+	 * <font color="#dd0000">Uwaga! użycie metody nadpisze dodane przy użyciu tej
+	 * metody {@link #addAttribute(IUserAttribute)} wartości.</font>
 	 * 
 	 * @param attributes
 	 *            the {@link #attributes} to set
@@ -132,7 +132,7 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 		if (this.attributes != null && !this.attributes.isEmpty()) {
 			// ustawianie mapy atrybutów, tak aby łatwo można było pobrać
 			// wartość atrybutu po jego nazwie.
-			this.attrMap = new Hashtable<String, IUserAttribute>();
+			this.attrMap = new HashMap<>();
 			for (IUserAttribute attr : this.attributes) {
 				this.attrMap.put(attr.getName(), attr);
 			}
@@ -141,8 +141,8 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 
 	/**
 	 * Dodawanie atrybutu, wykorzystywane przez mechanizmy zbierające dodatkowe
-	 * informacje o użytkowniku. Jeżeli {@link #attributes} lub {@link #attrMap}
-	 * są puste ({@code null}), to zostaną zainicjalizowane.
+	 * informacje o użytkowniku. Jeżeli {@link #attributes} lub {@link #attrMap} są
+	 * puste ({@code null}), to zostaną zainicjalizowane.
 	 * <p>
 	 * <font color="#dd0000">Uwaga! użycie metody {@link #setAttributes(List)}
 	 * nadpisze dodane przy użyciu tej metody wartości.</font>
@@ -154,10 +154,10 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 	 */
 	public void addAttribute(IUserAttribute attr) {
 		if (this.attrMap == null) {
-			this.attrMap = new Hashtable<String, IUserAttribute>();
+			this.attrMap = new HashMap<>();
 		}
 		if (this.attributes == null) {
-			this.attributes = new ArrayList<IUserAttribute>();
+			this.attributes = new ArrayList<>();
 		}
 		this.attrMap.put(attr.getName(), attr);
 		this.attributes.add(attr);
@@ -170,8 +170,8 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 	 */
 	@Override
 	public String toString() {
-		return "LdapEntrySupport [name=" + getName() + ", email=" + email
-				+ ", displayName=" + displayName + ", dn=" + getDn() + "]";
+		return "LdapEntrySupport [name=" + getName() + ", email=" + email + ", displayName=" + displayName + ", dn="
+				+ getDn() + "]";
 	}
 
 	/*
@@ -183,14 +183,11 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((attributes == null) ? 0 : attributes.hashCode());
-		result = prime * result
-				+ ((displayName == null) ? 0 : displayName.hashCode());
+		result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+		result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
 		result = prime * result + ((getDn() == null) ? 0 : getDn().hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		result = prime * result
-				+ ((getName() == null) ? 0 : getName().hashCode());
+		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
 		return result;
 	}
 
@@ -218,10 +215,8 @@ public abstract class LdapEntrySupport extends LdapBaseEntrySupport implements
 		} else if (attributes.size() != other.attributes.size()) {
 			return false;
 		} else {
-			IUserAttribute[] thisArray = attributes
-					.toArray(new IUserAttribute[attributes.size()]);
-			IUserAttribute[] otherArray = other.attributes
-					.toArray(new IUserAttribute[other.attributes.size()]);
+			IUserAttribute[] thisArray = attributes.toArray(new IUserAttribute[attributes.size()]);
+			IUserAttribute[] otherArray = other.attributes.toArray(new IUserAttribute[other.attributes.size()]);
 			if (!Arrays.equals(thisArray, otherArray)) {
 				return false;
 			}

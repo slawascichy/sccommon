@@ -156,17 +156,21 @@ public class LdapUserAttribute implements ILdapAttribute {
 			return false;
 		LdapUserAttribute other = (LdapUserAttribute) obj;
 		if (StringUtils.isBlank(name)) {
-			if (StringUtils.isNotBlank(other.name))
+			if (StringUtils.isNotBlank(other.name)) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (type != other.type)
 			return false;
 		if (value == null) {
-			if (other.value != null)
+			if (other.value != null) {
 				return false;
-		} else if (!value.equals(other.value))
+			}
+		} else if (!value.equals(other.value)) {
 			return false;
+		}
 		return true;
 	}
 

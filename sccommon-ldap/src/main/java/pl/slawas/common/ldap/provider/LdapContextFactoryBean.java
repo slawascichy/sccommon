@@ -24,7 +24,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -49,7 +48,6 @@ import pl.slawas.common.ldap.api.ILdapAttribute;
 import pl.slawas.common.ldap.api.ILdapContextFactory;
 import pl.slawas.common.ldap.api.ILdapEntry4Changes;
 import pl.slawas.common.ldap.dao.LdapAOHelper;
-import pl.slawas.common.ldap.provider.exceptions.ProviderOptionsNotInicjalized;
 import pl.slawas.twl4j.Logger;
 import pl.slawas.twl4j.LoggerFactory;
 
@@ -70,7 +68,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	 */
 	public static final String OU_PREFIX = "ou=";
 
-	protected final Logger log = LoggerFactory.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private static final String LDAP_ATTRIBUTES_BINARY = "java.naming.ldap.attributes.binary";
 	private static final String LDAP_DEFAULT_INITIAL_CONTEXT = "com.sun.jndi.ldap.LdapCtxFactory";
@@ -100,11 +98,9 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	 *            hasło użytkownika nawiązującego połączenie (otwartym tekstem)
 	 * @param pageSize
 	 *            Rozmiar strony wyniku wyszukiwania w LDAP.
-	 * @throws Exception
-	 * @throws ProviderOptionsNotInicjalized
 	 */
 	public LdapContextFactoryBean(ProviderOptions ldapOptions, String providerURL, String baseCtxDN, String bindDN,
-			String bindCredential, Integer pageSize) throws Exception, ProviderOptionsNotInicjalized {
+			String bindCredential, Integer pageSize) {
 		/* to musi być tutaj (na początku) i nigdzie indziej).... */
 		this.ldapOptions = ldapOptions;
 		this.pageSize = pageSize;
@@ -132,12 +128,8 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	 *            wartości {@link ProviderOptions#rolesCtxDN}
 	 * @param isGroupContext
 	 *            flaga mówiąca czy kontekst LDAP będzie służył pobieraniu grup.
-	 * 
-	 * @throws Exception
-	 * @throws ProviderOptionsNotInicjalized
 	 */
-	public LdapContextFactoryBean(ProviderOptions ldapOptions, String organizationalUnitName, boolean isGroupContext)
-			throws Exception, ProviderOptionsNotInicjalized {
+	public LdapContextFactoryBean(ProviderOptions ldapOptions, String organizationalUnitName, boolean isGroupContext) {
 		this.ldapOptions = ldapOptions;
 		this.pageSize = this.ldapOptions.getLdapResultPageSize();
 		/* przeczytanie parametrów konfiguracyjnych */
@@ -157,7 +149,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 		/* ustawianie URL'i kontekstu */
 		String entryProviderURL = buildProviderUrl(organizationalUnitName, providerURL, baseCtxDN);
 
-		log.debug("Tworzę nowy kontekst: entryProviderURL: {}", entryProviderURL);
+		logger.debug("Tworzę nowy kontekst: entryProviderURL: {}", entryProviderURL);
 		initContext(bindDN, bindCredential, entryProviderURL);
 
 	}
@@ -189,9 +181,9 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 			env.put(Context.PROVIDER_URL, entryProviderURL);
 			this.baseCtx = new InitialLdapContext(env, null);
 		} catch (NamingException e) {
-			log.error("Inicjalize userCtx.", e);
+			logger.error("Inicjalize userCtx.", e);
 		}
-		log.debug("Utworzylem kontekst (polaczenie) dla userProviderURL = {}", entryProviderURL);
+		logger.debug("Utworzylem kontekst (polaczenie) dla userProviderURL = {}", entryProviderURL);
 
 	}
 
@@ -234,7 +226,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 			}
 		}
 		String url = sb.toString();
-		log.debug("URL: {}", url);
+		logger.debug("URL: {}", url);
 		return url;
 	}
 
@@ -245,16 +237,15 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private LdapResult getResult(String[] attrs, NamingEnumeration results) throws NamingException {
+	private LdapResult getResult(String[] attrs, SearchResult sr) throws NamingException {
 
 		LdapResult searchResult = new LdapResult();
-		SearchResult sr = (SearchResult) results.next();
 		searchResult.setName(sr.getName());
 		searchResult.setRelative(sr.isRelative());
 
 		Attributes resultAttrs = sr.getAttributes();
 		for (String attr : attrs) {
-			Vector<LdapValue> values = new Vector<LdapValue>();
+			List<LdapValue> values = new ArrayList<>();
 			Attribute resAttr = (Attribute) resultAttrs.get(attr);
 			if (resAttr != null) {
 				NamingEnumeration attrValues = resAttr.getAll();
@@ -263,17 +254,19 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 					if (objValue instanceof String) {
 						String value = (String) objValue;
 						values.add(new LdapValue(value));
-						log.trace("{}: {}", new Object[] { attr, value });
+						if (logger.isTraceEnabled()) {
+							logger.trace("{}: {}", new Object[] { attr, value });
+						}
 					} else if (objValue instanceof byte[]) {
 						byte[] value = (byte[]) objValue;
 						values.add(new LdapValue(value, Types.BLOB));
 					} else {
 						values.add(new LdapValue("Unknown type"));
-						log.warn("{}: Unknown type {}", new Object[] { attr, objValue.getClass().getName() });
+						logger.warn("{}: Unknown type {}", new Object[] { attr, objValue.getClass().getName() });
 					}
 				}
 			} else {
-				log.trace("Attribute {} is null", attr);
+				logger.trace("Attribute {} is null", attr);
 				values.add(new LdapValue("null"));
 			}
 			searchResult.put(attr, values);
@@ -320,13 +313,13 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 							new Control[] { new PagedResultsControl(pageSize, Control.NONCRITICAL) });
 				}
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new NamingException(e.getMessage());
 			}
 			results = baseCtx.search("", searchFilter, controls);
 			if (results != null) {
-				while (results.hasMore()) {
-					searchResult = getResult(attrs, results);
-					break;
+				if (results.hasMore()) {
+					SearchResult sr = (SearchResult) results.next();
+					searchResult = getResult(attrs, sr);
 				}
 				results.close();
 			}
@@ -339,21 +332,22 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	public List<LdapResult> manyEntrySearch(String[] attrs, String searchFilter) throws NamingException {
 
 		NamingEnumeration results = null;
-		List<LdapResult> searchResults = new ArrayList<LdapResult>();
+		List<LdapResult> searchResults = new ArrayList<>();
 
 		SearchControls controls = new SearchControls();
 		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		controls.setReturningAttributes(attrs);
 
 		if (baseCtx != null) {
-			log.debug("pageSize={}", pageSize);
+			logger.debug("pageSize={}", pageSize);
 			if (this.pageSize != null && this.pageSize.intValue() > 0) {
 				loadPagedResult(baseCtx, attrs, searchFilter, searchResults);
 			} else {
 				results = baseCtx.search("", searchFilter, controls);
 				if (results != null) {
 					while (results.hasMore()) {
-						LdapResult searchResult = getResult(attrs, results);
+						SearchResult sr = (SearchResult) results.next();
+						LdapResult searchResult = getResult(attrs, sr);
 						searchResults.add(searchResult);
 					}
 					results.close();
@@ -384,14 +378,17 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 				SearchControls controls = new SearchControls();
 				controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 				controls.setReturningAttributes(attrs);
-				log.debug("--> loadPagedResult: searchFilter={}, ctx={}",
-						new Object[] { searchFilter, ctx.getNameInNamespace() });
+				if (logger.isDebugEnabled()) {
+					logger.debug("--> loadPagedResult: searchFilter={}, ctx={}",
+							new Object[] { searchFilter, ctx.getNameInNamespace() });
+				}
 				results = ctx.search("", searchFilter, controls);
 
 				/* for each entry print out name + all attrs and values */
 				if (results != null) {
 					while (results.hasMore()) {
-						LdapResult searchResult = getResult(attrs, results);
+						SearchResult sr = (SearchResult) results.next();
+						LdapResult searchResult = getResult(attrs, sr);
 						searchResults.add(searchResult);
 					}
 					results.close();
@@ -404,23 +401,26 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 						if (pControls[i] instanceof PagedResultsResponseControl) {
 							PagedResultsResponseControl prrc = (PagedResultsResponseControl) pControls[i];
 							total = prrc.getResultSize();
-							if (total != 0) {
-								log.debug("\n***************** END-OF-PAGE (total : {}) *****************", total);
-							} else {
-								log.debug("\n***************** END-OF-PAGE (total : unknown) *****************");
+							if (logger.isDebugEnabled()) {
+								if (total != 0) {
+									logger.debug("\n***************** END-OF-PAGE (total : {}) *****************",
+											total);
+								} else {
+									logger.debug("\n***************** END-OF-PAGE (total : unknown) *****************");
+								}
 							}
 							cookie = prrc.getCookie();
 						}
 					}
-				} else {
-					log.debug("No controls were sent from the server");
+				} else if (logger.isDebugEnabled()) {
+					logger.debug("No controls were sent from the server");
 				}
 				// Re-activate paged results
 				ctx.setRequestControls(new Control[] { new PagedResultsControl(pageSize, cookie, Control.CRITICAL) });
 
 			} while (cookie != null);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new NamingException(e.getMessage());
 		}
 	}
 
@@ -443,20 +443,20 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	public void addEntry(ILdapEntry4Changes newEntry, String entryNameAttr) throws NamingException {
 
 		if (newEntry == null) {
-			log.warn("-->addEntry: New entry is empty- operation skipped.");
+			logger.warn("-->addEntry: New entry is empty- operation skipped.");
 			return;
 		}
 		if (StringUtils.isBlank(newEntry.getDn())) {
-			log.warn("-->addEntry: New entry has empty DN - operation skipped.");
+			logger.warn("-->addEntry: New entry has empty DN - operation skipped.");
 			return;
 		}
 		String nameAttr = entryNameAttr;
 		if (StringUtils.isBlank(newEntry.getName())) {
-			log.warn("-->addEntry: New entry has empty {} - operation skipped.", nameAttr);
+			logger.warn("-->addEntry: New entry has empty {} - operation skipped.", nameAttr);
 			return;
 		}
 		if (newEntry.getChangesMap() == null || newEntry.getChangesMap().isEmpty()) {
-			log.warn("-->addEntry: New entry has empty changes map - operation skipped.");
+			logger.warn("-->addEntry: New entry has empty changes map - operation skipped.");
 			return;
 		}
 
@@ -471,13 +471,13 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 		}
 		entryDN = entryDN.substring(0, entryDN.length() - getDynamicCtx().length() - 1);
 
-		if (log.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) {
 			debugBuilder.append("dn: ").append(entryDN).append("\n");
 		}
 		Attributes entry = new BasicAttributes();
 
 		entry.put(new BasicAttribute(nameAttr, newEntry.getName()));
-		if (log.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) {
 			debugBuilder.append(nameAttr).append(": ").append(newEntry.getName()).append("\n");
 		}
 		Set<Entry<String, List<ILdapAttribute>>> entrySet = newEntry.getChangesMap().entrySet();
@@ -485,28 +485,30 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 			nameAttr = lEntry.getKey();
 			List<ILdapAttribute> values = lEntry.getValue();
 			if (values.isEmpty()) {
-				log.warn("-->addEntry: New attribute has empty {} - attribute skipped.", nameAttr);
+				logger.warn("-->addEntry: New attribute has empty {} - attribute skipped.", nameAttr);
 				continue;
 			}
 			Attribute attr = new BasicAttribute(nameAttr);
 			for (ILdapAttribute lAttr : values) {
 				Object value = lAttr.getValue();
 				attr.add(value);
-				if (log.isDebugEnabled()) {
+				if (logger.isDebugEnabled()) {
 					debugBuilder.append(nameAttr).append(": ").append(value).append("\n");
 				}
 			}
 			entry.put(attr);
 		}
-		log.debug("-->addEntry: New entry attributes in {}: \n{}",
-				new Object[] { this.getDynamicCtx(), debugBuilder.toString() });
+		if (logger.isDebugEnabled()) {
+			logger.debug("-->addEntry: New entry attributes in {}: \n{}",
+					new Object[] { this.getDynamicCtx(), debugBuilder.toString() });
+		}
 		try {
 			if (pageSize != null && pageSize.intValue() > 0) {
 				this.baseCtx
 						.setRequestControls(new Control[] { new PagedResultsControl(pageSize, Control.NONCRITICAL) });
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new NamingException(e.getMessage());
 		}
 		this.baseCtx.createSubcontext(entryDN, entry);
 	}
@@ -515,20 +517,20 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	@Override
 	public void modifyEntry(ILdapEntry4Changes modifiedEntry, String entryNameAttr) throws NamingException {
 		if (modifiedEntry == null) {
-			log.warn("-->modifyEntry: Modified entry is empty- operation skipped.");
+			logger.warn("-->modifyEntry: Modified entry is empty- operation skipped.");
 			return;
 		}
 		if (StringUtils.isBlank(modifiedEntry.getDn())) {
-			log.warn("-->modifyEntry: Modified entry has empty DN - operation skipped.");
+			logger.warn("-->modifyEntry: Modified entry has empty DN - operation skipped.");
 			return;
 		}
 		String nameAttr = entryNameAttr;
 		if (StringUtils.isBlank(modifiedEntry.getName())) {
-			log.warn("-->modifyEntry: Modified entry has empty {} - operation skipped.", nameAttr);
+			logger.warn("-->modifyEntry: Modified entry has empty {} - operation skipped.", nameAttr);
 			return;
 		}
 		if (modifiedEntry.getChangesMap() == null || modifiedEntry.getChangesMap().isEmpty()) {
-			log.warn("-->modifyEntry: Modified entry has empty changes map - operation skipped.");
+			logger.warn("-->modifyEntry: Modified entry has empty changes map - operation skipped.");
 			return;
 		}
 
@@ -543,17 +545,17 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 		}
 		entryDN = entryDN.substring(0, entryDN.length() - getDynamicCtx().length() - 1);
 
-		if (log.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) {
 			debugBuilder.append("dn: ").append(entryDN).append("\n");
 		}
 
-		List<ModificationItem> modifications = new ArrayList<ModificationItem>();
+		List<ModificationItem> modifications = new ArrayList<>();
 		Set<Entry<String, List<ILdapAttribute>>> entrySet = modifiedEntry.getChangesMap().entrySet();
 		for (Entry<String, List<ILdapAttribute>> lEntry : entrySet) {
 			nameAttr = lEntry.getKey();
 			List<ILdapAttribute> values = lEntry.getValue();
 			if (values.isEmpty()) {
-				log.warn("-->modifyEntry: Modified attribute has empty {} - attribute skipped.", nameAttr);
+				logger.warn("-->modifyEntry: Modified attribute has empty {} - attribute skipped.", nameAttr);
 				continue;
 			}
 
@@ -581,12 +583,12 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 							new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute(nameAttr, oldValue)));
 				}
 
-				if (log.isDebugEnabled()) {
+				if (logger.isDebugEnabled()) {
 					debugBuilder.append(nameAttr).append(": ").append(value).append("\n");
 				}
 			}
 		}
-		log.debug("-->modifyEntry: Modified entry attributes in {}: \n{}",
+		logger.debug("-->modifyEntry: Modified entry attributes in {}: \n{}",
 				new Object[] { this.getDynamicCtx(), debugBuilder.toString() });
 		try {
 			if (pageSize != null && pageSize.intValue() > 0) {
@@ -594,7 +596,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 						.setRequestControls(new Control[] { new PagedResultsControl(pageSize, Control.NONCRITICAL) });
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new NamingException(e.getMessage());
 		}
 		this.baseCtx.modifyAttributes(entryDN, modifications.toArray(new ModificationItem[] {}));
 
@@ -604,7 +606,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	@Override
 	public void removeEntry(String entryDN) throws NamingException {
 		if (StringUtils.isBlank(entryDN)) {
-			log.warn("-->modifyEntry: Modified entry has empty DN - operation skipped.");
+			logger.warn("-->modifyEntry: Modified entry has empty DN - operation skipped.");
 			return;
 		}
 		/*
@@ -621,7 +623,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 						.setRequestControls(new Control[] { new PagedResultsControl(pageSize, Control.NONCRITICAL) });
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new NamingException(e.getMessage());
 		}
 		this.baseCtx.destroySubcontext(entryDN);
 	}

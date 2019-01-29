@@ -256,48 +256,65 @@ public class LdapUserGroup extends LdapEntrySupport implements ILdapUserGroup, I
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		LdapUserGroup other = (LdapUserGroup) obj;
 		if (StringUtils.isBlank(description)) {
-			if (StringUtils.isNotBlank(other.description))
+			if (StringUtils.isNotBlank(other.description)) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
-		if (isStructureUnit != other.isStructureUnit)
+		}
+		if (isStructureUnit != other.isStructureUnit) {
 			return false;
+		}
 		if (StringUtils.isBlank(managerGroupName)) {
-			if (StringUtils.isNotBlank(other.managerGroupName))
+			if (StringUtils.isNotBlank(other.managerGroupName)) {
 				return false;
-		} else if (!managerGroupName.equals(other.managerGroupName))
+			}
+		} else if (!managerGroupName.equals(other.managerGroupName)) {
 			return false;
+		}
 		if (StringUtils.isBlank(managerSuffix)) {
-			if (StringUtils.isNotBlank(other.managerSuffix))
+			if (StringUtils.isNotBlank(other.managerSuffix)) {
 				return false;
-		} else if (!managerSuffix.equals(other.managerSuffix))
+			}
+		} else if (!managerSuffix.equals(other.managerSuffix)) {
 			return false;
+		}
 		if (StringUtils.isBlank(mainMemberOf)) {
-			if (StringUtils.isNotBlank(other.mainMemberOf))
+			if (StringUtils.isNotBlank(other.mainMemberOf)) {
 				return false;
-		} else if (!mainMemberOf.equals(other.mainMemberOf))
+			}
+		} else if (!mainMemberOf.equals(other.mainMemberOf)) {
 			return false;
+		}
 		if (members == null) {
-			if (other.members != null)
+			if (other.members != null) {
 				return false;
-		} else if (!members.equals(other.members))
+			}
+		} else if (!members.equals(other.members)) {
 			return false;
+		}
 		if (otherMembersOf == null) {
-			if (other.otherMembersOf != null)
+			if (other.otherMembersOf != null) {
 				return false;
-		} else if (!otherMembersOf.equals(other.otherMembersOf))
+			}
+		} else if (!otherMembersOf.equals(other.otherMembersOf)) {
 			return false;
+		}
 		if (StringUtils.isBlank(workerSuffix)) {
-			if (StringUtils.isNotBlank(other.workerSuffix))
+			if (StringUtils.isNotBlank(other.workerSuffix)) {
 				return false;
-		} else if (!workerSuffix.equals(other.workerSuffix))
+			}
+		} else if (!workerSuffix.equals(other.workerSuffix)) {
 			return false;
+		}
 		return true;
 	}
 

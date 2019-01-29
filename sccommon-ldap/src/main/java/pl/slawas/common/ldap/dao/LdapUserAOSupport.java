@@ -97,18 +97,18 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 			List<ILdapUserGroupAO<G>> groupLdapAO, String[] additionalAttrs) {
 		this.factory = new LdapConnectionFactoryBean(ldapOptions, organizationalUnitName, this.getClass());
 		if (groupLdapAO != null) {
-			this.groupLdapAO = new ArrayList<ILdapUserGroupAO<G>>();
+			this.groupLdapAO = new ArrayList<>();
 			for (ILdapUserGroupAO<G> groupAO : groupLdapAO) {
 				this.groupLdapAO.add(groupAO);
 			}
 		} else {
-			this.groupLdapAO = new ArrayList<ILdapUserGroupAO<G>>();
+			this.groupLdapAO = new ArrayList<>();
 		}
 
 		lo = factory.getLdapOptions();
 
 		// get list of users attributes
-		Set<String> vAttr = new HashSet<String>();
+		Set<String> vAttr = new HashSet<>();
 		vAttr.add(lo.getUserNameAttribute());
 		vAttr.add(lo.getUserDisplayNameAttribute());
 
@@ -121,8 +121,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 		if (lo.getUserDNAttribute() != null) {
 			vAttr.add(lo.getUserDNAttribute());
 		}
-		vAttr.add(lo.getUserEmailAttribute() != null ? lo.getUserEmailAttribute()
-				: ILdapAttribute.DEFAULT_EMAIL_ATTR_NAME);
+		vAttr.add(lo.getUserEmailAttribute() != null ? lo.getUserEmailAttribute() : Constants.DEFAULT_EMAIL_ATTR_NAME);
 		if (lo.getUserLocaleAttr() != null) {
 			vAttr.add(lo.getUserLocaleAttr());
 		}
@@ -133,7 +132,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 		// copy the list into final array of attributes
 		int attrSize = vAttr.size() + (additionalAttrs != null ? additionalAttrs.length : 0);
 		attrs = new String[attrSize];
-		attrSet = new HashSet<String>(attrSize);
+		attrSet = new HashSet<>(attrSize);
 
 		/*
 		 * wpierw przepisuję podstawowe informacje o atrybutach wynikające z
@@ -208,7 +207,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 		log.trace("userDN={}", userDN);
 
 		String email = lo.getUserEmailAttribute() != null ? lo.getUserEmailAttribute()
-				: ILdapAttribute.DEFAULT_EMAIL_ATTR_NAME;
+				: Constants.DEFAULT_EMAIL_ATTR_NAME;
 		single.setEmail(LdapAOHelper.readValue(result, email));
 
 		if (lo.getUserLocaleAttr() != null) {
@@ -224,7 +223,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 		if (lo.isUserGroupOptionsAreDefinded()) {
 			String[] userArgs = new String[] { single.getName(), single.getDn() };
 			String primaryGroupFilter = lo.getUserPrimaryGroupFilter(userArgs);
-			List<G> baseGroups = new ArrayList<G>();
+			List<G> baseGroups = new ArrayList<>();
 			G primaryGroup = null;
 			String primaryGroupDN = LdapAOHelper.readValue(result, lo.getUserPrimaryGroupAttribute());
 
@@ -251,18 +250,16 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 				if (loadWithGroup) {
 					single.setPrimaryGroup(primaryGroup);
 				}
-			} else if (StringUtils.isBlank(primaryGroupFilter) && lo.getUserPrimaryGroupAttribute() != null) {
-
+			} else if (StringUtils.isBlank(primaryGroupFilter) && lo.getUserPrimaryGroupAttribute() != null
+					&& StringUtils.isNotBlank(primaryGroupDN)) {
 				// user primary role, jeżeli jest zdefiniowana jako atrybut
 				/* ustawianie domyślnej grupy/roli - START */
-				if (StringUtils.isNotBlank(primaryGroupDN)) {
-					single.setPrimaryGroupDN(primaryGroupDN);
-					if (loadWithGroup) {
-						for (G baseGroup : baseGroups) {
-							if (baseGroup.getDn().equalsIgnoreCase(primaryGroupDN)) {
-								single.setPrimaryGroup(baseGroup);
-								break;
-							}
+				single.setPrimaryGroupDN(primaryGroupDN);
+				if (loadWithGroup) {
+					for (G baseGroup : baseGroups) {
+						if (baseGroup.getDn().equalsIgnoreCase(primaryGroupDN)) {
+							single.setPrimaryGroup(baseGroup);
+							break;
 						}
 					}
 				}
@@ -283,6 +280,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 			}
 		}
 		return single;
+
 	}
 
 	public E load(Object id) throws NamingException {
@@ -323,7 +321,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 	}
 
 	public Map<String, E> loadAllAsMap() throws NamingException {
-		Map<String, E> map = new HashMap<String, E>();
+		Map<String, E> map = new HashMap<>();
 		String searchFilter = lo.getUsersFilter();
 		log.debug("--> loadAllAsMap: Sarch Filter: {}", searchFilter);
 		return prepareAllAsMap(searchFilter, map, false);
@@ -463,7 +461,7 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 	/* Overridden (non-Javadoc) */
 	@Override
 	public List<E> loadByFilter(String searchFilter) throws NamingException {
-		List<E> list = new ArrayList<E>();
+		List<E> list = new ArrayList<>();
 		log.debug("--> loadByFilter: Sarch Filter: {}", searchFilter);
 		List<LdapResult> resultsList = super.loadByFilter(getFactory(), attrs, searchFilter);
 		for (LdapResult result : resultsList) {
@@ -483,10 +481,10 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 			return;
 		}
 		ILdapEntry4Changes user4Changes = transform4Changes(ldapUser);
-		Map<String, List<ILdapAttribute>> changesMap = new HashMap<String, List<ILdapAttribute>>();
+		Map<String, List<ILdapAttribute>> changesMap = new HashMap<>();
 		ILdapAttribute attr = new LdapUserAttribute(passwordAttrName, newPassword, Types.VARCHAR);
 		attr.setOldValue(oldPassword);
-		List<ILdapAttribute> values = new ArrayList<ILdapAttribute>();
+		List<ILdapAttribute> values = new ArrayList<>();
 		values.add(attr);
 		changesMap.put(passwordAttrName, values);
 		user4Changes.setChangesMap(changesMap);
@@ -501,10 +499,10 @@ public abstract class LdapUserAOSupport<E extends ILdapUser<G>, G extends ILdapU
 			return;
 		}
 		ILdapEntry4Changes user4Changes = transform4Changes(ldapUser);
-		Map<String, List<ILdapAttribute>> changesMap = new HashMap<String, List<ILdapAttribute>>();
+		Map<String, List<ILdapAttribute>> changesMap = new HashMap<>();
 		ILdapAttribute attr = new LdapUserAttribute(passwordAttrName, newPassword, Types.VARCHAR);
 		attr.setOldValue(oldPassword);
-		List<ILdapAttribute> values = new ArrayList<ILdapAttribute>();
+		List<ILdapAttribute> values = new ArrayList<>();
 		values.add(attr);
 		changesMap.put(passwordAttrName, values);
 		user4Changes.setChangesMap(changesMap);
