@@ -1,5 +1,6 @@
 package pl.slawas.common.ldap.dao;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -361,13 +362,17 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 						 * rodzic jest w tym samym drzewie.
 						 */
 						for (int ii = 0; ii < singleDNElements.length - 1; ii++) {
-							isInSubTree = singleDNElements[singleDNElements.length - 1 - ii]
-									.equalsIgnoreCase(currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii]);
+							int singleDNElementsIndx = singleDNElements.length - 1 - ii;
+							int currMemberOfDNElementsIndx = currMemberOfDNElements.length - 1 - ii;
+							if (singleDNElementsIndx < 0 || currMemberOfDNElementsIndx < 0) {
+								break;
+							}
+							isInSubTree = singleDNElements[singleDNElementsIndx]
+									.equalsIgnoreCase(currMemberOfDNElements[currMemberOfDNElementsIndx]);
 							if (logger.isTraceEnabled()) {
 								logger.trace("check[{}] isMainMemberOfInSubTree = {} ('{}'=='{}'",
-										new Object[] { ii, isInSubTree,
-												singleDNElements[singleDNElements.length - 1 - ii],
-												currMemberOfDNElements[currMemberOfDNElements.length - 1 - ii] });
+										new Object[] { ii, isInSubTree, singleDNElements[singleDNElementsIndx],
+												currMemberOfDNElements[currMemberOfDNElementsIndx] });
 							}
 						}
 						if (logger.isWarnEnabled() && isInSubTree) {
@@ -500,6 +505,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 			for (LdapResult result : resultsList) {
 				G group = transform2UserGroup(result);
 				if (group != null && group.getName() != null) {
+					checkMembers(result, group);
 					target.put(group.getName().toUpperCase(), group);
 				}
 			}
@@ -507,6 +513,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 			for (LdapResult result : resultsList) {
 				G group = transform2UserGroup(result);
 				if (group != null && group.getName() != null) {
+					checkMembers(result, group);
 					String key = group.getName().toUpperCase();
 					G oldGroup = target.get(key);
 					if (!group.equals(oldGroup)) {
@@ -519,6 +526,40 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		return target;
 	}
 
+	private void checkMembers(LdapResult result, G group) throws NamingException {
+		if (group.getMembers() == null || group.getMembers().isEmpty()) {
+			/* spróbuję pobrać użytkowników po range */
+			try {
+				String roleId = result.get(lo.getRoleAttributeID()).get(0).getString();
+				String internalFilter = "(" + lo.getRoleAttributeID() + "=" + roleId + ")";
+				String memeberAttrName = lo.getGroupMemberAttribute();
+				if (logger.isDebugEnabled()) {
+					logger.debug("--> checkMembers: try get range for '{}': roleId={}",
+							new Object[] { memeberAttrName, internalFilter });
+				}
+				Set<String> members = new HashSet<String>();
+				LdapResult membersRange = getFactory().uniqueEntrySearchWithRangeAttr(memeberAttrName, internalFilter);
+				if (membersRange != null && membersRange.get(memeberAttrName) != null) {
+					for (LdapValue memberResult : membersRange.get(memeberAttrName)) {
+						if (memberResult.getValue() != null) {
+							String member = (String) memberResult.getValue();
+							if (!Constants.NULL_STRING.equalsIgnoreCase(member) && StringUtils.isNotBlank(member)) {
+								members.add(member);
+							}
+						}
+					}
+				}
+				group.setMembers(members);
+				if (logger.isDebugEnabled()) {
+					logger.debug("--> checkMembers: range execution result: roleId={}; group.members.size={}",
+							new Object[] { memeberAttrName, group.getMembers().size() });
+				}
+			} catch (UnsupportedEncodingException e) {
+				/* to się nie zdarzy! */
+			}
+		}
+	}
+	
 	/**
 	 * @return the LDAP context factory
 	 */
@@ -617,6 +658,7 @@ public abstract class LdapUserGroupAOSupport<G extends ILdapUserGroup> extends L
 		for (LdapResult result : resultsList) {
 			G group = transform2UserGroup(result);
 			if (group != null) {
+				checkMembers(result, group);
 				list.add(group);
 			}
 		}

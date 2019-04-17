@@ -42,6 +42,8 @@ public interface ILdapContextFactory {
 
 	LdapResult uniqueEntrySearch(String[] attrs, String searchFilter) throws NamingException;
 
+	LdapResult uniqueEntrySearchWithRangeAttr(String attributeName, String searchFilter) throws NamingException;
+
 	List<LdapResult> manyEntrySearch(String[] attrs, String searchFilter) throws NamingException;
 
 	/**

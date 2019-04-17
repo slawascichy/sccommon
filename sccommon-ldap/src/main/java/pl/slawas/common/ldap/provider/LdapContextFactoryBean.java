@@ -44,6 +44,7 @@ import javax.naming.ldap.PagedResultsResponseControl;
 
 import org.apache.commons.lang.StringUtils;
 
+import pl.slawas.common.ldap.api.Constants;
 import pl.slawas.common.ldap.api.ILdapAttribute;
 import pl.slawas.common.ldap.api.ILdapContextFactory;
 import pl.slawas.common.ldap.api.ILdapEntry4Changes;
@@ -61,6 +62,8 @@ import pl.slawas.twl4j.LoggerFactory;
  * 
  */
 public class LdapContextFactoryBean implements ILdapContextFactory {
+
+	private static final int RANGE_SIZE = 1000;
 
 	/**
 	 * Prefiks dodawany do nazwy jednostki organizacyjnej w celu zbudowania
@@ -298,6 +301,7 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Override
 	public LdapResult uniqueEntrySearch(String[] attrs, String searchFilter) throws NamingException {
 
 		NamingEnumeration results = null;
@@ -329,6 +333,74 @@ public class LdapContextFactoryBean implements ILdapContextFactory {
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Override
+	public LdapResult uniqueEntrySearchWithRangeAttr(String attributeName, String searchFilter) throws NamingException {
+
+		LdapResult searchResult = null;
+		if (baseCtx != null) {
+			boolean finallyFinished = false;
+			int step = 0;
+			List<LdapValue> values = new ArrayList<>();
+			while (!finallyFinished) {
+				int start = step * RANGE_SIZE;
+				int finish = start + (RANGE_SIZE - 1);
+				String range = start + "-" + finish;
+				SearchControls controls = new SearchControls();
+				controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+				String rangeAttributeName = attributeName + ";Range=" + range;
+				controls.setReturningAttributes(new String[] { rangeAttributeName });
+				NamingEnumeration<SearchResult> rangedEntries = baseCtx.search("", searchFilter, controls);
+				if (rangedEntries.hasMore()) {
+					SearchResult sr = (SearchResult) rangedEntries.next();
+					Attributes resultAttrs = sr.getAttributes();
+					NamingEnumeration<? extends Attribute> all = resultAttrs.getAll();
+					boolean hasMore = all.hasMore();
+					if (!hasMore) {
+						finallyFinished = true;
+						values.add(new LdapValue(Constants.NULL_STRING));
+						if (logger.isTraceEnabled()) {
+							logger.trace("-->uniqueEntrySearchWithRangeAttr: end because range does nit exists!");
+						}
+					}
+					while (hasMore) {
+						Attribute attribute = all.next();
+						String attrName = attribute.getID();
+						if (attrName.endsWith("*")) {
+							rangeAttributeName = attrName;
+							finallyFinished = true;
+						}
+						NamingEnumeration attrValues = attribute.getAll();
+						while (attrValues.hasMore()) {
+							Object objValue = attrValues.next();
+							if (objValue instanceof String) {
+								String value = (String) objValue;
+								values.add(new LdapValue(value));
+								logger.trace("{}: {}", new Object[] { rangeAttributeName, value });
+							} else if (objValue instanceof byte[]) {
+								byte[] value = (byte[]) objValue;
+								values.add(new LdapValue(value, Types.BLOB));
+							} else {
+								values.add(new LdapValue("Unknown type"));
+								logger.warn("{}: Unknown type {}",
+										new Object[] { rangeAttributeName, objValue.getClass().getName() });
+							}
+						}
+						hasMore = all.hasMore();
+					}
+				} else {
+					finallyFinished = true;
+				}
+				rangedEntries.close();
+				step++;
+			}
+			searchResult = new LdapResult();
+			searchResult.put(attributeName, values);
+		}
+		return searchResult;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
 	public List<LdapResult> manyEntrySearch(String[] attrs, String searchFilter) throws NamingException {
 
 		NamingEnumeration results = null;
