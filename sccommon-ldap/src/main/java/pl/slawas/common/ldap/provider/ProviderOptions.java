@@ -814,17 +814,17 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 	private static String escape(final String input) {
 
 		String s = input;
+		if (s.indexOf('\\') >= 0) {
+			// escape backslash
+			s = Strings.replaceAll(s, "\\", "\\\\");
+		}
 		if (s.indexOf('(') >= 0) {
 			// escape left parenthesis
 			s = Strings.replaceAll(s, "(", "\\(");
 		}
 		if (s.indexOf(')') >= 0) {
 			// escape right parenthesis
-			s = Strings.replaceAll(s, "(", "\\)");
-		}
-		if (s.indexOf('\\') >= 0) {
-			// escape backslash
-			s = Strings.replaceAll(s, "(", "\\\\");
+			s = Strings.replaceAll(s, ")", "\\)");
 		}
 		return s;
 	}
