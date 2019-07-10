@@ -31,8 +31,8 @@ import pl.slawas.common.ldap.dao.LdapAOHelper;
 import pl.slawas.common.ldap.provider.LdapObjectFactorySupport;
 import pl.slawas.common.ldap.provider.ProviderOptions;
 import pl.slawas.common.ldap.provider.beans.GroupCacheHashTable;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * GroupCacheLists - pomocnicze tablice z parametrami synchronizowanych grup. Za

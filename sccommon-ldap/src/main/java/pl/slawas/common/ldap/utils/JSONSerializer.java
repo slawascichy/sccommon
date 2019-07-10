@@ -15,8 +15,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import pl.slawas.helpers.PrimitiveType;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 

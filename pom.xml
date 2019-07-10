@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.slawas</groupId>
 	<artifactId>sccommon</artifactId>
@@ -30,6 +32,7 @@
 		<spring.ws.version>1.5.10</spring.ws.version>
 		<lucene.version>7.2.1</lucene.version>
 		<slf4j.version>1.5.2</slf4j.version>
+		<sccommon-utils.version>1.0.1-SNAPSHOT</sccommon-utils.version>
 	</properties>
 
 	<licenses>
@@ -92,13 +95,20 @@
 		</plugins>
 	</build>
 	<dependencies>
-
+		
 		<dependency>
-			<groupId>pl.slawas</groupId>
-			<artifactId>schelper</artifactId>
-			<version>0.0.12-SNAPSHOT</version>
+			<groupId>pl.slawas.sccommon</groupId>
+			<artifactId>sccommon-utils</artifactId>
+			<version>${sccommon-utils.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>persistence-api</artifactId>
+					<groupId>javax.persistence</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+	
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>

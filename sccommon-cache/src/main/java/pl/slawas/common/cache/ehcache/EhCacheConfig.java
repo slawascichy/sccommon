@@ -9,8 +9,8 @@ import org.apache.commons.lang.StringUtils;
 
 import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.helpers.Configurations;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 

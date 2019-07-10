@@ -17,11 +17,12 @@
 
 package pl.slawas.common.ldap.config;
 
+import org.apache.log4j.lf5.LogLevel;
+
 import com.ibm.ws.security.util.WSEncoderDecoder;
 
 import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.common.ldap.provider.ProviderOptions;
-import pl.slawas.twl4j.logger.LogLevel;
 
 /**
  * LdapConfigOptions - definicja stałych wykorzystywanych w konfiguracji

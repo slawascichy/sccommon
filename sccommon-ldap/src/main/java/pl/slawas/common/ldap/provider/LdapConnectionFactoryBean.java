@@ -28,8 +28,8 @@ import pl.slawas.common.ldap.api.ILdapUserGroup;
 import pl.slawas.common.ldap.api.LockSerializableObject;
 import pl.slawas.common.ldap.dao.LdapAOHelper;
 import pl.slawas.helpers.Strings;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * LdapConnectionFactoryBean klasa pomocnicza obsługująca wyszukiwanie w LDAP.

@@ -49,8 +49,8 @@ import pl.slawas.common.ldap.api.ILdapAttribute;
 import pl.slawas.common.ldap.api.ILdapContextFactory;
 import pl.slawas.common.ldap.api.ILdapEntry4Changes;
 import pl.slawas.common.ldap.dao.LdapAOHelper;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * LdapContextFactoryBean - główna implementacja kontekstu LDAP/AD z metodami

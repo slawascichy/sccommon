@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pl.slawas.common.ldap.api.ILdapUserGroup;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * GroupCacheLists - pomocnicze tablice z parametrami synchronizowanych grup. Za

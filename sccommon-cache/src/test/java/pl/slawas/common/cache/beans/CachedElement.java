@@ -3,7 +3,6 @@ package pl.slawas.common.cache.beans;
 import org.apache.commons.lang.StringUtils;
 
 import pl.slawas.entities.NameValuePair;
-import pl.slawas.xml.XMLNameValuePairUtils;
 
 public class CachedElement implements NameValuePair {
 
@@ -54,19 +53,11 @@ public class CachedElement implements NameValuePair {
 
 	/* Overridden (non-Javadoc) */
 	@Override
-	public String toXMLItem() {
-		return XMLNameValuePairUtils.toXMLItem(this).toString();
-	}
-
-	/* Overridden (non-Javadoc) */
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ (StringUtils.isBlank(name) ? 0 : name.hashCode());
-		result = prime * result
-				+ (StringUtils.isBlank(value) ? 0 : value.hashCode());
+		result = prime * result + (StringUtils.isBlank(name) ? 0 : name.hashCode());
+		result = prime * result + (StringUtils.isBlank(value) ? 0 : value.hashCode());
 		return result;
 	}
 
@@ -92,4 +83,5 @@ public class CachedElement implements NameValuePair {
 			return false;
 		return true;
 	}
+
 }

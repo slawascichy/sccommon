@@ -36,8 +36,8 @@ import pl.slawas.common.cache.IObjectCacheStatistics;
 import pl.slawas.common.cache.ObjectCacheStatisticsList;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.helpers.Strings;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 

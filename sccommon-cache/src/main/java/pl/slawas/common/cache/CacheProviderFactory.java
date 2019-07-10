@@ -15,8 +15,8 @@ import org.jdom.Element;
 
 import pl.slawas.common.cache.ehcache.EhCacheProvider;
 import pl.slawas.helpers.Strings;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 

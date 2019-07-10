@@ -16,8 +16,8 @@ import org.ehcache.expiry.ExpiryPolicy;
 import pl.slawas.common.cache.IObjectCache;
 import pl.slawas.common.cache.IObjectCacheStatistics;
 import pl.slawas.common.cache.exceptions.CacheErrorException;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 

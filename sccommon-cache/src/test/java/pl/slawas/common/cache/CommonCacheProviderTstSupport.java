@@ -24,8 +24,8 @@ import pl.slawas.common.cache.exceptions.CacheErrorException;
 import pl.slawas.common.cache.threads.SampleMultiClient;
 import pl.slawas.common.cache.threads.UserSynchronizationMultiClient;
 import pl.slawas.helpers.Strings;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommonCacheProviderTstSupport extends TestCase {
 

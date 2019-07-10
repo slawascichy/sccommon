@@ -9,12 +9,12 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.lf5.LogLevel;
 
 import com.ibm.ws.security.util.WSEncoderDecoder;
 
 import pl.slawas.common.ldap.api.Constants;
 import pl.slawas.common.ldap.provider.ProviderOptions;
-import pl.slawas.twl4j.logger.LogLevel;
 
 /**
  * 

@@ -14,6 +14,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.lf5.LogLevel;
+import org.apache.log4j.lf5.LogLevelFormatException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ibm.ws.security.util.WSEncoderDecoder;
 
@@ -30,9 +34,6 @@ import pl.slawas.common.ldap.provider.helpers.ProviderOptionsHelper;
 import pl.slawas.common.ldap.utils.UserAttributeUtils;
 import pl.slawas.helpers.Configurations;
 import pl.slawas.helpers.Strings;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
-import pl.slawas.twl4j.logger.LogLevel;
 
 /**
  * 
@@ -756,7 +757,11 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 		}
 		String lLogLevel = optionalOption(option_logLevel);
 		if (StringUtils.isNotBlank(lLogLevel)) {
-			this.logLevel = LogLevel.valueOf(lLogLevel.toUpperCase());
+			try {
+				this.logLevel = LogLevel.valueOf(lLogLevel.toUpperCase());
+			} catch (LogLevelFormatException e) {
+				/* ignoruję błąd i tak już przestarzałej akcji */
+			}
 		}
 
 		String lDefaultTaskNotification = optionalOption(option_defaultTaskNotification);

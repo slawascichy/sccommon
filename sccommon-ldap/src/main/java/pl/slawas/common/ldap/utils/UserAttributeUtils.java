@@ -45,7 +45,7 @@ import pl.slawas.common.ldap.provider.ProviderOptions;
 import pl.slawas.common.ldap.provider.beans.UserAttributeDefinition;
 import pl.slawas.common.ldap.provider.beans.UserAttributeList;
 import pl.slawas.helpers.Strings;
-import pl.slawas.twl4j.Logger;
+import org.slf4j.Logger;
 
 /**
  * UserAttributeUtils - narzędzia do obróbki atrybutów użytkowników

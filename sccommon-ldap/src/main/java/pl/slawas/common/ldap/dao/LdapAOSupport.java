@@ -10,7 +10,7 @@ import pl.slawas.common.ldap.api.ILdapContextFactory;
 import pl.slawas.common.ldap.api.ILdapEntry;
 import pl.slawas.common.ldap.api.ILdapEntry4Changes;
 import pl.slawas.common.ldap.provider.LdapResult;
-import pl.slawas.twl4j.Logger;
+import org.slf4j.Logger;
 
 public abstract class LdapAOSupport<T extends ILdapEntry> {
 

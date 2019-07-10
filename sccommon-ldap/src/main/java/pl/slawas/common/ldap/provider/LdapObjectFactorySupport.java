@@ -35,8 +35,8 @@ import pl.slawas.common.ldap.cache.LdapGroupsCache;
 import pl.slawas.common.ldap.cache.LdapGroupsCacheLists;
 import pl.slawas.common.ldap.provider.beans.GroupCacheHashTable;
 import pl.slawas.common.ldap.provider.exceptions.LdapObjectFactoryException;
-import pl.slawas.twl4j.Logger;
-import pl.slawas.twl4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
