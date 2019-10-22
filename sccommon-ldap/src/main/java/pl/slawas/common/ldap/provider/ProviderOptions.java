@@ -16,10 +16,9 @@ import javax.xml.bind.Marshaller;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.lf5.LogLevel;
 import org.apache.log4j.lf5.LogLevelFormatException;
+import org.eclipse.wst.common.internal.emf.utilities.EncoderDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ibm.ws.security.util.WSEncoderDecoder;
 
 import pl.slawas.common.cache.ehcache.EhCacheConfig;
 import pl.slawas.common.ldap.api.Constants;
@@ -34,6 +33,7 @@ import pl.slawas.common.ldap.provider.helpers.ProviderOptionsHelper;
 import pl.slawas.common.ldap.utils.UserAttributeUtils;
 import pl.slawas.helpers.Configurations;
 import pl.slawas.helpers.Strings;
+import pl.slawas.security.PasswordEncoder;
 
 /**
  * 
@@ -88,6 +88,8 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 	private static Object providerOptionsFromURLLock = new Object();
 	private static Map<String, ProviderOptions> providerOptionsFromURL = new HashMap<>();
 
+	private EncoderDecoder encoderDecoder;
+
 	/**
 	 * Mapa opcji (parametrów).
 	 */
@@ -104,7 +106,8 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 	/**
 	 * Hasło wykorzystywane podczas uwierzytelniania nawiązywanego połączenia - z
 	 * reguły hasło użytkownika technicznego. Hasło zakodowane metodą dostępną w
-	 * {@link WSEncoderDecoder}.
+	 * {@link PasswordEncoder}. Zobacz również parametr
+	 * {@link #credentialEncoderClass}.
 	 */
 	private String bindCredential;
 
@@ -371,6 +374,13 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 	 */
 	@Deprecated
 	private LogLevel logLevel = LogLevel.INFO;
+
+	/**
+	 * Nazwa klasy implementacji kodera haseł, przechowywanych w pliku z
+	 * konfiguracją. Opcjonalnie, w przypadku gdy nie zostanie zdefiniowana nazwa
+	 * klasy zostanie użyty domyślny enkoder.
+	 */
+	private String credentialEncoderClass;
 
 	/**
 	 * Obiekt statyczny instancji {@link ProviderOptions}.
@@ -781,6 +791,11 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 			this.useDefaultParams = Boolean.parseBoolean(lUseDefaultParams);
 		}
 
+		String extCredentialEncoderClass = optionalOption(option_credentialEncoderClass);
+		if (StringUtils.isNotBlank(extCredentialEncoderClass)) {
+			this.credentialEncoderClass = extCredentialEncoderClass;
+		}
+
 		this.config = new LdapConfig(options);
 	}
 
@@ -859,7 +874,14 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 	 * @return the {@link #bindCredential}
 	 */
 	public String getBindCredential() {
-		return (new WSEncoderDecoder()).decode(bindCredential);
+		if (encoderDecoder == null) {
+			PasswordEncoder encoder = new PasswordEncoder();
+			if (StringUtils.isNotBlank(this.credentialEncoderClass)) {
+				encoder.setEncoderClass(credentialEncoderClass);
+			}
+			encoderDecoder = encoder.getEncoderDecoder();
+		}
+		return encoderDecoder.decode(bindCredential);
 	}
 
 	/**
@@ -1181,6 +1203,8 @@ public class ProviderOptions extends LdapConfigOptions implements Serializable {
 		builder.append(getValue(defaultAlertOnAssignAndRun));
 		builder.append(", userGroupOptionsAreDefinded=");
 		builder.append(getValue(userGroupOptionsAreDefinded));
+		builder.append(", credentialEncoderClass=");
+		builder.append(getValue(credentialEncoderClass));
 		builder.append("]");
 		return builder.toString();
 	}

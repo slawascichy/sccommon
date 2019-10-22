@@ -11,10 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.lf5.LogLevel;
 
-import com.ibm.ws.security.util.WSEncoderDecoder;
-
 import pl.slawas.common.ldap.api.Constants;
 import pl.slawas.common.ldap.provider.ProviderOptions;
+import pl.slawas.security.PasswordEncoder;
 
 /**
  * 
@@ -40,7 +39,8 @@ public class LdapConfig extends LdapConfigOptions implements Serializable {
 	/**
 	 * Hasło wykorzystywane podczas uwierzytelniania nawiązywanego połączenia - z
 	 * reguły hasło użytkownika technicznego. Hasło zakodowane metodą dostępną w
-	 * {@link WSEncoderDecoder}.
+	 * {@link PasswordEncoder}. Zobacz również parametr
+	 * {@link #credentialEncoderClass}.
 	 */
 	private String bindCredential;
 
@@ -348,6 +348,13 @@ public class LdapConfig extends LdapConfigOptions implements Serializable {
 	private String cacheDynamicParametersPath = DEFAULT_CACHE_DYNAMIC_PARAMETERS_PATH;
 
 	/**
+	 * Nazwa klasy implementacji kodera haseł, przechowywanych w pliku z
+	 * konfiguracją. Opcjonalnie, w przypadku gdy nie zostanie zdefiniowana nazwa
+	 * klasy zostanie użyty domyślny enkoder.
+	 */
+	private String credentialEncoderClass;
+
+	/**
 	 * Podstawowy konstruktor
 	 */
 	public LdapConfig() {
@@ -431,6 +438,11 @@ public class LdapConfig extends LdapConfigOptions implements Serializable {
 		group2GroupTokenAttributeIsDN = (String) options.get(option_group2GroupTokenAttributeIsDN);
 		logLevel = (String) options.get(option_logLevel);
 		cacheDynamicParametersPath = (String) options.get(option_cacheDynamicParametersPath);
+
+		String extCredentialEncoderClass = (String) options.get(option_credentialEncoderClass);
+		if (StringUtils.isNotBlank(extCredentialEncoderClass)) {
+			credentialEncoderClass = extCredentialEncoderClass;
+		}
 	}
 
 	/**
@@ -533,6 +545,11 @@ public class LdapConfig extends LdapConfigOptions implements Serializable {
 		out.put(option_group2GroupTokenAttributeIsDN, group2GroupTokenAttributeIsDN);
 		out.put(option_logLevel, logLevel);
 		out.put(option_cacheDynamicParametersPath, cacheDynamicParametersPath);
+
+		if (StringUtils.isNotBlank(credentialEncoderClass)) {
+			out.put(option_credentialEncoderClass, credentialEncoderClass);
+		}
+
 		return out;
 	}
 
@@ -1268,6 +1285,21 @@ public class LdapConfig extends LdapConfigOptions implements Serializable {
 	 */
 	public void setExtendedAttributiesOptions(OptionsList extendedAttributiesOptions) {
 		this.extendedAttributiesOptions = extendedAttributiesOptions;
+	}
+
+	/**
+	 * @return the {@link #credentialEncoderClass}
+	 */
+	public String getCredentialEncoderClass() {
+		return credentialEncoderClass;
+	}
+
+	/**
+	 * @param credentialEncoderClass
+	 *            the {@link #credentialEncoderClass} to set
+	 */
+	public void setCredentialEncoderClass(String credentialEncoderClass) {
+		this.credentialEncoderClass = credentialEncoderClass;
 	}
 
 }

@@ -14,6 +14,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<sccommon-utils.version>1.0.2-SNAPSHOT</sccommon-utils.version>
 	</properties>
 
 	<build>
@@ -45,6 +46,24 @@
 	</build>
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>pl.slawas.sccommon</groupId>
+			<artifactId>sccommon-utils</artifactId>
+			<version>${sccommon-utils.version}</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>persistence-api</artifactId>
+					<groupId>javax.persistence</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>pro.ibpm.gs</groupId>
+					<artifactId>db2odbcconfigreader</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -57,17 +76,18 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- API potrzebne np. do kodowania haseł - START -->
+		<!-- Specjalnie przygotowana klasa do kompilacji biblioteki -->
+		<dependency>
+			<groupId>pl.slawas.sccommon</groupId>
+			<artifactId>sccommon-eclipse-emf-api</artifactId>
+			<version>1.1.104</version>
+		</dependency>
+		<!-- API potrzebne np. do kodowania haseł - KONIEC -->
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.9</version>
-		</dependency>
-		<!-- potrzebne np. do kodowania haseł -->
-		<dependency>
-			<groupId>pro.ibpm</groupId>
-			<artifactId>ibm-ws-security-util</artifactId>
-			<version>7.0.0</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- potrzebne weryfikacji poprawności działania serializatora JSON'a, 
@@ -83,6 +103,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- potrzebne np. do kodowania haseł podczas testów -->
+		<dependency>
+			<groupId>pro.ibpm</groupId>
+			<artifactId>ibm-ws-security-util</artifactId>
+			<version>7.0.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

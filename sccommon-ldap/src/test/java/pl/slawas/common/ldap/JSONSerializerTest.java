@@ -148,7 +148,8 @@ public class JSONSerializerTest extends TestCase {
 				assertTrue(value.equals(testObj.getSn()));
 			}
 			if ("are".equals(key)) {
-				assertTrue(value.equals(testObj.getAge()));
+				Integer intValue = Integer.parseInt(value);
+				assertTrue(intValue.equals(testObj.getAge()));
 			}
 		}
 

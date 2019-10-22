@@ -19,10 +19,9 @@ package pl.slawas.common.ldap.config;
 
 import org.apache.log4j.lf5.LogLevel;
 
-import com.ibm.ws.security.util.WSEncoderDecoder;
-
 import pl.slawas.common.cache.CacheConstants;
 import pl.slawas.common.ldap.provider.ProviderOptions;
+import pl.slawas.security.PasswordEncoder;
 
 /**
  * LdapConfigOptions - definicja stałych wykorzystywanych w konfiguracji
@@ -137,7 +136,8 @@ public class LdapConfigOptions {
 	/**
 	 * Nazwa opcji dla: Hasło wykorzystywane podczas uwierzytelniania nawiązywanego
 	 * połączenia - z reguły hasło użytkownika technicznego. Hasło zakodowane metodą
-	 * dostępną w {@link WSEncoderDecoder}.
+	 * dostępną w {@link PasswordEncoder}. Zobacz również parametr
+	 * 'credentialEncoderClass'.
 	 */
 	public static final String option_bindCredential = "bindCredential";
 
@@ -406,5 +406,12 @@ public class LdapConfigOptions {
 	 * 
 	 */
 	public static final String option_cacheDynamicParametersPath = "cacheDynamicParametersPath";
+
+	/**
+	 * Nazwa opcji, która definiuje klasę implementacji kodera haseł,
+	 * przechowywanych w pliku z konfiguracją. Opcjonalnie, w przypadku gdy nie
+	 * zostanie zdefiniowana nazwa klasy zostanie użyty domyślny enkoder.
+	 */
+	public static final String option_credentialEncoderClass = "credentialEncoderClass";
 
 }
