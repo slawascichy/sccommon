@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.slawas</groupId>
 	<artifactId>sccommon</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<name>SC Common</name>
 	<description>SC Common Librares Main Project</description>
 
@@ -32,7 +32,7 @@
 		<spring.ws.version>1.5.10</spring.ws.version>
 		<lucene.version>7.2.1</lucene.version>
 		<slf4j.version>1.5.2</slf4j.version>
-		<sccommon-utils.version>1.0.1-SNAPSHOT</sccommon-utils.version>
+		<sccommon-utils.version>1.0.2</sccommon-utils.version>
 	</properties>
 
 	<licenses>
@@ -46,7 +46,15 @@
 		<name>Sci Software</name>
 		<url>http://scisoftware.pl</url>
 	</organization>
-
+	
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub slawascichy Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/slawascichy/sccommon</url>
+		</repository>
+	</distributionManagement>
+	
 	<build>
 		<extensions>
 			<extension>

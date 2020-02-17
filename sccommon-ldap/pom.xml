@@ -7,14 +7,13 @@
 	<parent>
 		<groupId>pl.slawas</groupId>
 		<artifactId>sccommon</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.0.2</version>
 	</parent>
 	<artifactId>sccommon-ldap</artifactId>
 	<name>sccommon-ldap</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sccommon-utils.version>1.0.2-SNAPSHOT</sccommon-utils.version>
 	</properties>
 
 	<build>
@@ -56,10 +55,6 @@
 				<exclusion>
 					<artifactId>persistence-api</artifactId>
 					<groupId>javax.persistence</groupId>
-				</exclusion>
-				<exclusion>
-					<groupId>pro.ibpm.gs</groupId>
-					<artifactId>db2odbcconfigreader</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
