@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>pl.slawas</groupId>
 		<artifactId>sccommon</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>sccommon-ldap</artifactId>
 	<name>sccommon-ldap</name>
