@@ -1,0 +1,31 @@
+package pl.slawas.common.mail.box;
+
+import java.util.Calendar;
+
+import pl.slawas.common.mail.helpers.MessageHelper;
+
+public class MailBoxVersion {
+
+	public static final String MailBoxName = "${project.name}";
+	public static final String MailVersion = "${project.version}";
+	public static final String MailBoxArtefactId = "${project.artifactId}";
+	public static final String MailBoxOrgName = "${project.organization.name}";
+	public static final String MailBoxOrgUrl = "${project.organization.url}";
+	public static final String MailBoxCopyrightYear = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+
+	/**
+	 * Nazwa pliku z logo organizacji - powinno się znaleźć w pakiecie z klasą
+	 * {@link MessageHelper} w katalogu src/main/resources.
+	 */
+	public static final String SCISOFTWARE_LOGO_FILE_NAME = "logo48x43.png";
+	public static final String SCISOFTWARE_LOGO_PATH = "/"
+			+ MessageHelper.class.getPackage().getName().replace(".", "/");
+	/** typ kontent załączanego loga */
+	public static final String SCISOFTWARE_LOGO_CONTENT_TYPE = String.format("image/png; name=\"%s\"",
+			SCISOFTWARE_LOGO_FILE_NAME);
+	/** Logo organizacji w base64 */
+	public static final String SCISOFTWARE_LOGO = "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";
+	/** Identyfikator CID logo */
+	public static final String SCISOFTWARE_LOGO_CID = SCISOFTWARE_LOGO_FILE_NAME + "@01D1D771.scisoftware";
+
+}

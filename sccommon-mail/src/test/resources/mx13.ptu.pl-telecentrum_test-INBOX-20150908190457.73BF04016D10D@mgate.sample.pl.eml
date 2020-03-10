@@ -1,0 +1,81 @@
+Received: from MX132.ptu.pl (10.0.1.24) by MX131.ptu.pl (10.0.1.23) with
+ Microsoft SMTP Server (TLS) id 15.0.1076.9 via Mailbox Transport; Tue, 8 Sep
+ 2015 21:04:50 +0200
+Received: from MX131.ptu.pl (10.0.1.23) by MX132.ptu.pl (10.0.1.24) with
+ Microsoft SMTP Server (TLS) id 15.0.1076.9; Tue, 8 Sep 2015 21:04:57 +0200
+Received: from mgate.sample.pl (212.160.138.229) by MX131.ptu.pl (10.0.1.23)
+ with Microsoft SMTP Server (TLS) id 15.0.1076.9 via Frontend Transport; Tue,
+ 8 Sep 2015 21:04:50 +0200
+Received: from mgate.sample.pl (localhost [127.0.0.1])
+	by mgate.sample.pl (Proxmox) with ESMTP id 73BF04016D10D
+	for <telecentrum_test@sample.pl>; Tue,  8 Sep 2015 21:04:57 +0200 (CEST)
+Received-SPF: pass (artseo.com.pl: 188.40.106.73 is authorized to use 'biuro@artseo.com.pl' in 'mfrom' identity (mechanism 'a' matched)) receiver=mgate.sample.pl; identity=mailfrom; envelope-from="biuro@artseo.com.pl"; helo=s55.linuxpl.com; client-ip=188.40.106.73
+Received: from s55.linuxpl.com (s55.linuxpl.com [188.40.106.73])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mgate.sample.pl (Proxmox) with ESMTPS id 0AA5240100CA9
+	for <telecentrum_test@sample.pl>; Tue,  8 Sep 2015 21:04:45 +0200 (CEST)
+Received: from [176.221.121.183] (helo=ITLCI)
+	by s55.linuxpl.com with esmtpsa (TLSv1:AES128-SHA:128)
+	(Exim 4.83)
+	(envelope-from <biuro@artseo.com.pl>)
+	id 1ZZOBx-00044j-9z
+	for telecentrum_test@sample.pl; Tue, 08 Sep 2015 21:04:29 +0200
+From: <biuro@artseo.com.pl>
+To: "=?utf-8?Q?telecentrum=5Ftest@sample.pl?=" <telecentrum_test@sample.pl>
+Subject: =?utf-8?Q?Testy_numer=C3=B3w_szk=C3=B3d?=
+Date: Tue, 8 Sep 2015 19:03:35 +0000
+Content-Type: multipart/alternative;
+	boundary="_7F7349A3-A980-4E6A-A755-8CB7F1C83A0D_"
+X-Proxmox-CTCH-Refid: str=0001.0A0C0204.55EF3154.0094,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+X-SPAM-LEVEL: Spam detection results:  0
+	BAYES_00                 -1.9 Bayes spam probability is 0 to 1%
+	HTML_MESSAGE            0.001 HTML included in message
+	MISSING_MID             0.497 Missing Message-Id: header
+	RCVD_IN_DNSWL_LOW        -0.7 Sender listed at http://www.dnswl.org/, low trust
+	SPF_PASS               -0.001 SPF: sender matches SPF record
+Message-ID: <20150908190457.73BF04016D10D@mgate.sample.pl>
+Return-Path: biuro@artseo.com.pl
+X-MS-Exchange-Organization-Network-Message-Id: c48c11ac-aa57-4dc7-bb98-08d2b8806361
+X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
+X-MS-Exchange-Organization-AuthSource: MX131.ptu.pl
+X-MS-Exchange-Organization-AuthAs: Anonymous
+MIME-Version: 1.0
+
+--_7F7349A3-A980-4E6A-A755-8CB7F1C83A0D_
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; format=flowed
+
+VGVzdHkgMDAwMTIzNDU2Nw0KDQphc2RmYXNkZnNhc2RmIDIyMjk5OTg4ODcNCg0KZGZnc2RmZ3Nk
+ZmcgMDAwMjIyOTk5OA0KDQpkc2Znc2RmZ2RzZmYgMzQzMzQzNTU1NA0KDQpnZmRzZ3NkZmdzZCAw
+MDA5OTk4ODg3DQoNCmFzZGZhc2RmYXNkZiAxMjM0NTY3ODkwDQoNCg0KZHNmZ3NkZmdz
+
+--_7F7349A3-A980-4E6A-A755-8CB7F1C83A0D_
+Content-Transfer-Encoding: base64
+Content-Type: text/html; charset="utf-8"; format=flowed
+
+PGh0bWw+PGhlYWQ+DQo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNvbnRlbnQ9InRl
+eHQvaHRtbDsgY2hhcnNldD11dGYtOCI+PG1ldGEgbmFtZT0iZ2VuZXJhdG9yIiBjb250ZW50PSJX
+aW5kb3dzIE1haWwgMTcuNS45NjAwLjIwOTExIj4KPHN0eWxlIGRhdGEtZXh0ZXJuYWxzdHlsZT0i
+dHJ1ZSI+PCEtLQpwLk1zb0xpc3RQYXJhZ3JhcGgsIGxpLk1zb0xpc3RQYXJhZ3JhcGgsIGRpdi5N
+c29MaXN0UGFyYWdyYXBoIHsKbWFyZ2luLXRvcDowaW47Cm1hcmdpbi1yaWdodDowaW47Cm1hcmdp
+bi1ib3R0b206MGluOwptYXJnaW4tbGVmdDouNWluOwptYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cn0K
+cC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05vcm1hbCB7Cm1hcmdpbjowaW47Cm1h
+cmdpbi1ib3R0b206LjAwMDFwdDsKfQpwLk1zb0xpc3RQYXJhZ3JhcGhDeFNwRmlyc3QsIGxpLk1z
+b0xpc3RQYXJhZ3JhcGhDeFNwRmlyc3QsIGRpdi5Nc29MaXN0UGFyYWdyYXBoQ3hTcEZpcnN0LCAK
+cC5Nc29MaXN0UGFyYWdyYXBoQ3hTcE1pZGRsZSwgbGkuTXNvTGlzdFBhcmFncmFwaEN4U3BNaWRk
+bGUsIGRpdi5Nc29MaXN0UGFyYWdyYXBoQ3hTcE1pZGRsZSwgCnAuTXNvTGlzdFBhcmFncmFwaEN4
+U3BMYXN0LCBsaS5Nc29MaXN0UGFyYWdyYXBoQ3hTcExhc3QsIGRpdi5Nc29MaXN0UGFyYWdyYXBo
+Q3hTcExhc3QgewptYXJnaW4tdG9wOjBpbjsKbWFyZ2luLXJpZ2h0OjBpbjsKbWFyZ2luLWJvdHRv
+bTowaW47Cm1hcmdpbi1sZWZ0Oi41aW47Cm1hcmdpbi1ib3R0b206LjAwMDFwdDsKbGluZS1oZWln
+aHQ6MTE1JTsKfQotLT48L3N0eWxlPjwvaGVhZD4KPGJvZHkgZGlyPSJsdHIiPgo8ZGl2IGRhdGEt
+ZXh0ZXJuYWxzdHlsZT0iZmFsc2UiIGRpcj0ibHRyIiBzdHlsZT0iZm9udC1mYW1pbHk6ICdDYWxp
+YnJpJywgJ1NlZ29lIFVJJywgJ01laXJ5bycsICdNaWNyb3NvZnQgWWFIZWkgVUknLCAnTWljcm9z
+b2Z0IEpoZW5nSGVpIFVJJywgJ01hbGd1biBHb3RoaWMnLCAnc2Fucy1zZXJpZic7Zm9udC1zaXpl
+OjEycHQ7Ij48ZGl2PlRlc3R5IDAwMDEyMzQ1Njc8L2Rpdj48ZGl2PmFzZGZhc2Rmc2FzZGYgMjIy
+OTk5ODg4NzwvZGl2PjxkaXY+ZGZnc2RmZ3NkZmcgMDAwMjIyOTk5ODwvZGl2PjxkaXY+ZHNmZ3Nk
+Zmdkc2ZmIDM0MzM0MzU1NTQ8L2Rpdj48ZGl2PmdmZHNnc2RmZ3NkIDAwMDk5OTg4ODc8L2Rpdj48
+ZGl2PmFzZGZhc2RmYXNkZiAxMjM0NTY3ODkwPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5kc2Zn
+c2RmZ3M8L2Rpdj48ZGl2Pjxicj48L2Rpdj48L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
+
+--_7F7349A3-A980-4E6A-A755-8CB7F1C83A0D_--
