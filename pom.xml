@@ -7,22 +7,6 @@
 	<name>SC Common</name>
 	<description>SC Common Librares Main Project</description>
 
-	<developers>
-		<developer>
-			<id>slawas</id>
-			<name>Sławomir Cichy</name>
-			<email>slawas@slawas.pl</email>
-			<roles>
-				<role>developer</role>
-				<role>manager</role>
-			</roles>
-			<url>
-				http://slawas.pl
-			</url>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
-
 	<properties>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,13 +17,27 @@
 		<sccommon-utils.version>1.0.2</sccommon-utils.version>
 	</properties>
 
+	<developers>
+		<developer>
+			<id>slawas</id>
+			<name>Sławomir Cichy</name>
+			<email>slawas@slawas.pl</email>
+			<roles>
+				<role>developer</role>
+				<role>manager</role>
+			</roles>
+			<url>http://slawas.pl</url>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+	
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
 		</license>
 	</licenses>
-	<url>http://scisoftware.pl/SC/Utils/${artifactId}/index.html</url>
+	<url>https://github.com/slawascichy/sccommon</url>
 	<organization>
 		<name>Sci Software</name>
 		<url>http://scisoftware.pl</url>
